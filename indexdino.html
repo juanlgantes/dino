@@ -5072,7 +5072,7 @@
                 this.skipTurns = [0, 0];
                 this.DINOS = [5, 9, 14, 18, 23, 27, 32, 36, 41, 45, 50, 54, 59];
 
-                // Special Cells
+                // Special Cells (Dino Path v17.1)
                 this.SPECIALS = {
                     6: { type: 'puente', target: 12, msg: '¡De Puente a Puente! 🌉' },
                     12: { type: 'puente', target: 6, msg: '¡De Puente a Puente! 🌉' },
@@ -5080,7 +5080,7 @@
                     31: { type: 'pozo', skip: 2, msg: '¡Al Pozo! Pierdes 2 turnos 🕳️' },
                     42: { type: 'laberinto', target: 30, msg: '¡Laberinto! Retrocedes al 30 🌀' },
                     52: { type: 'carcel', skip: 3, msg: '¡Cárcel! Pierdes 3 turnos ⛓️' },
-                    58: { type: 'muerte', target: 1, msg: '¡Calavera! Vuelves a empezar 💀' }
+                    58: { type: 'meteorito', target: 1, msg: '¡Oh no, un meteorito! Vuelve a empezar ☄️' }
                 };
 
                 this.init();
@@ -5091,6 +5091,7 @@
                 if (this.app.audio.muted) return;
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'es-ES';
+                utterance.rate = 1.2;
                 window.speechSynthesis.speak(utterance);
             }
 
@@ -5104,7 +5105,7 @@
 
                 // Title
                 const title = document.createElement('h2');
-                title.textContent = '🦆 Juego de la Oca';
+                title.textContent = '🦕 El Camino del Dino';
                 title.style.color = '#2c3e50';
                 title.style.fontSize = '3em';
                 title.style.marginBottom = '30px';
@@ -5138,7 +5139,7 @@
                 this.gameMode = mode;
                 this.msg = (mode === 'hybrid') ? 'Tira tu dado y anota 📝' : 'Tira el dado 🎲';
                 this.setupBoard();
-                this.speak("¡Bienvenido al Juego de la Oca!");
+                this.speak("¡Bienvenido al Camino del Dino!");
             }
 
             setupBoard() {
@@ -5241,14 +5242,14 @@
                     cell.style.gridColumn = `${pos.c + 1}`;
 
                     // Styling
-                    if (this.DINOS.includes(i)) { cell.style.background = '#fad390'; cell.innerHTML = '🦆<br>' + i; }
+                    if (this.DINOS.includes(i)) { cell.style.background = '#fad390'; cell.innerHTML = '🦕<br>' + i; }
                     if (i === 6 || i === 12) { cell.style.background = '#74b9ff'; cell.innerHTML = '🌉<br>' + i; }
                     if (i === 19) cell.innerHTML = '🏨<br>' + i;
                     if (i === 31) cell.innerHTML = '🕳️<br>' + i;
                     if (i === 42) cell.innerHTML = '🌀<br>' + i;
                     if (i === 52) cell.innerHTML = '⛓️<br>' + i;
-                    if (i === 58) cell.innerHTML = '💀<br>' + i;
-                    if (i === 63) { cell.style.background = '#55efc4'; cell.innerHTML = '🏁<br>' + i; }
+                    if (i === 58) cell.innerHTML = '☄️<br>' + i;
+                    if (i === 63) { cell.style.background = '#55efc4'; cell.innerHTML = '🥚<br>' + i; }
 
                     board.appendChild(cell);
                 }
@@ -5339,8 +5340,8 @@
                     const nextIdx = this.DINOS.indexOf(pos) + 1;
                     const nextOca = this.DINOS[nextIdx] || 63;
 
-                    this.statusEl.textContent = '¡De Oca a Oca! 🦆';
-                    this.speak("¡De Oca a Oca y tiro porque me toca!");
+                    this.statusEl.textContent = '¡De Dino a Dino! 🦕';
+                    this.speak("¡De Dino a Dino y tiro porque me toca!");
 
                     this.pieces[pIdx] = nextOca;
                     this.updatePieces();
