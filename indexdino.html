@@ -15,17 +15,17 @@
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>v17.0 "Dino Oca"</title>
-    <!-- 
+    <!--
         CHANGELOG v17.0
         - [FEATURE] Nuevo Juego: "El Juego de la Oca" (GooseGame).
         - [FEATURE] Oca: 3 Modos (1P vs Dino, 2P Local, Híbrido con Dado Real).
         - [FEATURE] Oca: Tablero visual 8x8 con recorrido serpiente.
         - [FEATURE] Oca: Reglas completas (Oca, Puente, Posada, Pozo, Laberinto, Muerte).
-        
+
         CHANGELOG v16.9
         - [FEATURE] Parchis: Modo Híbrido (Dado Real) añadido. Permite introducir manualmente el resultado del dado.
         - [FIX] Parchis: Mejora en la estabilidad de la lógica de turnos (corrección "Roll again on 6").
-        
+
         CHANGELOG v16.8
         - [FEATURE] Parchis: Modo 1 Jugador (vs Dino) y 2 Jugadores (Local) añadido.
 
@@ -1446,7 +1446,7 @@
                 // Dino Character (Composite: Dino + Board)
                 this.dinoEl = document.createElement('div');
                 this.dinoEl.style.cssText = `
-                    position: absolute; bottom: 15%; left: 50%; 
+                    position: absolute; bottom: 15%; left: 50%;
                     transform: translateX(-50%); pointer-events: none;
                     z-index: 10; display: flex; flex-direction: column; align-items: center;
                 `;
@@ -1734,7 +1734,7 @@
                 btn.textContent = '👟 CHUTAR';
                 btn.className = 'mode-btn kid';
                 btn.style.cssText = `
-                    position: absolute; bottom: 20px; right: 20px; 
+                    position: absolute; bottom: 20px; right: 20px;
                     background: #ff5722; width: auto; font-size: 1.2em;
                     z-index: 20;
                 `;
@@ -1744,7 +1744,7 @@
                 // Score UI
                 this.scoreEl = document.createElement('div');
                 this.scoreEl.style.cssText = `
-                    position: absolute; top: 10px; left: 10px; 
+                    position: absolute; top: 10px; left: 10px;
                     background: rgba(0,0,0,0.5); color: white; padding: 10px 20px;
                     border-radius: 20px; font-size: 1.5em; z-index:20;
                 `;
@@ -2783,7 +2783,7 @@
                 // FIX: Relative/Static positioning, flex wrap for small screens
                 bar.style.cssText = `
                     width: 95%; min-height: 80px; margin: 0 auto 10px auto;
-                    background: white; border-radius: 20px; 
+                    background: white; border-radius: 20px;
                     display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px;
                     box-shadow: 0 5px 15px rgba(0,0,0,0.1); padding: 10px; box-sizing: border-box; flex-shrink: 0;
                 `;
@@ -3207,7 +3207,7 @@
                             { x: 0.7, y: 0.8 }, // 6 Bot Right Wing Tip
                             { x: 0.8, y: 0.5 }, // 7 Mid Right Wing
                             { x: 0.7, y: 0.2 }, // 8 Top Right Wing Tip
-                            { x: 0.5, y: 0.4 }, // 9 Upper Center 
+                            { x: 0.5, y: 0.4 }, // 9 Upper Center
                             { x: 0.5, y: 0.2 }  // 10 Antenna/Head
                         ]
                     }
@@ -3360,7 +3360,7 @@
 
             finishLevel() {
                 this.draw();
-                // Close shape if needed? 
+                // Close shape if needed?
                 // For fish: 10 connects to 1? My points list has 10 as close to 1.
                 // Let's connect last to first to close loop if it's the Fish
                 if (this.level === 0) {
@@ -3446,7 +3446,7 @@
                         }
                         /* Controls */
                         .clock-controls {
-                            display: flex; flex-wrap: wrap; 
+                            display: flex; flex-wrap: wrap;
                             justify-content: center; gap: 8px;
                             width: 100%;
                         }
@@ -3457,7 +3457,7 @@
                         }
                         /* Main Content Area */
                         .clock-content {
-                            flex-grow: 1; display: flex; 
+                            flex-grow: 1; display: flex;
                             flex-direction: column; align-items: center; justify-content: center;
                             width: 100%; position: relative;
                         }
@@ -3465,7 +3465,7 @@
                         .clock-face-v2 {
                             width: 50vmin; height: 50vmin; /* Reduced from 60 to fit better */
                             border-radius: 50%; border: 1vmin solid white;
-                            position: relative; 
+                            position: relative;
                             margin: 10px 0; /* Add Breathing room */
                             box-shadow: 0 1vmin 3vmin rgba(0,0,0,0.4);
                             touch-action: none;
@@ -3480,14 +3480,14 @@
                         /* Hands */
                         .hand-hour-v2 {
                             position: absolute; bottom: 50%; left: 50%;
-                            width: 2vmin; height: 16vmin; 
+                            width: 2vmin; height: 16vmin;
                             background: #333; border-radius: 2vmin;
                             transform-origin: bottom center; z-index: 10;
                             box-shadow: 0 0 1vmin rgba(0,0,0,0.5);
                         }
                         .hand-min-v2 {
                             position: absolute; bottom: 50%; left: 50%;
-                            width: 1vmin; height: 22vmin; 
+                            width: 1vmin; height: 22vmin;
                             background: #e74c3c; border-radius: 1vmin;
                             transform-origin: bottom center; z-index: 10;
                             box-shadow: 0 0 1vmin rgba(0,0,0,0.5);
@@ -3500,11 +3500,11 @@
                         }
                         .digital-box {
                             background: #2c3e50; border-radius: 2vmin;
-                            border: 0.5vmin solid #95a5a6; 
+                            border: 0.5vmin solid #95a5a6;
                             padding: 1vmin 2vmin;
                             text-align: center; margin-top: 10px;
                             /* Static Flow for Mobile */
-                            position: static; 
+                            position: static;
                             margin-bottom: 20px;
                         }
                         .digital-text {
@@ -3515,18 +3515,18 @@
                         /* --- LANDSCAPE MOBILE (Small Screens) --- */
                         @media (min-aspect-ratio: 1/1) and (max-width: 1024px) {
                             .clock-layout {
-                                flex-direction: row; 
-                                justify-content: center; 
+                                flex-direction: row;
+                                justify-content: center;
                                 align-items: stretch; /* Ensure full height to avoid entering clipping */
                                 gap: 20px;
                             }
                             .clock-controls {
-                                flex-direction: column; width: auto; 
+                                flex-direction: column; width: auto;
                                 align-items: flex-end; justify-content: center;
                                 height: 100%;
                             }
                             .clock-controls .mode-btn {
-                                font-size: 4vmin !important; 
+                                font-size: 4vmin !important;
                             }
                             .clock-face-v2 {
                                 width: 50vmin; height: 50vmin; /* Reduced further */
@@ -3550,7 +3550,7 @@
                         /* --- DESKTOP PC (Large Screens) --- */
                         @media (min-width: 1025px) {
                             .clock-layout {
-                                flex-direction: row; 
+                                flex-direction: row;
                                 justify-content: center;
                                 gap: 40px; /* Spacious gap for PC */
                                 max-width: 1200px; /* Constrain width on huge monitors */
@@ -3594,8 +3594,8 @@
                             .clock-content {
                                 flex-direction: column; /* Stack Title and (Clock+Digital) */
                             }
-                            /* Wrap Clock and Digital in a row container? 
-                               Actually, let's keep it simple: layout row. 
+                            /* Wrap Clock and Digital in a row container?
+                               Actually, let's keep it simple: layout row.
                             */
                         }
                     `;
@@ -3713,7 +3713,7 @@
 
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     // Use relative check (radius is approx width/2)
-                    // width is 60vmin. rect.width is pixels. 
+                    // width is 60vmin. rect.width is pixels.
                     // Let's use % distance relative to radius.
                     const radius = rect.width / 2;
                     const distPercent = (dist / radius) * 100; // 0 to 100 (edge)
@@ -3858,8 +3858,8 @@
                 boardEl.className = 'c4-board';
                 // Dynamic grid style
                 boardEl.style.cssText = `
-                    display: grid; 
-                    grid-template-columns: repeat(7, 1fr); 
+                    display: grid;
+                    grid-template-columns: repeat(7, 1fr);
                     gap: 1vmin;
                     padding: 1vmin;
                     background: #3498db;
@@ -3939,7 +3939,7 @@
             dinoMove() {
                 if (this.gameOver) return;
 
-                // Simple AI: 
+                // Simple AI:
                 // 1. Check if can win directly
                 // 2. Check if must block player win
                 // 3. Random valid move
@@ -4142,8 +4142,8 @@
                 const boardEl = document.createElement('div');
                 boardEl.className = 'checkers-board';
                 boardEl.style.cssText = `
-                    display: grid; 
-                    grid-template-columns: repeat(8, 1fr); 
+                    display: grid;
+                    grid-template-columns: repeat(8, 1fr);
                     width: 90vmin; max-width: 600px; aspect-ratio: 1/1;
                     border: 1vmin solid #5d4037;
                     background: #f0d9b5;
@@ -4475,7 +4475,7 @@
                 this.waitingRoll = true;
                 // Pieces: 0-3 Red, 4-7 Yellow. Value = position index (0=Home, 1..68=Path, >100=Goal)
                 // Let's us a simple path model:
-                // Shared Path: 1 to 68. 
+                // Shared Path: 1 to 68.
                 // Red Start: 5. Red Goal Entry: 68 -> 101..107 (Winner).
                 // Yellow Start: 22. Yellow Goal Entry: 17 -> 201..207 (Winner).
                 this.pieces = [0, 0, 0, 0, 0, 0, 0, 0]; // 0=Home
@@ -4693,7 +4693,7 @@
                 // Let's implement static mapping for key milestones to avoid complex math.
                 // Or simplified cycle.
 
-                /* 
+                /*
                    Grid 11x11.
                    Outer Path clockwise:
                    (4,0)->(4,4)->(0,4)->(0,6)->(4,6)->(4,10)->(6,10)->(6,6)->(10,6)->(10,4)->(6,4)->(6,0)->Loop
@@ -4713,13 +4713,13 @@
 
                 // Map linear path index to (x,y)
                 // This is the tricky part. For a pure Agent approach, let's look-up table or logic?
-                // Logic: 
-                // Segments: 
+                // Logic:
+                // Segments:
                 // 1. Red Start (4,0) -> Right to (4,4) -> Up to (0,4) -> Right (0,6) -> Down (4,6) -> Right (4,10) ...
 
                 // Let's define key waypoints and interpolate.
                 // Actually, for robust movement, let's hardcode the ~40 cells coords is safest.
-                // Or use a "Walk" function. 
+                // Or use a "Walk" function.
 
                 // SIMPLIFIED MAP (11x11):
                 // 04,00 (Start Red) -> 04,01 -> 04,02 -> 04,03 -> 04,04
@@ -4906,7 +4906,7 @@
                 // 2. In Goal Already
                 if (pos > 100) {
                     // Red Goal: 100+, Yellow Goal: 200+
-                    const goalMax = isRed ? 107 : 207; // 100 + 7 steps logic? 
+                    const goalMax = isRed ? 107 : 207; // 100 + 7 steps logic?
                     // Let's assume path logic led to 100+ being safely inside.
                     // If we just add steps, we need to check limit.
                     // Original code: if (pos + steps <= 105) ...
@@ -5062,16 +5062,17 @@
             constructor(data, container) {
                 this.data = data;
                 this.c = container;
-                this.pieces = [1, 1]; // P1 (Red), P2 (Yellow). Start at 1.
-                this.turn = 1; // 1=Red, 2=Yellow
-                this.gameMode = 'pve'; // pve | pvp | hybrid
+                this.app = window.app; // Access to global audio engine
+                this.pieces = [1, 1];
+                this.turn = 1;
+                this.gameMode = 'pve';
                 this.diceVal = null;
-                this.waitingRoll = false;
+                this.waitingRoll = true;
                 this.gameOver = false;
-                this.skipTurns = [0, 0]; // P1, P2 skip counter
-                this.msg = 'Selecciona Modo 🎮';
+                this.skipTurns = [0, 0];
+                this.DINOS = [5, 9, 14, 18, 23, 27, 32, 36, 41, 45, 50, 54, 59];
 
-                // Game Board Data (Special Cells)
+                // Special Cells
                 this.SPECIALS = {
                     6: { type: 'puente', target: 12, msg: '¡De Puente a Puente! 🌉' },
                     12: { type: 'puente', target: 6, msg: '¡De Puente a Puente! 🌉' },
@@ -5081,9 +5082,16 @@
                     52: { type: 'carcel', skip: 3, msg: '¡Cárcel! Pierdes 3 turnos ⛓️' },
                     58: { type: 'muerte', target: 1, msg: '¡Calavera! Vuelves a empezar 💀' }
                 };
-                this.OCAS = [5, 9, 14, 18, 23, 27, 32, 36, 41, 45, 50, 54, 59];
 
                 this.init();
+            }
+
+            // Voice Method
+            speak(text) {
+                if (this.app.audio.muted) return;
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'es-ES';
+                window.speechSynthesis.speak(utterance);
             }
 
             init() {
@@ -5094,7 +5102,7 @@
                 this.c.style.alignItems = 'center';
                 this.c.style.justifyContent = 'center';
 
-                // Mode Selection
+                // Title
                 const title = document.createElement('h2');
                 title.textContent = '🦆 Juego de la Oca';
                 title.style.color = '#2c3e50';
@@ -5102,6 +5110,7 @@
                 title.style.marginBottom = '30px';
                 this.c.appendChild(title);
 
+                // Mode Selection Buttons
                 const btnContainer = document.createElement('div');
                 btnContainer.style.display = 'flex';
                 btnContainer.style.gap = '20px';
@@ -5129,6 +5138,7 @@
                 this.gameMode = mode;
                 this.msg = (mode === 'hybrid') ? 'Tira tu dado y anota 📝' : 'Tira el dado 🎲';
                 this.setupBoard();
+                this.speak("¡Bienvenido al Juego de la Oca!");
             }
 
             setupBoard() {
@@ -5151,10 +5161,9 @@
                 header.appendChild(this.diceEl);
                 this.c.appendChild(header);
 
-                // Manual Input UI
                 this.createDiceInput();
 
-                // Board Container (8x8 Grid)
+                // Board (8x8 Grid)
                 const board = document.createElement('div');
                 board.style.cssText = `
                     display: grid;
@@ -5167,9 +5176,9 @@
                     border-radius: 10px;
                     position: relative;
                 `;
+                this.boardEl = board;
                 this.renderCells(board);
                 this.c.appendChild(board);
-                this.boardEl = board;
                 this.updatePieces();
             }
 
@@ -5187,10 +5196,8 @@
                 btns.style.display = 'flex'; btns.style.gap = '10px';
                 for (let i = 1; i <= 6; i++) {
                     const b = document.createElement('button');
-                    b.onmousedown = () => b.style.transform = 'scale(0.9)';
-                    b.onmouseup = () => b.style.transform = 'scale(1)';
                     b.textContent = i;
-                    b.style.cssText = 'width:40px; height:40px; font-size:1.5em; border:none; border-radius:50%; background:#3498db; color:white; cursor:pointer; transition:transform 0.1s;';
+                    b.style.cssText = 'width:40px; height:40px; font-size:1.5em; border:none; border-radius:50%; background:#3498db; color:white; cursor:pointer;';
                     b.onclick = () => this.submitDice(i);
                     btns.appendChild(b);
                 }
@@ -5198,30 +5205,49 @@
                 this.c.appendChild(this.diceInput);
             }
 
+            // Helper to get Spiral Coordinates (0-indexed 8x8 grid)
+            getGridPos(n) {
+                // Map linear 1..64 to spiral (0,0) inwards
+                // Spiral path: Right, Down, Left, Up
+                // 1 at (0,0)
+
+                let x = 0, y = 0;
+                let dx = 1, dy = 0;
+                let xMin = 0, yMin = 0, xMax = 7, yMax = 7;
+
+                // Simulate walk to N
+                for (let i = 1; i < n; i++) {
+                    if (x + dx > xMax || x + dx < xMin || y + dy > yMax || y + dy < yMin) {
+                        // Turn right (Right->Down->Left->Up)
+                        if (dx === 1 && dy === 0) { dx = 0; dy = 1; yMin++; }
+                        else if (dx === 0 && dy === 1) { dx = -1; dy = 0; xMax--; }
+                        else if (dx === -1 && dy === 0) { dx = 0; dy = -1; yMax--; }
+                        else if (dx === 0 && dy === -1) { dx = 1; dy = 0; xMin++; }
+                    }
+                    x += dx;
+                    y += dy;
+                }
+                return { r: y, c: x };
+            }
+
             renderCells(board) {
-                // Snake Logic: Bottom-Left (1) to Top-Left (63)
-                // 8 rows. Row 0 (Bottom) -> Row 7 (Top) in grid coords (7..0)
                 for (let i = 1; i <= 63; i++) {
                     const cell = document.createElement('div');
                     cell.style.cssText = 'border:1px solid #bdc3c7; position:relative; display:flex; justify-content:center; align-items:center; font-size:0.8em; color:#7f8c8d; background:white;';
-                    cell.textContent = i;
+                    cell.innerHTML = i;
 
-                    // Grid Pos
-                    const r = Math.floor((i - 1) / 8); // 0..7
-                    const isEvenRow = (r % 2 === 0);
-                    const c = isEvenRow ? (i - 1) % 8 : 7 - ((i - 1) % 8);
+                    const pos = this.getGridPos(i);
+                    cell.style.gridRow = `${pos.r + 1}`;
+                    cell.style.gridColumn = `${pos.c + 1}`;
 
-                    cell.style.gridRow = `${8 - r}`; // 8..1
-                    cell.style.gridColumn = `${c + 1}`; // 1..8
-
-                    // Special Styling
-                    if (this.OCAS.includes(i)) { cell.style.background = '#fad390'; cell.innerHTML = '🦆<br>' + i; }
-                    if (i === 6 || i === 12) { cell.style.background = '#74b9ff'; cell.innerHTML = '🌉<br>' + i; } // Puente
-                    if (i === 19) cell.innerHTML = '🏨<br>' + i; // Posada
-                    if (i === 31) cell.innerHTML = '🕳️<br>' + i; // Pozo
-                    if (i === 42) cell.innerHTML = '🌀<br>' + i; // Laberinto
-                    if (i === 52) cell.innerHTML = '⛓️<br>' + i; // Carcel
-                    if (i === 58) cell.innerHTML = '💀<br>' + i; // Muerte
+                    // Styling
+                    if (this.DINOS.includes(i)) { cell.style.background = '#fad390'; cell.innerHTML = '🦆<br>' + i; }
+                    if (i === 6 || i === 12) { cell.style.background = '#74b9ff'; cell.innerHTML = '🌉<br>' + i; }
+                    if (i === 19) cell.innerHTML = '🏨<br>' + i;
+                    if (i === 31) cell.innerHTML = '🕳️<br>' + i;
+                    if (i === 42) cell.innerHTML = '🌀<br>' + i;
+                    if (i === 52) cell.innerHTML = '⛓️<br>' + i;
+                    if (i === 58) cell.innerHTML = '💀<br>' + i;
                     if (i === 63) { cell.style.background = '#55efc4'; cell.innerHTML = '🏁<br>' + i; }
 
                     board.appendChild(cell);
@@ -5229,34 +5255,25 @@
             }
 
             updatePieces() {
-                // Remove old pieces
-                while (this.boardEl.querySelector('.oca-piece')) {
-                    this.boardEl.querySelector('.oca-piece').remove();
-                }
+                // Clear old
+                this.boardEl.querySelectorAll('.oca-piece').forEach(e => e.remove());
 
-                // Render P1 (Red) and P2 (Yellow)
                 this.pieces.forEach((pos, idx) => {
+                    if (pos > 63) pos = 63; // Safety
                     const p = document.createElement('div');
                     p.className = 'oca-piece';
                     p.textContent = idx === 0 ? '🔴' : '🟡';
                     p.style.cssText = 'position:absolute; width: 40%; height: 40%; font-size:1.5em; z-index:10; transition: all 0.5s ease-out;';
 
-                    // Convert pos to grid style for absolute positioning over grid cells
-                    // Actually we can append to the specific cell div? No, difficult to query by grid index.
-                    // Easier: Re-calc Grid Pos and use calculate pixel offset? 
-                    // CSS Grid allows overlapping items if we give them grid coordinates!
+                    const gridPos = this.getGridPos(pos);
+                    p.style.gridRow = `${gridPos.r + 1}`;
+                    p.style.gridColumn = `${gridPos.c + 1}`;
 
-                    const r = Math.floor((pos - 1) / 8);
-                    const isEvenRow = (r % 2 === 0);
-                    const c = isEvenRow ? (pos - 1) % 8 : 7 - ((pos - 1) % 8);
-
-                    p.style.gridRow = `${8 - r}`;
-                    p.style.gridColumn = `${c + 1}`;
-
-                    // Offset to separate players
                     if (idx === 0) p.style.justifySelf = 'start';
                     else p.style.justifySelf = 'end';
                     p.style.alignSelf = 'center';
+                    p.style.marginLeft = '5px';
+                    p.style.marginRight = '5px';
 
                     this.boardEl.appendChild(p);
                 });
@@ -5264,7 +5281,6 @@
 
             rollDice() {
                 if (this.waitingRoll) {
-                    // Mode Check
                     if (this.gameMode === 'pve' && this.turn !== 1) return;
                     if (this.gameMode === 'hybrid') { this.diceInput.style.display = 'flex'; return; }
 
@@ -5283,16 +5299,18 @@
                 this.waitingRoll = false;
                 this.statusEl.textContent = `Has sacado un ${val}`;
 
-                // Validate Move
+                // --- VOZ ---
+                this.speak(`¡Has sacado un ${val}!`);
+
                 if (this.skipTurns[this.turn - 1] > 0) {
                     this.skipTurns[this.turn - 1]--;
                     setTimeout(() => {
+                        this.speak("¡Estás bloqueado!");
                         this.statusEl.textContent = '¡Sigues bloqueado! 🚫';
                         this.nextTurn();
-                    }, 1500);
+                    }, 1000);
                     return;
                 }
-
                 setTimeout(() => this.movePiece(this.turn - 1, val), 500);
             }
 
@@ -5300,18 +5318,15 @@
                 let current = this.pieces[pIdx];
                 let target = current + steps;
 
-                // Bounce at 63
                 if (target > 63) {
-                    let diff = target - 63;
+                    const diff = target - 63;
                     target = 63 - diff;
                 }
 
-                // Apply Move
                 this.pieces[pIdx] = target;
                 this.updatePieces();
-                app.audio.playPop();
+                this.app.audio.playPop();
 
-                // Check Special Rules
                 setTimeout(() => this.checkSpecials(pIdx, target, steps), 600);
             }
 
@@ -5321,17 +5336,20 @@
                     return;
                 }
 
-                // Oca
-                if (this.OCAS.includes(pos)) {
-                    const nextOca = this.OCAS[this.OCAS.indexOf(pos) + 1] || 63;
+                if (this.DINOS.includes(pos)) {
+                    const nextIdx = this.DINOS.indexOf(pos) + 1;
+                    const nextOca = this.DINOS[nextIdx] || 63;
+
                     this.statusEl.textContent = '¡De Oca a Oca! 🦆';
+                    this.speak("¡De Oca a Oca y tiro porque me toca!");
+
                     this.pieces[pIdx] = nextOca;
                     this.updatePieces();
-                    app.audio.playWin();
+                    this.app.audio.playWin();
+
                     setTimeout(() => {
                         this.waitingRoll = true;
                         this.statusEl.textContent = '¡Tira otra vez!';
-                        // Hybrid/PVP logic: stay on turn
                         if (this.gameMode === 'pve' && this.turn === 2) this.dinoAI();
                     }, 1000);
                     return;
@@ -5340,13 +5358,16 @@
                 const rule = this.SPECIALS[pos];
                 if (rule) {
                     this.statusEl.textContent = rule.msg;
-                    app.audio.playError();
+                    this.speak(rule.msg);
+                    this.app.audio.playError();
+
                     if (rule.target) {
                         this.pieces[pIdx] = rule.target;
                         this.updatePieces();
-                        // Puente rule: "De puente a puente y tiro..."
+
                         if (rule.type === 'puente') {
-                            setTimeout(() => {
+                             this.speak("¡De puente a puente y tiro porque me lleva la corriente!");
+                             setTimeout(() => {
                                 this.waitingRoll = true;
                                 this.statusEl.textContent = '¡Tira otra vez!';
                                 if (this.gameMode === 'pve' && this.turn === 2) this.dinoAI();
@@ -5358,7 +5379,6 @@
                     }
                 }
 
-                // End Logic
                 setTimeout(() => this.nextTurn(), 1000);
             }
 
@@ -5374,16 +5394,18 @@
                         this.waitingRoll = true;
                         this.statusEl.textContent = 'Turno Amarillo 🟡';
                         this.c.style.background = '#fff9c4';
+                        this.speak("Turno Amarillo");
                     }
                 } else {
                     this.waitingRoll = true;
                     this.statusEl.textContent = 'Turno Rojo 🔴';
                     this.c.style.background = '#ecf0f1';
+                    this.speak("Turno Rojo");
                 }
             }
 
             dinoAI() {
-                let val = Math.floor(Math.random() * 6) + 1;
+                const val = Math.floor(Math.random() * 6) + 1;
                 this.diceEl.textContent = '🎲 ' + val;
                 setTimeout(() => this.processDice(val), 500);
             }
@@ -5392,25 +5414,26 @@
                 this.gameOver = true;
                 const winner = (pIdx === 0) ? 'ROJO 🔴' : 'AMARILLO 🟡';
                 this.statusEl.innerHTML = `¡GANÓ ${winner}! 🏆`;
-                app.audio.playWin();
+                this.speak(`¡Ganó ${pIdx === 0 ? 'Rojo' : 'Amarillo'}!`);
+                this.app.audio.playWin();
 
                 setTimeout(() => {
                     const ov = document.createElement('div');
                     ov.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:100; border-radius:10px;';
                     ov.innerHTML = `
-                            <div style="font-size:5em;">🏆</div>
-                            <h2 style="color:white; margin:20px;">¡${winner} GANA!</h2>
-                            <div style="display:flex; gap:20px; flex-direction:column;">
-                                <button class="mode-btn kid" style="background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
-                                <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
-                            </div>
-                        `;
+                        <div style="font-size:5em;">🏆</div>
+                        <h2 style="color:white; margin:20px;">¡${winner} GANA!</h2>
+                        <div style="display:flex; gap:20px; flex-direction:column;">
+                            <button class="mode-btn kid" style="background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
+                            <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
+                        </div>
+                    `;
                     this.c.appendChild(ov);
                 }, 1000);
             }
+
             cleanup() { }
         }
-
         /**
          * ♟️ CHESS GAME (Ajedrez Simplified)
          * Human (White) vs Dino (Black)
@@ -5424,7 +5447,7 @@
                 this.moves = []; // Valid moves for selected
                 this.gameOver = false;
 
-                // Representation: 
+                // Representation:
                 // lower = black (dino), UPPER = WHITE (Player)
                 // r,n,b,q,k,p
                 // Board 8x8
@@ -5803,7 +5826,7 @@
 
                 const ARCADE_KEYS = ['aventura', 'surf', 'soccer', 'kart', 'fighter', 'laberinto', 'unir_puntos', 'connect_four', 'checkers', 'parchis', 'oca', 'chess'];
 
-                // 1. Render Specific Folder Header/Back Button? 
+                // 1. Render Specific Folder Header/Back Button?
                 if (mode === 'arcade') {
                     // Back Button Card
                     const backCard = document.createElement('div');
@@ -5994,8 +6017,8 @@
 
                     row.innerHTML = `
                         <div style="width: 30px; height: 30px; background: ${video.color}; border-radius: 5px; display:flex; align-items:center; justify-content:center;">${index + 1}</div>
-                        <input type="url" inputmode="url" autocomplete="off" class="cinema-url-input" data-index="${index}" value="${currentUrl}" 
-                            placeholder="Enlace Video ${index + 1}" 
+                        <input type="url" inputmode="url" autocomplete="off" class="cinema-url-input" data-index="${index}" value="${currentUrl}"
+                            placeholder="Enlace Video ${index + 1}"
                             style="flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 5px;">
                     `;
                     container.appendChild(row);
