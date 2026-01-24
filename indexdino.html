@@ -5062,7 +5062,7 @@
             constructor(data, container) {
                 this.data = data;
                 this.c = container;
-                this.app = window.app; // Access to global audio engine
+                this.app = window.app; // Acceso al motor global de audio
                 this.pieces = [1, 1];
                 this.turn = 1;
                 this.gameMode = 'pve';
@@ -5086,7 +5086,7 @@
                 this.init();
             }
 
-            // Voice Method
+            // Método de Voz
             speak(text) {
                 if (this.app.audio.muted) return;
                 const utterance = new SpeechSynthesisUtterance(text);
@@ -5306,7 +5306,6 @@
                     this.skipTurns[this.turn - 1]--;
                     setTimeout(() => {
                         this.speak("¡Estás bloqueado!");
-                        this.statusEl.textContent = '¡Sigues bloqueado! 🚫';
                         this.nextTurn();
                     }, 1000);
                     return;
