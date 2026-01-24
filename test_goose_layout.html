@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Goose</title>
+    <style>
+        body { font-family: sans-serif; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div id="testContainer" style="width: 500px; height: 600px; border: 1px solid black;"></div>
+
+    <script>
+        // Mock App
+        window.app = {
+            audio: {
+                speak: (t) => console.log('Speak:', t),
+                playPop: () => console.log('Pop'),
+                playWin: () => console.log('Win'),
+                playError: () => console.log('Error')
+            }
+        };
+
+        // Class to Test
+        class GooseGame {
+            constructor(data, container) {
+                this.data = data;
+                this.c = container;
+                this.app = window.app;
+                this.pieces = [1, 1];
+                this.turn = 0;
+                this.waitingRoll = true;
+                this.skip = [0, 0];
+
+                this.DINOS = [5, 9, 14, 18, 23, 27, 32, 36, 41, 45, 50, 54, 59];
+                this.SPECIALS = {
+                    6: { t: 12, msg: '¡De Puente a Puente! 🌉' },
+                    12: { t: 6, msg: '¡Puente roto! 🌉' },
+                    19: { skip: 1, msg: '¡Posada! Pierdes 1 turno 💤' },
+                    31: { skip: 2, msg: '¡Pozo! Pierdes 2 turnos 🕳️' },
+                    42: { t: 30, msg: '¡Laberinto! Retrocedes 🌀' },
+                    58: { t: 1, msg: '¡METEORITO! Vuelve al inicio ☄️' }
+                };
+
+                this.init();
+            }
+
+            init() {
+                this.c.innerHTML = '';
+                this.c.style.cssText = 'display:flex; flex-direction:column; align-items:center; background:#ecf0f1; height:100%; justify-content:center; overflow:hidden;';
+
+                // Board
+                this.boardEl = document.createElement('div');
+                this.boardEl.style.cssText = `
+                    display: grid;
+                    grid-template-columns: repeat(8, 1fr);
+                    grid-template-rows: repeat(8, 1fr);
+                    gap: 2px;
+                    width: 95vmin; height: 95vmin;
+                    max-width: 500px; max-height: 500px;
+                    background: #2c3e50; border: 4px solid #34495e;
+                    border-radius: 10px; position: relative;
+                    padding: 2px;
+                `;
+                this.c.append(this.boardEl);
+
+                this.renderSpiral();
+                this.createTokens();
+                this.updatePositions();
+
+                // ROBUSTNESS FIX TEST: ResizeObserver
+                const ro = new ResizeObserver(() => {
+                    console.log('Resize detected, updating positions...');
+                    this.updatePositions();
+                });
+                ro.observe(this.boardEl);
+            }
+
+            renderSpiral() {
+                const matrix = Array(8).fill().map(() => Array(8).fill(0));
+                let x = 0, y = 0, dx = 1, dy = 0;
+
+                for (let i = 1; i <= 64; i++) {
+                    matrix[y][x] = i;
+                    let nx = x + dx, ny = y + dy;
+                    if (nx < 0 || nx >= 8 || ny < 0 || ny >= 8 || matrix[ny][nx] !== 0) {
+                        [dx, dy] = [-dy, dx];
+                    }
+                    x += dx; y += dy;
+                }
+
+                for(let r=0; r<8; r++){
+                    for(let c=0; c<8; c++){
+                        let val = matrix[r][c];
+                        if(val > 63) continue;
+
+                        let cell = document.createElement('div');
+                        cell.dataset.index = val;
+                        // INCREASED SIZE HERE
+                        cell.style.cssText = `
+                            grid-row: ${r+1}; grid-column: ${c+1};
+                            background:#ecf0f1; border-radius:2px; position:relative;
+                            display:flex; justify-content:center; align-items:center;
+                            font-size: 1.2em; color:#7f8c8d; font-weight:bold;
+                            flex-direction: column;
+                        `;
+                        cell.innerHTML = `<span>${val}</span>`;
+
+                        // Decoración - INCREASED SIZE
+                        if(this.DINOS.includes(val)) { cell.style.background='#f1c40f'; cell.innerHTML += '<div style="font-size:1.5em">🦕</div>'; }
+                        else if(this.SPECIALS[val]) { cell.style.background='#e74c3c'; cell.style.color='white'; cell.innerHTML += '<div style="font-size:1.5em">⚠️</div>'; }
+                        else if(val===63) { cell.style.background='#2ecc71'; cell.innerHTML = '<div style="font-size:2em">🥚</div>'; }
+
+                        this.boardEl.append(cell);
+                    }
+                }
+            }
+
+            createTokens() {
+                this.tokens = [];
+                // User: Dino Pequeño
+                let t1 = document.createElement('div');
+                t1.innerText = '🦕';
+                t1.style.cssText = 'position:absolute; font-size:2em; transition:all 0.5s; z-index:20; pointer-events:none; filter: drop-shadow(0 0 2px white);';
+                this.boardEl.append(t1);
+                this.tokens.push(t1);
+
+                // AI: Oca
+                let t2 = document.createElement('div');
+                t2.innerText = '🦆';
+                t2.style.cssText = 'position:absolute; font-size:2em; transition:all 0.5s; z-index:20; pointer-events:none; filter: drop-shadow(0 0 2px white);';
+                this.boardEl.append(t2);
+                this.tokens.push(t2);
+            }
+
+            updatePositions() {
+                this.tokens.forEach((token, idx) => {
+                    let pos = this.pieces[idx];
+                    let cell = this.boardEl.querySelector(`div[data-index='${pos}']`);
+                    if (!cell) cell = this.boardEl.querySelector(`div[data-index='1']`);
+
+                    let x = cell.offsetLeft + (cell.offsetWidth / 2) - (token.offsetWidth / 2 || 15);
+                    let y = cell.offsetTop + (cell.offsetHeight / 2) - (token.offsetHeight / 2 || 15);
+
+                    console.log(`Token ${idx} at pos ${pos}: x=${x}, y=${y} (Cell: ${cell.offsetLeft}, ${cell.offsetTop})`);
+
+                    if (this.pieces[0] === this.pieces[1] && idx === 1) {
+                        x += 8; y += 8; // Offset collision
+                    }
+
+                    token.style.left = x + 'px';
+                    token.style.top = y + 'px';
+                });
+            }
+        }
+
+        // Run
+        console.log("Starting Game...");
+        const game = new GooseGame({}, document.getElementById('testContainer'));
+    </script>
+</body>
+</html>
