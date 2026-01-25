@@ -14,8 +14,12 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.20 "Responsive Maze & Goose"</title>
+    <title>v17.21 "Fluid Maze"</title>
     <!--
+        CHANGELOG v17.21
+        - [FEATURE] Laberinto: Nuevo control fluido "Aventura" (Arrastrar para mover).
+        - [FIX] Laberinto: Movimiento suave en lugar de paso a paso.
+
         CHANGELOG v17.20
         - [FIX] Oca: Tablero ajustado para móviles (evita desbordamiento vertical).
         - [FIX] Laberinto: Diseño responsive y controles táctiles (Swipe).
@@ -3105,8 +3109,12 @@
                 this.c = container;
                 this.level = 0;
                 this.grid = [];
-                this.playerPos = { x: 1, y: 1 };
+                // Player is pixel-based now. Center point.
+                this.p = { x: 0, y: 0 };
                 this.tileSize = 40;
+                this.speed = 3; // px per frame
+                this.running = false;
+                this.dragTarget = null; // {x, y} or null
 
                 this.levels = [
                     // Level 1: Easy
@@ -3184,7 +3192,7 @@
                 this.c.style.display = 'flex';
                 this.c.style.flexDirection = 'column';
                 this.c.style.alignItems = 'center';
-                this.c.style.justifyContent = 'flex-start'; // Align top to allow fitting
+                this.c.style.justifyContent = 'flex-start';
                 this.c.style.overflow = 'hidden';
 
                 // Title
@@ -3195,59 +3203,80 @@
                 title.textContent = `Nivel ${this.level + 1}`;
                 this.c.appendChild(title);
 
+                // Instruction
+                const inst = document.createElement('p');
+                inst.textContent = '👆 Arrastra a Dino para moverlo';
+                inst.style.color = '#bdc3c7';
+                inst.style.margin = '0 0 10px 0';
+                this.c.appendChild(inst);
+
                 // Canvas
                 this.canvas = document.createElement('canvas');
                 this.canvas.style.background = '#95a5a6';
                 this.canvas.style.borderRadius = '10px';
                 this.canvas.style.boxShadow = '0 10px 20px rgba(0,0,0,0.3)';
-                // Swipe Support
-                this.bindSwipe();
+                this.canvas.style.touchAction = 'none'; // Prevents scrolling
                 this.c.appendChild(this.canvas);
                 this.ctx = this.canvas.getContext('2d');
 
-                // Controls
-                this.createControls();
+                // Bind Input
+                this.bindInput();
 
                 // Start Level
                 this.loadLevel(this.level);
 
-                // Keyboard support
-                this.keyHandler = (e) => {
-                    if (e.key === 'ArrowUp') this.move(0, -1);
-                    if (e.key === 'ArrowDown') this.move(0, 1);
-                    if (e.key === 'ArrowLeft') this.move(-1, 0);
-                    if (e.key === 'ArrowRight') this.move(1, 0);
-                };
-                document.addEventListener('keydown', this.keyHandler);
+                // Loop
+                this.running = true;
+                this.loop();
 
                 // Responsive
                 this.ro = new ResizeObserver(() => this.resizeCanvas());
                 this.ro.observe(this.c);
+
+                // Exit
+                const exit = document.createElement('button');
+                exit.textContent = '🏠 Salir';
+                exit.className = 'mode-btn kid';
+                exit.style.marginTop = '10px';
+                exit.onclick = () => app.nav.goDashboard();
+                this.c.appendChild(exit);
             }
 
-            bindSwipe() {
-                let startX = 0;
-                let startY = 0;
-                this.canvas.addEventListener('touchstart', (e) => {
-                    startX = e.touches[0].clientX;
-                    startY = e.touches[0].clientY;
-                    e.preventDefault();
-                }, { passive: false });
-
-                this.canvas.addEventListener('touchend', (e) => {
-                    const endX = e.changedTouches[0].clientX;
-                    const endY = e.changedTouches[0].clientY;
-                    const diffX = endX - startX;
-                    const diffY = endY - startY;
-
-                    if (Math.abs(diffX) > 30 || Math.abs(diffY) > 30) {
-                        if (Math.abs(diffX) > Math.abs(diffY)) {
-                            this.move(diffX > 0 ? 1 : -1, 0);
-                        } else {
-                            this.move(0, diffY > 0 ? 1 : -1);
-                        }
+            bindInput() {
+                this.handlers = {
+                    start: (e) => {
+                        e.preventDefault();
+                        this.updateDragTarget(e);
+                    },
+                    move: (e) => {
+                        // Only prevent default if interacting with game to allow other interactions?
+                        // Actually for this game mode we want to capture everything.
+                        if(e.cancelable) e.preventDefault();
+                        if(this.dragTarget) this.updateDragTarget(e);
+                    },
+                    end: (e) => {
+                        e.preventDefault();
+                        this.dragTarget = null;
                     }
-                });
+                };
+
+                this.canvas.addEventListener('mousedown', this.handlers.start);
+                window.addEventListener('mousemove', this.handlers.move);
+                window.addEventListener('mouseup', this.handlers.end);
+
+                this.canvas.addEventListener('touchstart', this.handlers.start, { passive: false });
+                window.addEventListener('touchmove', this.handlers.move, { passive: false });
+                window.addEventListener('touchend', this.handlers.end);
+            }
+
+            updateDragTarget(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                this.dragTarget = {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
+                };
             }
 
             loadLevel(idx) {
@@ -3262,45 +3291,120 @@
                 const map = this.levels[idx];
                 this.grid = map.map(row => row.split(''));
 
-                // Find Start
+                this.resizeCanvas(); // Recalc grid size
+
+                // Find Start Pixel
                 for (let y = 0; y < this.grid.length; y++) {
                     for (let x = 0; x < this.grid[y].length; x++) {
                         if (this.grid[y][x] === 'S') {
-                            this.playerPos = { x, y };
+                            this.p = {
+                                x: x * this.tileSize + this.tileSize/2,
+                                y: y * this.tileSize + this.tileSize/2
+                            };
                         }
                     }
                 }
-
-                this.resizeCanvas();
-                this.draw();
             }
 
             resizeCanvas() {
                 if(!this.grid || this.grid.length === 0) return;
+
+                // Capture current relative pos
+                let relX = 0.5, relY = 0.5;
+                if (this.tileSize > 0 && this.p.x > 0) {
+                    relX = this.p.x / (this.grid[0].length * this.tileSize);
+                    relY = this.p.y / (this.grid.length * this.tileSize);
+                }
+
                 const rows = this.grid.length;
                 const cols = this.grid[0].length;
 
-                // Responsive Calculation
                 const rect = this.c.getBoundingClientRect();
-                // Deduct Title (~60px) and Controls (~120px) + Padding
                 const availW = rect.width - 20;
-                const availH = rect.height - 180;
+                const availH = rect.height - 150;
 
                 const tileW = Math.floor(availW / cols);
                 const tileH = Math.floor(availH / rows);
 
-                // Choose smallest to fit, but max 50px
-                this.tileSize = Math.min(50, tileW, tileH);
-                this.tileSize = Math.max(20, this.tileSize); // Min size
+                this.tileSize = Math.min(60, tileW, tileH);
+                this.tileSize = Math.max(20, this.tileSize);
 
                 this.canvas.width = cols * this.tileSize;
                 this.canvas.height = rows * this.tileSize;
-                this.draw();
+
+                // Restore pos scaled
+                if (this.running && relX > 0) {
+                    this.p.x = relX * this.canvas.width;
+                    this.p.y = relY * this.canvas.height;
+                }
             }
 
-            cleanup() {
-                if(this.ro) this.ro.disconnect();
-                document.removeEventListener('keydown', this.keyHandler);
+            loop() {
+                if (!this.running) return;
+
+                if (this.dragTarget) {
+                    // Vector to target
+                    const dx = this.dragTarget.x - this.p.x;
+                    const dy = this.dragTarget.y - this.p.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+
+                    if (dist > 5) { // Deadzone
+                        // Normalize
+                        const speed = Math.min(dist, this.speed); // Slow down near finger
+                        const vx = (dx / dist) * speed;
+                        const vy = (dy / dist) * speed;
+
+                        // Move X
+                        if (!this.checkWall(this.p.x + vx, this.p.y)) {
+                            this.p.x += vx;
+                        }
+                        // Move Y
+                        if (!this.checkWall(this.p.x, this.p.y + vy)) {
+                            this.p.y += vy;
+                        }
+
+                        // Check Events
+                        this.checkEvents();
+                    }
+                }
+
+                this.draw();
+                requestAnimationFrame(() => this.loop());
+            }
+
+            checkWall(x, y) {
+                // Check bounding box (Player is size * 0.6)
+                const rad = this.tileSize * 0.3;
+                const testPoints = [
+                    {x: x - rad, y: y - rad},
+                    {x: x + rad, y: y - rad},
+                    {x: x - rad, y: y + rad},
+                    {x: x + rad, y: y + rad}
+                ];
+
+                for (let pt of testPoints) {
+                    const gx = Math.floor(pt.x / this.tileSize);
+                    const gy = Math.floor(pt.y / this.tileSize);
+
+                    // Out of bounds
+                    if (gy < 0 || gy >= this.grid.length || gx < 0 || gx >= this.grid[0].length) return true;
+                    // Wall
+                    if (this.grid[gy][gx] === '#') return true;
+                }
+                return false;
+            }
+
+            checkEvents() {
+                const gx = Math.floor(this.p.x / this.tileSize);
+                const gy = Math.floor(this.p.y / this.tileSize);
+
+                if (gy >= 0 && gy < this.grid.length && gx >= 0 && gx < this.grid[0].length) {
+                    if (this.grid[gy][gx] === 'E') {
+                        app.audio.playPop();
+                        this.dragTarget = null; // Stop moving
+                        this.loadLevel(this.level + 1);
+                    }
+                }
             }
 
             draw() {
@@ -3313,87 +3417,36 @@
                         const py = y * this.tileSize;
 
                         if (cell === '#') {
-                            this.ctx.fillStyle = '#34495e'; // Wall
+                            this.ctx.fillStyle = '#34495e';
                             this.ctx.fillRect(px, py, this.tileSize, this.tileSize);
-                            // Highlight
                             this.ctx.fillStyle = '#2c3e50';
-                            this.ctx.fillRect(px + 5, py + 5, this.tileSize - 10, this.tileSize - 10);
+                            this.ctx.fillRect(px + 4, py + 4, this.tileSize - 8, this.tileSize - 8);
                         } else if (cell === 'E') {
-                            this.ctx.font = `${this.tileSize * 0.8}px Arial`;
+                            this.ctx.font = `${this.tileSize * 0.7}px Arial`;
                             this.ctx.textAlign = 'center';
                             this.ctx.textBaseline = 'middle';
-                            this.ctx.fillText('🥚', px + this.tileSize / 2, py + this.tileSize / 2);
+                            this.ctx.fillText('🥚', px + this.tileSize/2, py + this.tileSize/2);
                         }
                     }
                 }
 
                 // Draw Player
-                const px = this.playerPos.x * this.tileSize;
-                const py = this.playerPos.y * this.tileSize;
-                this.ctx.font = `${this.tileSize * 0.8}px Arial`;
+                this.ctx.font = `${this.tileSize * 0.7}px Arial`;
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
-                this.ctx.fillText('🦖', px + this.tileSize / 2, py + this.tileSize / 2);
+                this.ctx.fillText('🦖', this.p.x, this.p.y);
             }
 
-            move(dx, dy) {
-                const newX = this.playerPos.x + dx;
-                const newY = this.playerPos.y + dy;
+            cleanup() {
+                this.running = false;
+                if(this.ro) this.ro.disconnect();
 
-                if (newX < 0 || newY < 0 || newY >= this.grid.length || newX >= this.grid[0].length) return;
-
-                const cell = this.grid[newY][newX];
-                if (cell === '#') {
-                    app.audio.playError(); // Bonk
-                    return;
+                if (this.handlers) {
+                    window.removeEventListener('mousemove', this.handlers.move);
+                    window.removeEventListener('mouseup', this.handlers.end);
+                    window.removeEventListener('touchmove', this.handlers.move);
+                    window.removeEventListener('touchend', this.handlers.end);
                 }
-
-                this.playerPos = { x: newX, y: newY };
-                this.draw();
-
-                if (cell === 'E') {
-                    app.audio.playPop();
-                    setTimeout(() => {
-                        this.loadLevel(this.level + 1);
-                    }, 500);
-                }
-            }
-
-            createControls() {
-                const panel = document.createElement('div');
-                panel.style.cssText = `
-                    margin-top: 20px; display: grid; grid-template-areas: ". U ." "L D R";
-                    gap: 10px;
-                `;
-
-                const mkBtn = (txt, area, dx, dy) => {
-                    const b = document.createElement('button');
-                    b.textContent = txt;
-                    b.className = 'mode-btn kid';
-                    b.style.gridArea = area;
-                    b.style.width = '60px';
-                    b.style.height = '60px';
-                    b.style.fontSize = '2em';
-                    b.style.margin = '0';
-                    b.style.padding = '0'; // Fix centering
-                    b.onclick = () => this.move(dx, dy);
-                    return b;
-                };
-
-                panel.appendChild(mkBtn('⬆️', 'U', 0, -1));
-                panel.appendChild(mkBtn('⬅️', 'L', -1, 0));
-                panel.appendChild(mkBtn('⬇️', 'D', 0, 1));
-                panel.appendChild(mkBtn('➡️', 'R', 1, 0));
-
-                this.c.appendChild(panel);
-
-                // Exit
-                const exit = document.createElement('button');
-                exit.textContent = '🏠 Salir';
-                exit.className = 'mode-btn kid';
-                exit.style.marginTop = '20px';
-                exit.onclick = () => app.nav.goDashboard();
-                this.c.appendChild(exit);
             }
 
             winGame() {
