@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.8 "Voice Fix"</title>
+    <title>v17.9 "Voice Boost"</title>
     <!--
+        CHANGELOG v17.9
+        - [FIX] AudioEngine: Carga explícita de voces y "warm-up" del motor de voz para garantizar sonido en móviles/Chrome.
+
         CHANGELOG v17.8
         - [FIX] AudioEngine: Solucionado problema de voz (SpeechSynthesis) que no sonaba en algunos dispositivos (GC fix).
 
@@ -968,6 +971,24 @@
                 this.muted = false;
                 this.unlocked = false;
                 this._lastUtterance = null;
+                this._voices = [];
+                this.initVoices();
+            }
+
+            initVoices() {
+                if (!window.speechSynthesis) return;
+
+                const load = () => {
+                    this._voices = window.speechSynthesis.getVoices();
+                    console.log('Voces cargadas:', this._voices.length);
+                };
+
+                // Chrome loads async
+                if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                    window.speechSynthesis.onvoiceschanged = load;
+                }
+                // Try now anyway
+                load();
             }
 
             get ctx() {
@@ -978,18 +999,27 @@
             }
 
             unlock() {
-                if (!this.unlocked && this.ctx.state !== 'running') {
-                    // Android Audio Fix: Play silent buffer + Resume
+                if (this.unlocked) return Promise.resolve();
+
+                // 1. Unlock Web Audio
+                if (this.ctx.state !== 'running') {
                     const buffer = this.ctx.createBuffer(1, 1, 22050);
                     const source = this.ctx.createBufferSource();
                     source.buffer = buffer;
                     source.connect(this.ctx.destination);
                     source.start(0);
-
-                    return this.ctx.resume().then(() => {
-                        this.unlocked = true;
-                    });
+                    this.ctx.resume();
                 }
+
+                // 2. Unlock Speech Synthesis (Mobile Wake-up)
+                if (window.speechSynthesis) {
+                    // Speak silence to initialize the engine on user gesture
+                    const u = new SpeechSynthesisUtterance('');
+                    u.volume = 0;
+                    window.speechSynthesis.speak(u);
+                }
+
+                this.unlocked = true;
                 return Promise.resolve();
             }
 
@@ -1016,17 +1046,35 @@
             speak(text) {
                 if (this.muted || !window.speechSynthesis) return;
 
-                // Cancel previous to avoid stuck state
+                // 1. Cancel previous
                 window.speechSynthesis.cancel();
 
+                // 2. Create Utterance
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = "es-ES";
-                utterance.rate = 1.2;
+                utterance.rate = 1.1; // Slight slow down for clarity
+                utterance.volume = 1.0; // Force Max Volume
 
-                // Fix for GC bug (Chrome/Android)
+                // 3. Select Voice Explicitly (Crucial for Mobile/Chrome)
+                if (this._voices.length === 0) this._voices = window.speechSynthesis.getVoices();
+
+                // Priority: ES-ES -> Any ES -> Default
+                const voice = this._voices.find(v => v.lang === 'es-ES' || v.lang === 'es_ES') ||
+                              this._voices.find(v => v.lang.startsWith('es')) ||
+                              this._voices.find(v => v.default);
+
+                if (voice) {
+                    utterance.voice = voice;
+                    utterance.lang = voice.lang; // Sync lang
+                } else {
+                    utterance.lang = "es-ES"; // Fallback
+                }
+
+                // 4. GC Fix
                 this._lastUtterance = utterance;
                 utterance.onend = () => { this._lastUtterance = null; };
+                utterance.onerror = (e) => { console.error('Speech Error:', e); };
 
+                // 5. Speak
                 window.speechSynthesis.speak(utterance);
             }
         }
