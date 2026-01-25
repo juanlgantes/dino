@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.5 "Dino Oca Remaster"</title>
+    <title>v17.6 "Dino Clean"</title>
     <!--
+        CHANGELOG v17.6
+        - [MAINTENANCE] Limpieza de comentarios históricos (MusicGame).
+
         CHANGELOG v17.5
         - [FIX] Oca: Tablero 8x8 corregido, tokens visuales (Dino/Oca) y movimiento suave.
         - [FEATURE] Oca: Botón "Jugar Otra Vez" añadido al finalizar.
@@ -2538,7 +2541,6 @@
 
                 // Piano Container
                 const piano = document.createElement('div');
-                // FIX: Added width: 95%, max-width: 600px, reduced gap/padding for mobile
                 piano.style.cssText = `display: flex; gap: 5px; padding: 10px; width: 95%; max-width: 600px; background: #dfe6e9; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); box-sizing: border-box;`;
 
                 Object.keys(this.notes).forEach(key => {
@@ -3415,10 +3417,8 @@
                 }
             }
         }
-        }
 
         /**
-    /**
          * ⏰ CLOCK GAME (Responsive v12.0)
          * - Visuals: Cake Slices (conic-gradient)
          * - Layout: Auto-adaptive (vmin) + Flexbox Sidebar/Topbar
@@ -5320,7 +5320,9 @@
         }
 
         /**
-         * ♟️ CHESS GAME (Ajedrez Simplified)class ChessGame {
+         * ♟️ CHESS GAME (Ajedrez Simplified)
+         */
+        class ChessGame {
             constructor(data, container) {
                 this.data = data;
                 this.c = container;
