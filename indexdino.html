@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.7 "Cleanup & Fixes"</title>
+    <title>v17.8 "Voice Fix"</title>
     <!--
+        CHANGELOG v17.8
+        - [FIX] AudioEngine: Solucionado problema de voz (SpeechSynthesis) que no sonaba en algunos dispositivos (GC fix).
+
         CHANGELOG v17.7
         - [FIX] Dino Reloj: Solucionado memory leak en eventos de arrastre.
         - [FIX] Oca: Gestión de limpieza mejorada (Timeouts y ResizeObserver).
@@ -964,6 +967,7 @@
                 this._ctx = null;
                 this.muted = false;
                 this.unlocked = false;
+                this._lastUtterance = null;
             }
 
             get ctx() {
@@ -1010,10 +1014,19 @@
             }
 
             speak(text) {
-                if (this.muted) return;
+                if (this.muted || !window.speechSynthesis) return;
+
+                // Cancel previous to avoid stuck state
+                window.speechSynthesis.cancel();
+
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = "es-ES";
                 utterance.rate = 1.2;
+
+                // Fix for GC bug (Chrome/Android)
+                this._lastUtterance = utterance;
+                utterance.onend = () => { this._lastUtterance = null; };
+
                 window.speechSynthesis.speak(utterance);
             }
         }
