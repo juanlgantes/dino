@@ -1459,6 +1459,7 @@
                 // Player Position (percentage 0-100)
                 this.pX = 50;
 
+                this.loop = this.loop.bind(this);
                 this.init();
             }
 
@@ -1607,7 +1608,7 @@
                 // Cleanup array
                 this.items = this.items.filter(i => i.active);
 
-                requestAnimationFrame(() => this.loop());
+                requestAnimationFrame(this.loop);
             }
 
             handleCollision(item) {
@@ -3426,10 +3427,8 @@
                 }
             }
         }
-        }
 
         /**
-    /**
          * ⏰ CLOCK GAME (Responsive v12.0)
          * - Visuals: Cake Slices (conic-gradient)
          * - Layout: Auto-adaptive (vmin) + Flexbox Sidebar/Topbar
@@ -5331,7 +5330,9 @@
         }
 
         /**
-         * ♟️ CHESS GAME (Ajedrez Simplified)class ChessGame {
+         * ♟️ CHESS GAME (Ajedrez Simplified)
+         */
+        class ChessGame {
             constructor(data, container) {
                 this.data = data;
                 this.c = container;
