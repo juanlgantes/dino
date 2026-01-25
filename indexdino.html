@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.5 "Dino Oca Remaster"</title>
+    <title>v17.6 "Dino Soccer Optimized"</title>
     <!--
+        CHANGELOG v17.6
+        - [PERF] Soccer: Optimización de loop de animación (reducción de allocations).
+
         CHANGELOG v17.5
         - [FIX] Oca: Tablero 8x8 corregido, tokens visuales (Dino/Oca) y movimiento suave.
         - [FEATURE] Oca: Botón "Jugar Otra Vez" añadido al finalizar.
@@ -1689,6 +1692,7 @@
                 this.keeper = { x: 50, dir: 1, speed: 1.5 }; // Speed increases?
                 this.aim = { angle: 0, dir: 1 }; // -45 to 45 deg
 
+                this.loop = this.loop.bind(this);
                 this.init();
             }
 
@@ -1796,7 +1800,7 @@
                     this.checkBallStatus();
                 }
 
-                requestAnimationFrame(() => this.loop());
+                requestAnimationFrame(this.loop);
             }
 
             shoot() {
@@ -3415,10 +3419,8 @@
                 }
             }
         }
-        }
 
         /**
-    /**
          * ⏰ CLOCK GAME (Responsive v12.0)
          * - Visuals: Cake Slices (conic-gradient)
          * - Layout: Auto-adaptive (vmin) + Flexbox Sidebar/Topbar
@@ -5320,7 +5322,9 @@
         }
 
         /**
-         * ♟️ CHESS GAME (Ajedrez Simplified)class ChessGame {
+         * ♟️ CHESS GAME (Ajedrez Simplified)
+         */
+        class ChessGame {
             constructor(data, container) {
                 this.data = data;
                 this.c = container;
