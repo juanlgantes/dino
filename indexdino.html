@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.12 "Goose Stable"</title>
+    <title>v17.13 "Goose Layout"</title>
     <!--
+        CHANGELOG v17.13
+        - [FIX] Oca: Optimizado padding y ancho del tablero para pantallas móviles pequeñas.
+
         CHANGELOG v17.12
         - [FIX] Oca: Solucionado bloqueo/crash en móviles (ResizeObserver Loop).
         - [FIX] Oca: Tablero responsive (aspect-ratio) para evitar cortes en pantallas verticales.
@@ -188,6 +191,12 @@
             opacity: 0;
             transform: translateY(20px);
             animation: slideIn 0.5s forwards ease-out;
+        }
+
+        @media (max-width: 600px) {
+            .content-section {
+                padding: 10px;
+            }
         }
 
         @keyframes slideIn {
@@ -5330,12 +5339,12 @@
                     grid-template-columns: repeat(8, 1fr);
                     grid-template-rows: repeat(8, 1fr);
                     gap: 2px;
-                    width: 98%; aspect-ratio: 1/1; height: auto;
+                    width: 95%; aspect-ratio: 1/1; height: auto;
                     max-width: 600px; box-sizing: border-box;
                     background: #2c3e50; border: 4px solid #34495e;
                     border-radius: 10px; position: relative;
                     padding: 2px;
-            margin-top: 10px;
+                    margin-top: 10px;
                 `;
                 this.c.append(this.boardEl);
 
