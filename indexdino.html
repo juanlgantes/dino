@@ -14,8 +14,12 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.5 "Dino Oca Remaster"</title>
+    <title>v17.6 "Dino Painter Fix"</title>
     <!--
+        CHANGELOG v17.6
+        - [FIX] Painter: Toolbar positioning (Relative) and flex wrap enforcement.
+        - [FIX] System: Corregidos errores de sintaxis en ConnectDots, Clock y Chess.
+
         CHANGELOG v17.5
         - [FIX] Oca: Tablero 8x8 corregido, tokens visuales (Dino/Oca) y movimiento suave.
         - [FEATURE] Oca: Botón "Jugar Otra Vez" añadido al finalizar.
@@ -2796,7 +2800,7 @@
                 const bar = document.createElement('div');
                 // FIX: Relative/Static positioning, flex wrap for small screens
                 bar.style.cssText = `
-                    width: 95%; min-height: 80px; margin: 0 auto 10px auto;
+                    position: relative; width: 95%; min-height: 80px; margin: 0 auto 10px auto;
                     background: white; border-radius: 20px;
                     display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px;
                     box-shadow: 0 5px 15px rgba(0,0,0,0.1); padding: 10px; box-sizing: border-box; flex-shrink: 0;
@@ -3415,10 +3419,8 @@
                 }
             }
         }
-        }
 
         /**
-    /**
          * ⏰ CLOCK GAME (Responsive v12.0)
          * - Visuals: Cake Slices (conic-gradient)
          * - Layout: Auto-adaptive (vmin) + Flexbox Sidebar/Topbar
@@ -5320,7 +5322,9 @@
         }
 
         /**
-         * ♟️ CHESS GAME (Ajedrez Simplified)class ChessGame {
+         * ♟️ CHESS GAME (Ajedrez Simplified)
+         */
+        class ChessGame {
             constructor(data, container) {
                 this.data = data;
                 this.c = container;
