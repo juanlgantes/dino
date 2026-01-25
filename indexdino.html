@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.5 "Dino Oca Remaster"</title>
+    <title>v17.6 "Dino Performance"</title>
     <!--
+        CHANGELOG v17.6
+        - [PERF] KartGame: Reduced memory allocation in animation loop.
+
         CHANGELOG v17.5
         - [FIX] Oca: Tablero 8x8 corregido, tokens visuales (Dino/Oca) y movimiento suave.
         - [FEATURE] Oca: Botón "Jugar Otra Vez" añadido al finalizar.
@@ -1942,6 +1945,7 @@
                 this.height = this.c.offsetHeight;
                 this.playerX = 50; // Percentage
 
+                this.loop = this.loop.bind(this);
                 this.init();
             }
 
@@ -2106,7 +2110,7 @@
                 if (this.timeLeft <= 0) {
                     this.finishLine();
                 } else {
-                    requestAnimationFrame(() => this.loop());
+                    requestAnimationFrame(this.loop);
                 }
             }
 
