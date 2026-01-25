@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.8 "Voice Fix"</title>
+    <title>v17.9 "Voice Boost"</title>
     <!--
+        CHANGELOG v17.9
+        - [FIX] AudioEngine: Carga explícita de voces y "warm-up" del motor de voz para garantizar sonido en móviles/Chrome.
+
         CHANGELOG v17.8
         - [FIX] AudioEngine: Solucionado problema de voz (SpeechSynthesis) que no sonaba en algunos dispositivos (GC fix).
 
@@ -968,6 +971,34 @@
                 this.muted = false;
                 this.unlocked = false;
                 this._lastUtterance = null;
+                this._voices = [];
+                this.initVoices();
+            }
+
+            initVoices() {
+                if (!window.speechSynthesis) return;
+
+                const load = () => {
+                    this._voices = window.speechSynthesis.getVoices();
+                    // console.log('Voces cargadas:', this._voices.length);
+                };
+
+                // Chrome loads async
+                if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                    window.speechSynthesis.onvoiceschanged = load;
+                }
+                // Try now anyway
+                load();
+
+                // Aggressive Retry for Samsung/Android
+                if (this._voices.length === 0) {
+                    let attempts = 0;
+                    const interval = setInterval(() => {
+                        load();
+                        attempts++;
+                        if (this._voices.length > 0 || attempts > 10) clearInterval(interval);
+                    }, 500);
+                }
             }
 
             get ctx() {
@@ -978,18 +1009,31 @@
             }
 
             unlock() {
-                if (!this.unlocked && this.ctx.state !== 'running') {
-                    // Android Audio Fix: Play silent buffer + Resume
+                if (this.unlocked) return Promise.resolve();
+
+                // 1. Unlock Web Audio
+                if (this.ctx.state !== 'running') {
                     const buffer = this.ctx.createBuffer(1, 1, 22050);
                     const source = this.ctx.createBufferSource();
                     source.buffer = buffer;
                     source.connect(this.ctx.destination);
                     source.start(0);
-
-                    return this.ctx.resume().then(() => {
-                        this.unlocked = true;
-                    });
+                    this.ctx.resume();
                 }
+
+                // 2. Unlock Speech Synthesis (Mobile Wake-up)
+                if (window.speechSynthesis) {
+                    // Clear queue first
+                    window.speechSynthesis.cancel();
+
+                    // Speak silence to initialize the engine on user gesture
+                    const u = new SpeechSynthesisUtterance(' ');
+                    u.volume = 0; // Silent
+                    u.rate = 1.0;
+                    window.speechSynthesis.speak(u);
+                }
+
+                this.unlocked = true;
                 return Promise.resolve();
             }
 
@@ -1014,19 +1058,50 @@
             }
 
             speak(text) {
-                if (this.muted || !window.speechSynthesis) return;
+                if (this.muted || !window.speechSynthesis || !text) return;
 
-                // Cancel previous to avoid stuck state
+                // 0. Resume
+                if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+
+                // 1. Cancel
                 window.speechSynthesis.cancel();
 
+                // 2. Create
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = "es-ES";
-                utterance.rate = 1.2;
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
 
-                // Fix for GC bug (Chrome/Android)
+                // 3. Legacy Voice Mode for Android/Samsung
+                // If specific voice object causes issues, rely on lang only.
+                // We use User Agent detection to infer potential trouble environment (Android)
+                const isAndroid = /Android/i.test(navigator.userAgent);
+
+                if (isAndroid) {
+                    // LEGACY MODE: Just Lang
+                    utterance.lang = "es-ES";
+                } else {
+                    // STANDARD MODE: Explicit Voice
+                    if (this._voices.length === 0) this._voices = window.speechSynthesis.getVoices();
+
+                    const voice = this._voices.find(v => v.lang === 'es-ES' || v.lang === 'es_ES') ||
+                                  this._voices.find(v => v.lang.startsWith('es')) ||
+                                  this._voices.find(v => v.default);
+
+                    if (voice) {
+                        utterance.voice = voice;
+                        utterance.lang = voice.lang;
+                    } else {
+                        utterance.lang = "es-ES";
+                    }
+                }
+
+                // 4. GC Fix
                 this._lastUtterance = utterance;
                 utterance.onend = () => { this._lastUtterance = null; };
+                utterance.onerror = (e) => { console.error('Speech Error:', e); };
 
+                // 5. Speak
                 window.speechSynthesis.speak(utterance);
             }
         }
@@ -3262,25 +3337,28 @@
                     {
                         name: "GATO 🐱",
                         points: [
-                            { x: 0.2, y: 0.6 }, { x: 0.2, y: 0.3 }, { x: 0.3, y: 0.2 }, { x: 0.4, y: 0.3 },
-                            { x: 0.6, y: 0.3 }, { x: 0.7, y: 0.2 }, { x: 0.8, y: 0.3 }, { x: 0.8, y: 0.6 },
-                            { x: 0.7, y: 0.8 }, { x: 0.3, y: 0.8 }
+                            {x:0.3,y:0.75},{x:0.25,y:0.65},{x:0.2,y:0.55},{x:0.2,y:0.4},{x:0.25,y:0.3},
+                            {x:0.2,y:0.15},{x:0.35,y:0.25},{x:0.5,y:0.25},{x:0.65,y:0.15},{x:0.6,y:0.3},
+                            {x:0.65,y:0.4},{x:0.65,y:0.55},{x:0.6,y:0.65},{x:0.55,y:0.75},{x:0.55,y:0.85},
+                            {x:0.7,y:0.85},{x:0.75,y:0.75},{x:0.8,y:0.5},{x:0.8,y:0.4},{x:0.75,y:0.3}
                         ]
                     },
                     {
                         name: "PERRO 🐶",
                         points: [
-                            { x: 0.3, y: 0.4 }, { x: 0.2, y: 0.6 }, { x: 0.3, y: 0.8 }, { x: 0.7, y: 0.8 },
-                            { x: 0.8, y: 0.6 }, { x: 0.7, y: 0.4 }, { x: 0.8, y: 0.2 }, { x: 0.6, y: 0.2 },
-                            { x: 0.5, y: 0.3 }, { x: 0.2, y: 0.2 }
+                            {x:0.2,y:0.5},{x:0.25,y:0.4},{x:0.35,y:0.35},{x:0.3,y:0.2},{x:0.4,y:0.15},
+                            {x:0.5,y:0.2},{x:0.6,y:0.25},{x:0.7,y:0.3},{x:0.75,y:0.4},{x:0.8,y:0.5},
+                            {x:0.85,y:0.6},{x:0.8,y:0.7},{x:0.7,y:0.75},{x:0.6,y:0.7},{x:0.5,y:0.75},
+                            {x:0.4,y:0.7},{x:0.3,y:0.65},{x:0.25,y:0.6},{x:0.2,y:0.55},{x:0.15,y:0.5}
                         ]
                     },
                     {
                         name: "PATO 🦆",
                         points: [
-                            { x: 0.3, y: 0.3 }, { x: 0.5, y: 0.2 }, { x: 0.7, y: 0.3 }, { x: 0.8, y: 0.5 },
-                            { x: 0.7, y: 0.7 }, { x: 0.5, y: 0.8 }, { x: 0.3, y: 0.7 }, { x: 0.2, y: 0.5 },
-                            { x: 0.1, y: 0.4 }, { x: 0.4, y: 0.4 }
+                            {x:0.2,y:0.4},{x:0.25,y:0.3},{x:0.35,y:0.25},{x:0.45,y:0.25},{x:0.5,y:0.3},
+                            {x:0.5,y:0.4},{x:0.55,y:0.5},{x:0.65,y:0.55},{x:0.75,y:0.5},{x:0.8,y:0.4},
+                            {x:0.85,y:0.35},{x:0.9,y:0.4},{x:0.85,y:0.55},{x:0.75,y:0.65},{x:0.65,y:0.7},
+                            {x:0.55,y:0.7},{x:0.45,y:0.65},{x:0.35,y:0.6},{x:0.25,y:0.5},{x:0.2,y:0.45}
                         ]
                     }
                 ];
@@ -3353,6 +3431,7 @@
                     x: p.x * this.canvas.width,
                     y: p.y * this.canvas.height
                 }));
+                this.maxDots = this.dots.length;
                 this.currentDot = 1;
                 this.documentTitle = document.getElementById("dotsTitle");
                 this.documentTitle.textContent = `Nivel ${this.level + 1}: ${this.currentDot} ➡️ ${this.currentDot + 1}`;
@@ -5124,11 +5203,12 @@
                 this.data = data;
                 this.c = container;
                 this.app = window.app;
-                this.pieces = [1, 1]; // P1 (User), P2 (AI)
-                this.turn = 0; // 0 = User, 1 = AI
-                this.waitingRoll = true;
+                this.pieces = [1, 1]; // P1 (User/Dino), P2 (AI/Human)
+                this.turn = 0; // 0 = P1, 1 = P2
+                this.waitingRoll = false;
                 this.skip = [0, 0];
                 this.timeouts = [];
+                this.gameMode = 'pve'; // pve, pvp, hybrid
 
                 this.DINOS = [5, 9, 14, 18, 23, 27, 32, 36, 41, 45, 50, 54, 59];
                 this.SPECIALS = {
@@ -5153,24 +5233,85 @@
 
             init() {
                 this.c.innerHTML = '';
-                this.c.style.cssText = 'display:flex; flex-direction:column; align-items:center; background:#ecf0f1; height:100%; justify-content:center; overflow:hidden;';
+                this.c.style.cssText = 'display:flex; flex-direction:column; align-items:center; background:#ecf0f1; height:100%; justify-content:center; overflow:hidden; font-family: "Fredoka", sans-serif;';
+
+                // Title
+                const title = document.createElement('h2');
+                title.textContent = '🦆 La Oca Dino';
+                title.style.cssText = 'color:#2c3e50; font-size:3em; margin-bottom:30px; text-align:center;';
+                this.c.appendChild(title);
+
+                const btnContainer = document.createElement('div');
+                btnContainer.style.cssText = 'display:flex; gap:20px; flex-wrap:wrap; justify-content:center;';
+
+                const btn1 = document.createElement('button');
+                btn1.className = 'mode-btn kid';
+                btn1.style.background = '#e74c3c';
+                btn1.innerHTML = '🤖 1 Jugador<br><span style="font-size:0.6em">vs Dino</span>';
+                btn1.onclick = () => this.startGame('pve');
+
+                const btn2 = document.createElement('button');
+                btn2.className = 'mode-btn kid';
+                btn2.style.background = '#f1c40f';
+                btn2.innerHTML = '👥 2 Jugadores<br><span style="font-size:0.6em">Amigos</span>';
+                btn2.onclick = () => this.startGame('pvp');
+
+                const btn3 = document.createElement('button');
+                btn3.className = 'mode-btn kid';
+                btn3.style.background = '#9b59b6';
+                btn3.innerHTML = '🎲 Híbrido<br><span style="font-size:0.6em">Dado Real</span>';
+                btn3.onclick = () => this.startGame('hybrid');
+
+                btnContainer.appendChild(btn1);
+                btnContainer.appendChild(btn2);
+                btnContainer.appendChild(btn3);
+                this.c.appendChild(btnContainer);
+            }
+
+            startGame(mode) {
+                this.gameMode = mode;
+                this.c.innerHTML = '';
+                this.waitingRoll = true;
 
                 // 1. Cabecera
                 const h = document.createElement('div');
                 h.style.cssText = 'width:95%; max-width:500px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; background:white; padding:10px; border-radius:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); flex-shrink:0;';
 
                 this.statusEl = document.createElement('h3');
-                this.statusEl.innerText = '¡Tira el dado!';
+                this.statusEl.innerText = (mode === 'hybrid') ? 'Tira tu dado' : '¡Tira el dado!';
                 this.statusEl.style.fontSize = '1.1em';
                 this.statusEl.style.margin = '0';
 
                 this.diceEl = document.createElement('div');
                 this.diceEl.innerText = '🎲';
                 this.diceEl.style.fontSize = '2.5em';
+                this.diceEl.style.cursor = 'pointer';
                 this.diceEl.onclick = () => this.rollDice();
 
                 h.append(this.statusEl, this.diceEl);
                 this.c.append(h);
+
+                // Manual Input (Hidden)
+                this.diceInput = document.createElement('div');
+                this.diceInput.style.cssText = `
+                    display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 20px;
+                    box-shadow: 0 10px 20px rgba(0,0,0,0.3); flex-direction: column; align-items: center; gap: 10px; z-index: 100;
+                `;
+                const inputLabel = document.createElement('h3');
+                inputLabel.textContent = '¿Qué número salió?';
+                this.diceInput.appendChild(inputLabel);
+                const btnsDiv = document.createElement('div');
+                btnsDiv.style.display = 'flex'; btnsDiv.style.gap = '10px';
+                for (let i = 1; i <= 6; i++) {
+                    const b = document.createElement('button');
+                    b.textContent = i;
+                    b.style.cssText = 'width:50px; height:50px; font-size:1.5em; border:none; border-radius:50%; background:#3498db; color:white; cursor:pointer;';
+                    b.onclick = () => { this.diceInput.style.display = 'none'; this.processRoll(i); };
+                    btnsDiv.appendChild(b);
+                }
+                this.diceInput.appendChild(btnsDiv);
+                this.c.appendChild(this.diceInput);
 
                 // 2. Tablero
                 this.boardEl = document.createElement('div');
@@ -5242,16 +5383,16 @@
 
             createTokens() {
                 this.tokens = [];
-                // User: Dino Pequeño (🦕)
+                // P1: Dino (🦕)
                 let t1 = document.createElement('div');
                 t1.innerText = '🦕';
                 t1.style.cssText = 'position:absolute; font-size:2.2em; transition:all 0.5s; z-index:20; pointer-events:none; filter: drop-shadow(0 0 2px white);';
                 this.boardEl.append(t1);
                 this.tokens.push(t1);
 
-                // AI: Oca (🦆)
+                // P2: Oca/Friend (🦆 or 🦖)
                 let t2 = document.createElement('div');
-                t2.innerText = '🦆';
+                t2.innerText = (this.gameMode === 'pve') ? '🦆' : '🦖';
                 t2.style.cssText = 'position:absolute; font-size:2.2em; transition:all 0.5s; z-index:20; pointer-events:none; filter: drop-shadow(0 0 2px white);';
                 this.boardEl.append(t2);
                 this.tokens.push(t2);
@@ -5267,8 +5408,10 @@
                         let x = cell.offsetLeft + (cell.offsetWidth / 2) - (token.offsetWidth / 2 || 15);
                         let y = cell.offsetTop + (cell.offsetHeight / 2) - (token.offsetHeight / 2 || 15);
 
-                        if (this.pieces[0] === this.pieces[1] && idx === 1) {
-                            x += 8; y += 8;
+                        // Offset if occupying same square
+                        if (this.pieces[0] === this.pieces[1]) {
+                            if (idx === 0) { x -= 5; y -= 5; }
+                            if (idx === 1) { x += 5; y += 5; }
                         }
 
                         token.style.left = x + 'px';
@@ -5280,6 +5423,10 @@
             rollDice() {
                 if (!this.waitingRoll) return;
 
+                // PVE Mode Logic: P1 rolls, P2 is Auto
+                if (this.gameMode === 'pve' && this.turn === 1) return;
+
+                // Skip Turn Logic
                 if (this.skip[this.turn] > 0) {
                     this.skip[this.turn]--;
                     this.statusEl.innerText = 'Turno perdido 🚫';
@@ -5288,11 +5435,21 @@
                     return;
                 }
 
+                // Hybrid Mode
+                if (this.gameMode === 'hybrid') {
+                    this.diceInput.style.display = 'flex';
+                    return;
+                }
+
+                // Standard Roll
                 this.waitingRoll = false;
                 let val = Math.floor(Math.random()*6)+1;
+                this.processRoll(val);
+            }
+
+            processRoll(val) {
                 this.diceEl.innerText = '🎲 ' + val;
                 this.app.audio.speak(val.toString());
-
                 this.wait(() => this.move(val), 600);
             }
 
@@ -5311,8 +5468,8 @@
 
             checkRules(pos) {
                 if(pos === 63) {
-                    this.statusEl.innerText = this.turn === 0 ? '¡GANASTE! 🎉' : '¡Dino Gana! 🦆';
-                    this.app.audio.speak(this.turn === 0 ? 'Ganaste' : 'La Oca gana');
+                    this.statusEl.innerText = (this.turn === 0) ? '¡GANASTE! 🎉' : (this.gameMode === 'pve' ? '¡La Oca Gana! 🦆' : '¡J2 Gana! 🎉');
+                    this.app.audio.speak(this.turn === 0 ? 'Ganaste' : 'Oca gana');
                     this.app.audio.playWin();
 
                     // REPLAY BUTTON OVERLAY
@@ -5339,7 +5496,9 @@
 
                     this.pieces[this.turn] = next;
                     this.updatePositions();
-                    this.waitingRoll = true;
+                    this.waitingRoll = true; // Auto roll? usually Rules say roll again.
+                    // Simplified: Just move, keep turn? Or just move.
+                    // Code before said: waitingRoll = true; return; -> User rolls again.
                     return;
                 }
 
@@ -5362,15 +5521,21 @@
                 this.turn = this.turn === 0 ? 1 : 0;
                 this.waitingRoll = true;
                 this.diceEl.innerText = '🎲';
-                this.statusEl.innerText = this.turn===0 ? 'Turno Jugador 🦕' : 'Turno Oca 🦆';
 
-                if(this.turn === 1) {
+                let pName = (this.turn === 0) ? 'Dino 🦕' : ((this.gameMode === 'pve') ? 'Oca 🦆' : 'J2 🦖');
+                this.statusEl.innerText = `Turno ${pName}`;
+
+                if (this.gameMode === 'pve' && this.turn === 1) {
                     this.wait(() => {
                         let val = Math.floor(Math.random()*6)+1;
                         this.diceEl.innerText = '🎲 ' + val;
                         this.app.audio.speak('Oca saca ' + val);
-                        this.move(val);
+                        this.processRoll(val);
                     }, 1000);
+                } else {
+                    // PVP or Hybrid
+                    // Highlight or sound to indicate change
+                    if(this.gameMode !== 'pve') this.app.audio.playPop();
                 }
             }
 
@@ -5757,12 +5922,15 @@
                 const unlockAudio = () => {
                     this.audio.unlock().then(() => {
                         // Remove listeners only after successful unlock promise resolution
-                        document.removeEventListener('touchstart', unlockAudio);
+                        document.removeEventListener('touchend', unlockAudio);
                         document.removeEventListener('click', unlockAudio);
+                        document.removeEventListener('keydown', unlockAudio);
                     });
                 };
-                document.addEventListener('touchstart', unlockAudio);
+                // Use touchend for better mobile compatibility (gesture finish)
+                document.addEventListener('touchend', unlockAudio);
                 document.addEventListener('click', unlockAudio);
+                document.addEventListener('keydown', unlockAudio);
             }
 
             renderActivities(mode = 'root') {
