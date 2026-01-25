@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.13 "Goose Layout"</title>
+    <title>v17.14 "Goose Nav"</title>
     <!--
+        CHANGELOG v17.14
+        - [FEATURE] Oca: Botón "Salir" en el menú de modos y botón "Volver" (🔙) durante el juego.
+
         CHANGELOG v17.13
         - [FIX] Oca: Optimizado padding y ancho del tablero para pantallas móviles pequeñas.
 
@@ -4690,6 +4693,14 @@
                 btnContainer.appendChild(btn2);
                 btnContainer.appendChild(btn3);
                 this.c.appendChild(btnContainer);
+
+                // Exit Button
+                const exit = document.createElement('button');
+                exit.textContent = '🏠 Salir';
+                exit.className = 'mode-btn kid';
+                exit.style.marginTop = '40px';
+                exit.onclick = () => this.app.nav.goDashboard();
+                this.c.appendChild(exit);
             }
 
             startGame(mode) {
@@ -5285,6 +5296,14 @@
                 btnContainer.appendChild(btn2);
                 btnContainer.appendChild(btn3);
                 this.c.appendChild(btnContainer);
+
+                // Exit Button
+                const exit = document.createElement('button');
+                exit.textContent = '🏠 Salir';
+                exit.className = 'mode-btn kid';
+                exit.style.marginTop = '40px';
+                exit.onclick = () => this.app.nav.goDashboard();
+                this.c.appendChild(exit);
             }
 
             startGame(mode) {
@@ -5307,7 +5326,25 @@
                 this.diceEl.style.cursor = 'pointer';
                 this.diceEl.onclick = () => this.rollDice();
 
-                h.append(this.statusEl, this.diceEl);
+                // Back Button (New)
+                const backBtn = document.createElement('button');
+                backBtn.innerText = '🔙';
+                backBtn.style.cssText = 'background:none; border:none; font-size:2em; cursor:pointer; margin-right:10px;';
+                backBtn.onclick = () => {
+                    if(confirm('¿Salir al menú de la Oca?')) {
+                        this.cleanup();
+                        this.init();
+                    }
+                };
+
+                // Wrap status and dice
+                const rightDiv = document.createElement('div');
+                rightDiv.style.display = 'flex';
+                rightDiv.style.alignItems = 'center';
+                rightDiv.style.gap = '10px';
+                rightDiv.append(this.statusEl, this.diceEl);
+
+                h.append(backBtn, rightDiv);
                 this.c.append(h);
 
                 // Manual Input (Hidden)
