@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kart UI Benchmark</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .results { margin-top: 20px; font-family: monospace; }
+        .bar { height: 20px; background: blue; margin-bottom: 5px; transition: width 0.5s; }
+        #container-baseline, #container-optimized {
+            display: none; /* Hide to avoid painting cost interfering too much, though layout cost still applies */
+            position: absolute; top: 10px; left: 10px; color: black;
+            font-size: 1.5em; font-weight: bold; background: rgba(0,0,0,0.5);
+            padding: 5px 15px; border-radius: 15px; z-index: 20;
+        }
+    </style>
+</head>
+<body>
+    <h1>Kart UI Performance Benchmark</h1>
+    <p>Simulating 3600 frames (60fps for 60 seconds).</p>
+    <button onclick="runBenchmark()">Run Benchmark</button>
+    <div id="results" class="results"></div>
+
+    <!-- Hidden containers for testing -->
+    <div id="test-area"></div>
+
+    <script>
+        function runBenchmark() {
+            const resultsEl = document.getElementById('results');
+            resultsEl.innerHTML = 'Running...';
+            const testArea = document.getElementById('test-area');
+            testArea.innerHTML = '';
+
+            // Configuration
+            const TOTAL_FRAMES = 3600; // 60 seconds * 60 fps
+            const LIVES = 3;
+
+            // --- BASELINE ---
+            const containerBaseline = document.createElement('div');
+            // Style mimicking the game
+            containerBaseline.style.cssText = `
+                position: absolute; top: 10px; left: 10px; color: white;
+                font-size: 1.5em; font-weight: bold; background: rgba(0,0,0,0.5);
+                padding: 5px 15px; border-radius: 15px; z-index: 20;
+            `;
+            testArea.appendChild(containerBaseline);
+
+            const startBase = performance.now();
+            let timeLeft = 60;
+
+            for (let i = 0; i < TOTAL_FRAMES; i++) {
+                // Simulate Game Loop Logic
+                // Decrease time every frame
+                timeLeft -= 1/60;
+                if (timeLeft < 0) timeLeft = 0;
+
+                // updateUI Logic (Baseline)
+                const m = Math.floor(timeLeft / 60);
+                const s = Math.floor(timeLeft % 60);
+                const timeStr = `${m}:${s.toString().padStart(2, '0')}`;
+
+                containerBaseline.innerHTML = `⏱️ ${timeStr} <span style="margin-left:10px">❤️ ${LIVES}</span>`;
+            }
+            const endBase = performance.now();
+            const timeBase = endBase - startBase;
+
+            // --- OPTIMIZED ---
+            const containerOpt = document.createElement('div');
+            containerOpt.style.cssText = `
+                position: absolute; top: 10px; left: 10px; color: white;
+                font-size: 1.5em; font-weight: bold; background: rgba(0,0,0,0.5);
+                padding: 5px 15px; border-radius: 15px; z-index: 20;
+            `;
+
+            // Init Structure
+            const timeDisplay = document.createElement('span');
+            const livesDisplay = document.createElement('span');
+            livesDisplay.style.marginLeft = '10px';
+
+            containerOpt.appendChild(document.createTextNode('⏱️ '));
+            containerOpt.appendChild(timeDisplay);
+            containerOpt.appendChild(document.createTextNode(' '));
+            containerOpt.appendChild(livesDisplay);
+
+            testArea.appendChild(containerOpt);
+
+            // Init tracking
+            let lastRenderedTime = '';
+            let lastRenderedLives = -1;
+            let currentLives = LIVES;
+
+            const startOpt = performance.now();
+            timeLeft = 60;
+
+            for (let i = 0; i < TOTAL_FRAMES; i++) {
+                 // Simulate Game Loop Logic
+                timeLeft -= 1/60;
+                if (timeLeft < 0) timeLeft = 0;
+
+                // updateUI Logic (Optimized)
+                const m = Math.floor(timeLeft / 60);
+                const s = Math.floor(timeLeft % 60);
+                const timeStr = `${m}:${s.toString().padStart(2, '0')}`;
+
+                if (timeStr !== lastRenderedTime) {
+                    timeDisplay.textContent = timeStr;
+                    lastRenderedTime = timeStr;
+                }
+
+                if (currentLives !== lastRenderedLives) {
+                    livesDisplay.textContent = `❤️ ${currentLives}`;
+                    lastRenderedLives = currentLives;
+                }
+            }
+            const endOpt = performance.now();
+            const timeOpt = endOpt - startOpt;
+
+            // Report
+            resultsEl.innerHTML = `
+                <h3>Results:</h3>
+                <p>Baseline (innerHTML): <strong>${timeBase.toFixed(2)} ms</strong></p>
+                <p>Optimized (textContent + Check): <strong>${timeOpt.toFixed(2)} ms</strong></p>
+                <p>Improvement: <strong>${(timeBase / timeOpt).toFixed(1)}x faster</strong></p>
+            `;
+
+            // Clean up
+            // testArea.innerHTML = '';
+        }
+    </script>
+</body>
+</html>
