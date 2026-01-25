@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.15 "Goose AI Fix"</title>
+    <title>v17.16 "Goose Layout Fix"</title>
     <!--
+        CHANGELOG v17.16
+        - [FIX] Oca: Tablero responsive en móviles landscape (horizontal). Ahora se adapta al alto de la pantalla.
+
         CHANGELOG v17.15
         - [FIX] Oca: Corregido bloqueo del juego cuando la IA (Dino) cae en una casilla "De Dino a Dino".
 
@@ -5264,6 +5267,44 @@
                 this.timeouts.push(id);
             }
 
+            injectStyles() {
+                if (document.getElementById('goose-game-style')) return;
+                const s = document.createElement('style');
+                s.id = 'goose-game-style';
+                s.innerHTML = `
+                    .goose-board {
+                        display: grid;
+                        grid-template-columns: repeat(8, 1fr);
+                        grid-template-rows: repeat(8, 1fr);
+                        gap: 2px;
+                        box-sizing: border-box;
+                        background: #2c3e50;
+                        border: 4px solid #34495e;
+                        border-radius: 10px;
+                        position: relative;
+                        padding: 2px;
+                        margin-top: 10px;
+
+                        /* Default Portrait / Desktop */
+                        width: 95%;
+                        aspect-ratio: 1/1;
+                        height: auto;
+                        max-width: 600px;
+                        max-height: 600px;
+                        margin-left: auto;
+                        margin-right: auto;
+                    }
+
+                    @media (orientation: landscape) {
+                        .goose-board {
+                            width: auto;
+                            height: 80vh;
+                        }
+                    }
+                `;
+                document.head.appendChild(s);
+            }
+
             init() {
                 this.c.innerHTML = '';
         this.c.style.cssText = 'display:flex; flex-direction:column; align-items:center; background:#ecf0f1; height:auto; min-height:100%; justify-content:flex-start; font-family: "Fredoka", sans-serif; padding: 10px; padding-bottom: 40px;';
@@ -5373,19 +5414,9 @@
                 this.c.appendChild(this.diceInput);
 
                 // 2. Tablero
+                this.injectStyles();
                 this.boardEl = document.createElement('div');
-                this.boardEl.style.cssText = `
-                    display: grid;
-                    grid-template-columns: repeat(8, 1fr);
-                    grid-template-rows: repeat(8, 1fr);
-                    gap: 2px;
-                    width: 95%; aspect-ratio: 1/1; height: auto;
-                    max-width: 600px; box-sizing: border-box;
-                    background: #2c3e50; border: 4px solid #34495e;
-                    border-radius: 10px; position: relative;
-                    padding: 2px;
-                    margin-top: 10px;
-                `;
+                this.boardEl.className = 'goose-board';
                 this.c.append(this.boardEl);
 
                 // 3. Render
