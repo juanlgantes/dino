@@ -14,8 +14,12 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.6 "Android Audio Fix"</title>
+    <title>v17.7 "Cleanup & Fixes"</title>
     <!--
+        CHANGELOG v17.7
+        - [FIX] Dino Reloj: Solucionado memory leak en eventos de arrastre.
+        - [FIX] Oca: Gestión de limpieza mejorada (Timeouts y ResizeObserver).
+
         CHANGELOG v17.6
         - [SYS] AudioEngine: Mejora en desbloqueo de audio para Android.
 
@@ -3448,10 +3452,8 @@
                 }
             }
         }
-        }
 
         /**
-    /**
          * ⏰ CLOCK GAME (Responsive v12.0)
          * - Visuals: Cake Slices (conic-gradient)
          * - Layout: Auto-adaptive (vmin) + Flexbox Sidebar/Topbar
@@ -3757,11 +3759,8 @@
                     if (angle < 0) angle += 360;
 
                     const dist = Math.sqrt(dx * dx + dy * dy);
-                    // Use relative check (radius is approx width/2)
-                    // width is 60vmin. rect.width is pixels.
-                    // Let's use % distance relative to radius.
                     const radius = rect.width / 2;
-                    const distPercent = (dist / radius) * 100; // 0 to 100 (edge)
+                    const distPercent = (dist / radius) * 100;
 
                     if (distPercent < 60 || this.difficulty === 'easy') {
                         let h = Math.round(angle / 30);
@@ -3775,13 +3774,17 @@
                     this.updateVisuals();
                 };
 
+                const stopDrag = () => {
+                    el.removeEventListener('mousemove', handleMove);
+                    window.removeEventListener('mouseup', stopDrag);
+                };
+
                 el.addEventListener('mousedown', (e) => {
                     el.addEventListener('mousemove', handleMove);
+                    window.addEventListener('mouseup', stopDrag);
                     handleMove(e);
                 });
-                window.addEventListener('mouseup', () => {
-                    el.removeEventListener('mousemove', handleMove);
-                });
+
                 el.addEventListener('touchmove', handleMove, { passive: false });
                 el.addEventListener('touchstart', handleMove, { passive: false });
             }
@@ -5112,6 +5115,7 @@
                 this.turn = 0; // 0 = User, 1 = AI
                 this.waitingRoll = true;
                 this.skip = [0, 0];
+                this.timeouts = [];
 
                 this.DINOS = [5, 9, 14, 18, 23, 27, 32, 36, 41, 45, 50, 54, 59];
                 this.SPECIALS = {
@@ -5124,6 +5128,14 @@
                 };
 
                 this.init();
+            }
+
+            wait(fn, ms) {
+                const id = setTimeout(() => {
+                    fn();
+                    this.timeouts = this.timeouts.filter(t => t !== id);
+                }, ms);
+                this.timeouts.push(id);
             }
 
             init() {
@@ -5169,10 +5181,10 @@
 
                 // 4. Robustez
                 if (window.ResizeObserver) {
-                    const ro = new ResizeObserver(() => this.updatePositions());
-                    ro.observe(this.boardEl);
+                    this.ro = new ResizeObserver(() => this.updatePositions());
+                    this.ro.observe(this.boardEl);
                 } else {
-                    setTimeout(() => this.updatePositions(), 500);
+                    this.wait(() => this.updatePositions(), 500);
                 }
             }
 
@@ -5259,7 +5271,7 @@
                     this.skip[this.turn]--;
                     this.statusEl.innerText = 'Turno perdido 🚫';
                     this.app.audio.speak('Turno perdido');
-                    setTimeout(() => this.nextTurn(), 1500);
+                    this.wait(() => this.nextTurn(), 1500);
                     return;
                 }
 
@@ -5268,7 +5280,7 @@
                 this.diceEl.innerText = '🎲 ' + val;
                 this.app.audio.speak(val.toString());
 
-                setTimeout(() => this.move(val), 600);
+                this.wait(() => this.move(val), 600);
             }
 
             move(steps) {
@@ -5281,7 +5293,7 @@
                 this.updatePositions();
                 this.app.audio.playPop();
 
-                setTimeout(() => this.checkRules(target), 600);
+                this.wait(() => this.checkRules(target), 600);
             }
 
             checkRules(pos) {
@@ -5291,7 +5303,7 @@
                     this.app.audio.playWin();
 
                     // REPLAY BUTTON OVERLAY
-                    setTimeout(() => {
+                    this.wait(() => {
                         const ov = document.createElement('div');
                         ov.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:100; border-radius:10px;';
                         ov.innerHTML = `
@@ -5340,7 +5352,7 @@
                 this.statusEl.innerText = this.turn===0 ? 'Turno Jugador 🦕' : 'Turno Oca 🦆';
 
                 if(this.turn === 1) {
-                    setTimeout(() => {
+                    this.wait(() => {
                         let val = Math.floor(Math.random()*6)+1;
                         this.diceEl.innerText = '🎲 ' + val;
                         this.app.audio.speak('Oca saca ' + val);
@@ -5349,11 +5361,17 @@
                 }
             }
 
-            cleanup() { }
+            cleanup() {
+                if (this.ro) this.ro.disconnect();
+                this.timeouts.forEach(clearTimeout);
+                this.timeouts = [];
+            }
         }
 
         /**
-         * ♟️ CHESS GAME (Ajedrez Simplified)class ChessGame {
+         * ♟️ CHESS GAME (Ajedrez Simplified)
+         */
+        class ChessGame {
             constructor(data, container) {
                 this.data = data;
                 this.c = container;
