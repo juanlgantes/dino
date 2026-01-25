@@ -1995,6 +1995,19 @@
                     font-size: 1.5em; font-weight: bold; background: rgba(0,0,0,0.5);
                     padding: 5px 15px; border-radius: 15px; z-index: 20;
                 `;
+
+                // Optimized UI Structure (No innerHTML loop)
+                this.uiEl.appendChild(document.createTextNode('⏱️ '));
+                this.timeNode = document.createTextNode('');
+                this.uiEl.appendChild(this.timeNode);
+
+                const livesContainer = document.createElement('span');
+                livesContainer.style.marginLeft = '10px';
+                livesContainer.appendChild(document.createTextNode('❤️ '));
+                this.livesNode = document.createTextNode('');
+                livesContainer.appendChild(this.livesNode);
+                this.uiEl.appendChild(livesContainer);
+
                 this.c.appendChild(this.uiEl);
 
                 this.bindControls();
@@ -2128,7 +2141,8 @@
                 const s = Math.floor(this.timeLeft % 60);
                 const timeStr = `${m}:${s.toString().padStart(2, '0')}`;
 
-                this.uiEl.innerHTML = `⏱️ ${timeStr} <span style="margin-left:10px">❤️ ${this.lives}</span>`;
+                this.timeNode.textContent = timeStr;
+                this.livesNode.textContent = this.lives;
             }
 
             finishLine() {
