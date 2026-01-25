@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.21 "Fluid Maze"</title>
+    <title>v17.22 "Maze Freeze Fix"</title>
     <!--
+        CHANGELOG v17.22
+        - [FIX] Laberinto: Solucionado "Freeze" al completar el nivel final.
+
         CHANGELOG v17.21
         - [FEATURE] Laberinto: Nuevo control fluido "Aventura" (Arrastrar para mover).
         - [FIX] Laberinto: Movimiento suave en lugar de paso a paso.
@@ -3450,6 +3453,7 @@
             }
 
             winGame() {
+                this.running = false; // Stop Loop
                 this.c.innerHTML = '';
                 const winDiv = document.createElement('div');
                 winDiv.style.textAlign = 'center';
@@ -3467,10 +3471,6 @@
 
                 app.audio.playWin();
                 app.updateParentStats(50, 1, 'maze');
-            }
-
-            cleanup() {
-                document.removeEventListener('keydown', this.keyHandler);
             }
         }
 
