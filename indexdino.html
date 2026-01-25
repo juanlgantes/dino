@@ -16,6 +16,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>v17.9 "Voice Boost"</title>
     <!--
+        CHANGELOG v17.10
+        - [FIX] Oca: Corregido tamaño del tablero y overflow en móviles (Landscape/Portrait).
+
         CHANGELOG v17.9
         - [FIX] AudioEngine: Carga explícita de voces y "warm-up" del motor de voz para garantizar sonido en móviles/Chrome.
 
@@ -5233,7 +5236,7 @@
 
             init() {
                 this.c.innerHTML = '';
-                this.c.style.cssText = 'display:flex; flex-direction:column; align-items:center; background:#ecf0f1; height:100%; justify-content:center; overflow:hidden; font-family: "Fredoka", sans-serif;';
+                this.c.style.cssText = 'display:flex; flex-direction:column; align-items:center; background:#ecf0f1; height:auto; min-height:100%; justify-content:center; overflow:hidden; font-family: "Fredoka", sans-serif; padding: 10px;';
 
                 // Title
                 const title = document.createElement('h2');
@@ -5320,7 +5323,7 @@
                     grid-template-columns: repeat(8, 1fr);
                     grid-template-rows: repeat(8, 1fr);
                     gap: 2px;
-                    width: 95vmin; height: 95vmin;
+                    width: 90vmin; height: 90vmin;
                     max-width: 500px; max-height: 500px;
                     background: #2c3e50; border: 4px solid #34495e;
                     border-radius: 10px; position: relative;
