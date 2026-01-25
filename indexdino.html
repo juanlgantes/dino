@@ -14,8 +14,14 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.0 "Dino Oca"</title>
+    <title>v17.5 "Dino Oca Remaster"</title>
     <!--
+        CHANGELOG v17.5
+        - [FIX] Oca: Tablero 8x8 corregido, tokens visuales (Dino/Oca) y movimiento suave.
+        - [FEATURE] Oca: Botón "Jugar Otra Vez" añadido al finalizar.
+        - [FEATURE] Unir Puntos: Añadidos 3 nuevos animales (Gato, Perro, Pato).
+        - [SYS] AudioEngine: Soporte para síntesis de voz (Speak).
+
         CHANGELOG v17.0
         - [FEATURE] Nuevo Juego: "El Juego de la Oca" (GooseGame).
         - [FEATURE] Oca: 3 Modos (1P vs Dino, 2P Local, Híbrido con Dado Real).
@@ -986,6 +992,14 @@
             playWin() {
                 this.playTone(500, 'sine', 0.2);
                 setTimeout(() => this.playTone(800, 'sine', 0.4), 200);
+            }
+
+            speak(text) {
+                if (this.muted) return;
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = "es-ES";
+                utterance.rate = 1.2;
+                window.speechSynthesis.speak(utterance);
             }
         }
 
@@ -3180,35 +3194,43 @@
                 // Normalized Coordinates (0.0 to 1.0)
                 this.levels = [
                     {
-                        name: 'PEZ 🐟',
-                        // Simple Fish shape
+                        name: "PEZ 🐟",
                         points: [
-                            { x: 0.2, y: 0.5 }, // 1 Mouth
-                            { x: 0.4, y: 0.3 }, // 2 Top Head
-                            { x: 0.6, y: 0.3 }, // 3 Top Back
-                            { x: 0.8, y: 0.5 }, // 4 Tail Junction
-                            { x: 0.9, y: 0.3 }, // 5 Tail Top
-                            { x: 0.9, y: 0.7 }, // 6 Tail Bottom
-                            { x: 0.8, y: 0.5 }, // 7 Tail Junction (Back)
-                            { x: 0.6, y: 0.7 }, // 8 Bottom Belly
-                            { x: 0.4, y: 0.7 }, // 9 Bottom Head
-                            { x: 0.2, y: 0.5 }  // 10 Mouth (Close)
+                            { x: 0.2, y: 0.5 }, { x: 0.4, y: 0.3 }, { x: 0.6, y: 0.3 }, { x: 0.8, y: 0.5 },
+                            { x: 0.9, y: 0.3 }, { x: 0.9, y: 0.7 }, { x: 0.8, y: 0.5 }, { x: 0.6, y: 0.7 },
+                            { x: 0.4, y: 0.7 }, { x: 0.2, y: 0.5 }
                         ]
                     },
                     {
-                        name: 'MARIPOSA 🦋',
-                        // Butterfly
+                        name: "MARIPOSA 🦋",
                         points: [
-                            { x: 0.5, y: 0.5 }, // 1 Center
-                            { x: 0.3, y: 0.2 }, // 2 Top Left Wing Tip
-                            { x: 0.2, y: 0.5 }, // 3 Mid Left Wing
-                            { x: 0.3, y: 0.8 }, // 4 Bot Left Wing Tip
-                            { x: 0.5, y: 0.6 }, // 5 Center Bottom
-                            { x: 0.7, y: 0.8 }, // 6 Bot Right Wing Tip
-                            { x: 0.8, y: 0.5 }, // 7 Mid Right Wing
-                            { x: 0.7, y: 0.2 }, // 8 Top Right Wing Tip
-                            { x: 0.5, y: 0.4 }, // 9 Upper Center
-                            { x: 0.5, y: 0.2 }  // 10 Antenna/Head
+                            { x: 0.5, y: 0.5 }, { x: 0.3, y: 0.2 }, { x: 0.2, y: 0.5 }, { x: 0.3, y: 0.8 },
+                            { x: 0.5, y: 0.6 }, { x: 0.7, y: 0.8 }, { x: 0.8, y: 0.5 }, { x: 0.7, y: 0.2 },
+                            { x: 0.5, y: 0.4 }, { x: 0.5, y: 0.2 }
+                        ]
+                    },
+                    {
+                        name: "GATO 🐱",
+                        points: [
+                            { x: 0.2, y: 0.6 }, { x: 0.2, y: 0.3 }, { x: 0.3, y: 0.2 }, { x: 0.4, y: 0.3 },
+                            { x: 0.6, y: 0.3 }, { x: 0.7, y: 0.2 }, { x: 0.8, y: 0.3 }, { x: 0.8, y: 0.6 },
+                            { x: 0.7, y: 0.8 }, { x: 0.3, y: 0.8 }
+                        ]
+                    },
+                    {
+                        name: "PERRO 🐶",
+                        points: [
+                            { x: 0.3, y: 0.4 }, { x: 0.2, y: 0.6 }, { x: 0.3, y: 0.8 }, { x: 0.7, y: 0.8 },
+                            { x: 0.8, y: 0.6 }, { x: 0.7, y: 0.4 }, { x: 0.8, y: 0.2 }, { x: 0.6, y: 0.2 },
+                            { x: 0.5, y: 0.3 }, { x: 0.2, y: 0.2 }
+                        ]
+                    },
+                    {
+                        name: "PATO 🦆",
+                        points: [
+                            { x: 0.3, y: 0.3 }, { x: 0.5, y: 0.2 }, { x: 0.7, y: 0.3 }, { x: 0.8, y: 0.5 },
+                            { x: 0.7, y: 0.7 }, { x: 0.5, y: 0.8 }, { x: 0.3, y: 0.7 }, { x: 0.2, y: 0.5 },
+                            { x: 0.1, y: 0.4 }, { x: 0.4, y: 0.4 }
                         ]
                     }
                 ];
@@ -3217,45 +3239,41 @@
             }
 
             init() {
-                this.c.innerHTML = '';
-                this.c.style.background = '#f0f8ff'; // AliceBlue
-                this.c.style.display = 'flex';
-                this.c.style.flexDirection = 'column';
-                this.c.style.alignItems = 'center';
-                this.c.style.justifyContent = 'center';
+                this.c.innerHTML = "";
+                this.c.style.background = "#f0f8ff";
+                this.c.style.display = "flex";
+                this.c.style.flexDirection = "column";
+                this.c.style.alignItems = "center";
+                this.c.style.justifyContent = "center";
 
-                const title = document.createElement('h2');
-                title.id = 'dotsTitle';
-                title.style.color = '#2980b9';
+                const title = document.createElement("h2");
+                title.id = "dotsTitle";
+                title.style.color = "#2980b9";
                 title.textContent = `Nivel ${this.level + 1}`;
                 this.c.appendChild(title);
 
-                const canvasContainer = document.createElement('div');
-                canvasContainer.style.position = 'relative';
-                canvasContainer.style.margin = '20px';
+                const canvasContainer = document.createElement("div");
+                canvasContainer.style.position = "relative";
+                canvasContainer.style.margin = "20px";
                 this.c.appendChild(canvasContainer);
 
-                this.canvas = document.createElement('canvas');
-                this.canvas.style.background = 'white';
-                this.canvas.style.borderRadius = '20px';
-                this.canvas.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
-                // Size logic
-                const size = Math.min(this.c.clientWidth - 40, 400); // Max 400px
+                this.canvas = document.createElement("canvas");
+                this.canvas.style.background = "white";
+                this.canvas.style.borderRadius = "20px";
+                this.canvas.style.boxShadow = "0 10px 20px rgba(0,0,0,0.1)";
+                const size = Math.min(this.c.clientWidth - 40, 400);
                 this.canvas.width = size;
                 this.canvas.height = size;
                 canvasContainer.appendChild(this.canvas);
-                this.ctx = this.canvas.getContext('2d');
+                this.ctx = this.canvas.getContext("2d");
 
-                // Exit
-                const exit = document.createElement('button');
-                exit.textContent = '🏠 Salir';
-                exit.className = 'mode-btn kid';
-                exit.style.marginTop = '20px';
+                const exit = document.createElement("button");
+                exit.textContent = "🏠 Salir";
+                exit.className = "mode-btn kid";
+                exit.style.marginTop = "20px";
                 exit.onclick = () => app.nav.goDashboard();
                 this.c.appendChild(exit);
 
-                // Interactions
-                // Interactions
                 this.handleInput = (e) => {
                     e.preventDefault();
                     const rect = this.canvas.getBoundingClientRect();
@@ -3269,8 +3287,8 @@
                     }
                     this.checkClick(cx, cy);
                 };
-                this.canvas.addEventListener('mousedown', this.handleInput);
-                this.canvas.addEventListener('touchstart', this.handleInput, { passive: false });
+                this.canvas.addEventListener("mousedown", this.handleInput);
+                this.canvas.addEventListener("touchstart", this.handleInput, { passive: false });
 
                 this.loadLevel(this.level);
             }
@@ -3286,8 +3304,8 @@
                     y: p.y * this.canvas.height
                 }));
                 this.currentDot = 1;
-                this.documentTitle = document.getElementById('dotsTitle');
-                this.documentTitle.textContent = `Nivel ${this.level + 1}: ${this.currentDot} ➡️ ${this.currentDot + 1}`; // Hint
+                this.documentTitle = document.getElementById("dotsTitle");
+                this.documentTitle.textContent = `Nivel ${this.level + 1}: ${this.currentDot} ➡️ ${this.currentDot + 1}`;
                 this.lines = [];
                 this.draw();
             }
@@ -3295,41 +3313,37 @@
             draw() {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-                // Draw Lines
                 this.ctx.beginPath();
-                this.ctx.strokeStyle = '#3498db';
+                this.ctx.strokeStyle = "#3498db";
                 this.ctx.lineWidth = 5;
-                this.ctx.lineCap = 'round';
-                this.ctx.lineJoin = 'round';
-
+                this.lines.forEach((p, i) => {
+                    if (i === 0) this.ctx.moveTo(p.x, p.y);
+                    else this.ctx.lineTo(p.x, p.y);
+                });
                 if (this.lines.length > 0) {
-                    this.ctx.moveTo(this.lines[0].x, this.lines[0].y);
-                    for (let i = 1; i < this.lines.length; i++) {
-                        this.ctx.lineTo(this.lines[i].x, this.lines[i].y);
-                    }
-                    this.ctx.stroke();
+                    const last = this.lines[this.lines.length - 1];
+                    this.ctx.lineTo(last.x, last.y);
                 }
+                this.ctx.stroke();
 
-                // Draw Dots
                 this.dots.forEach((p, i) => {
                     const num = i + 1;
-                    const isNext = num === this.currentDot;
                     const isDone = num < this.currentDot;
+                    const isNext = num === this.currentDot;
 
                     this.ctx.beginPath();
                     this.ctx.arc(p.x, p.y, 20, 0, Math.PI * 2);
-                    this.ctx.fillStyle = isDone ? '#2ecc71' : (isNext ? '#e74c3c' : '#bdc3c7');
+                    this.ctx.fillStyle = isDone ? "#2ecc71" : (isNext ? "#e74c3c" : "#bdc3c7");
                     this.ctx.fill();
 
-                    this.ctx.fillStyle = 'white';
-                    this.ctx.font = 'bold 20px Arial';
-                    this.ctx.textAlign = 'center';
-                    this.ctx.textBaseline = 'middle';
+                    this.ctx.fillStyle = "white";
+                    this.ctx.font = "bold 20px Arial";
+                    this.ctx.textAlign = "center";
+                    this.ctx.textBaseline = "middle";
                     this.ctx.fillText(num, p.x, p.y);
 
-                    // Pulse effect for next
                     if (isNext) {
-                        this.ctx.strokeStyle = '#e74c3c';
+                        this.ctx.strokeStyle = "#e74c3c";
                         this.ctx.lineWidth = 2;
                         this.ctx.stroke();
                     }
@@ -3344,7 +3358,7 @@
                 const dy = y - target.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
 
-                if (dist < 40) { // Hit radius
+                if (dist < 40) {
                     app.audio.playPop();
                     this.lines.push(target);
                     this.currentDot++;
@@ -3360,9 +3374,6 @@
 
             finishLevel() {
                 this.draw();
-                // Close shape if needed?
-                // For fish: 10 connects to 1? My points list has 10 as close to 1.
-                // Let's connect last to first to close loop if it's the Fish
                 if (this.level === 0) {
                     this.ctx.beginPath();
                     this.ctx.moveTo(this.dots[9].x, this.dots[9].y);
@@ -3379,9 +3390,9 @@
             }
 
             winGame() {
-                this.c.innerHTML = '';
-                const winDiv = document.createElement('div');
-                winDiv.style.textAlign = 'center';
+                this.c.innerHTML = "";
+                const winDiv = document.createElement("div");
+                winDiv.style.textAlign = "center";
 
                 winDiv.innerHTML = `
                     <div style="font-size: 6em;">✏️</div>
@@ -3394,15 +3405,16 @@
                 this.c.appendChild(winDiv);
 
                 app.audio.playWin();
-                app.updateParentStats(50, 1, 'connect_dots');
+                app.updateParentStats(50, 1, "connect_dots");
             }
 
             cleanup() {
                 if (this.canvas && this.handleInput) {
-                    this.canvas.removeEventListener('mousedown', this.handleInput);
-                    this.canvas.removeEventListener('touchstart', this.handleInput);
+                    this.canvas.removeEventListener("mousedown", this.handleInput);
+                    this.canvas.removeEventListener("touchstart", this.handleInput);
                 }
             }
+        }
         }
 
         /**
@@ -5062,383 +5074,253 @@
             constructor(data, container) {
                 this.data = data;
                 this.c = container;
-                this.app = window.app; // Acceso al motor global de audio
-                this.pieces = [1, 1];
-                this.turn = 1;
-                this.gameMode = 'pve';
-                this.diceVal = null;
+                this.app = window.app;
+                this.pieces = [1, 1]; // P1 (User), P2 (AI)
+                this.turn = 0; // 0 = User, 1 = AI
                 this.waitingRoll = true;
-                this.gameOver = false;
-                this.skipTurns = [0, 0];
-                this.DINOS = [5, 9, 14, 18, 23, 27, 32, 36, 41, 45, 50, 54, 59];
+                this.skip = [0, 0];
 
-                // Special Cells (Dino Path v17.1)
+                this.DINOS = [5, 9, 14, 18, 23, 27, 32, 36, 41, 45, 50, 54, 59];
                 this.SPECIALS = {
-                    6: { type: 'puente', target: 12, msg: '¡De Puente a Puente! 🌉' },
-                    12: { type: 'puente', target: 6, msg: '¡De Puente a Puente! 🌉' },
-                    19: { type: 'posada', skip: 1, msg: '¡A la Posada! Pierdes 1 turno 🏨' },
-                    31: { type: 'pozo', skip: 2, msg: '¡Al Pozo! Pierdes 2 turnos 🕳️' },
-                    42: { type: 'laberinto', target: 30, msg: '¡Laberinto! Retrocedes al 30 🌀' },
-                    52: { type: 'carcel', skip: 3, msg: '¡Cárcel! Pierdes 3 turnos ⛓️' },
-                    58: { type: 'meteorito', target: 1, msg: '¡Oh no, un meteorito! Vuelve a empezar ☄️' }
+                    6: { t: 12, msg: '¡De Puente a Puente! 🌉' },
+                    12: { t: 6, msg: '¡Puente roto! 🌉' },
+                    19: { skip: 1, msg: '¡Posada! Pierdes 1 turno 💤' },
+                    31: { skip: 2, msg: '¡Pozo! Pierdes 2 turnos 🕳️' },
+                    42: { t: 30, msg: '¡Laberinto! Retrocedes 🌀' },
+                    58: { t: 1, msg: '¡METEORITO! Vuelve al inicio ☄️' }
                 };
 
                 this.init();
             }
 
-            // Método de Voz
-            speak(text) {
-                if (this.app.audio.muted) return;
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'es-ES';
-                utterance.rate = 1.2;
-                window.speechSynthesis.speak(utterance);
-            }
-
             init() {
                 this.c.innerHTML = '';
-                this.c.style.background = '#ecf0f1';
-                this.c.style.display = 'flex';
-                this.c.style.flexDirection = 'column';
-                this.c.style.alignItems = 'center';
-                this.c.style.justifyContent = 'center';
+                this.c.style.cssText = 'display:flex; flex-direction:column; align-items:center; background:#ecf0f1; height:100%; justify-content:center; overflow:hidden;';
 
-                // Title
-                const title = document.createElement('h2');
-                title.textContent = '🦕 El Camino del Dino';
-                title.style.color = '#2c3e50';
-                title.style.fontSize = '3em';
-                title.style.marginBottom = '30px';
-                this.c.appendChild(title);
-
-                // Mode Selection Buttons
-                const btnContainer = document.createElement('div');
-                btnContainer.style.display = 'flex';
-                btnContainer.style.gap = '20px';
-                btnContainer.style.flexWrap = 'wrap';
-                btnContainer.style.justifyContent = 'center';
-
-                const modes = [
-                    { id: 'pve', txt: '🤖 1 Jugador', sub: 'vs Dino', col: '#e74c3c' },
-                    { id: 'pvp', txt: '👥 2 Jugadores', sub: 'Amigos', col: '#f1c40f' },
-                    { id: 'hybrid', txt: '🎲 2 Jugadores', sub: 'Dado Real', col: '#9b59b6' }
-                ];
-
-                modes.forEach(m => {
-                    const btn = document.createElement('button');
-                    btn.className = 'mode-btn kid';
-                    btn.style.background = m.col;
-                    btn.innerHTML = `${m.txt}<br><span style="font-size:0.6em">${m.sub}</span>`;
-                    btn.onclick = () => this.startGame(m.id);
-                    btnContainer.appendChild(btn);
-                });
-                this.c.appendChild(btnContainer);
-            }
-
-            startGame(mode) {
-                this.gameMode = mode;
-                this.msg = (mode === 'hybrid') ? 'Tira tu dado y anota 📝' : 'Tira el dado 🎲';
-                this.setupBoard();
-                this.speak("¡Bienvenido al Camino del Dino!");
-            }
-
-            setupBoard() {
-                this.c.innerHTML = '';
-                // Header
-                const header = document.createElement('div');
-                header.style.cssText = 'display:flex; justify-content:space-between; width:100%; max-width:600px; padding:10px; align-items:center;';
+                // 1. Cabecera
+                const h = document.createElement('div');
+                h.style.cssText = 'width:95%; max-width:500px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; background:white; padding:10px; border-radius:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); flex-shrink:0;';
 
                 this.statusEl = document.createElement('h3');
-                this.statusEl.textContent = this.msg;
-                this.statusEl.style.color = '#2c3e50';
-                this.statusEl.style.flex = '1';
+                this.statusEl.innerText = '¡Tira el dado!';
+                this.statusEl.style.fontSize = '1.1em';
+                this.statusEl.style.margin = '0';
 
                 this.diceEl = document.createElement('div');
-                this.diceEl.textContent = '🎲';
-                this.diceEl.style.cssText = 'font-size:3em; cursor:pointer; background:white; padding:10px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.2); user-select:none;';
+                this.diceEl.innerText = '🎲';
+                this.diceEl.style.fontSize = '2.5em';
                 this.diceEl.onclick = () => this.rollDice();
 
-                header.appendChild(this.statusEl);
-                header.appendChild(this.diceEl);
-                this.c.appendChild(header);
+                h.append(this.statusEl, this.diceEl);
+                this.c.append(h);
 
-                this.createDiceInput();
-
-                // Board (8x8 Grid)
-                const board = document.createElement('div');
-                board.style.cssText = `
+                // 2. Tablero
+                this.boardEl = document.createElement('div');
+                this.boardEl.style.cssText = `
                     display: grid;
                     grid-template-columns: repeat(8, 1fr);
                     grid-template-rows: repeat(8, 1fr);
                     gap: 2px;
                     width: 95vmin; height: 95vmin;
-                    max-width: 600px; max-height: 600px;
-                    background: #dfe6e9; border: 4px solid #333;
-                    border-radius: 10px;
-                    position: relative;
+                    max-width: 500px; max-height: 500px;
+                    background: #2c3e50; border: 4px solid #34495e;
+                    border-radius: 10px; position: relative;
+                    padding: 2px;
                 `;
-                this.boardEl = board;
-                this.renderCells(board);
-                this.c.appendChild(board);
-                this.updatePieces();
-            }
+                this.c.append(this.boardEl);
 
-            createDiceInput() {
-                this.diceInput = document.createElement('div');
-                this.diceInput.style.cssText = `
-                    display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                    background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 20px;
-                    box-shadow: 0 10px 20px rgba(0,0,0,0.3); flex-direction: column; align-items: center; gap: 10px; z-index: 100;
-                `;
-                const lbl = document.createElement('h3');
-                lbl.textContent = '¿Qué número salió?';
-                this.diceInput.appendChild(lbl);
-                const btns = document.createElement('div');
-                btns.style.display = 'flex'; btns.style.gap = '10px';
-                for (let i = 1; i <= 6; i++) {
-                    const b = document.createElement('button');
-                    b.textContent = i;
-                    b.style.cssText = 'width:40px; height:40px; font-size:1.5em; border:none; border-radius:50%; background:#3498db; color:white; cursor:pointer;';
-                    b.onclick = () => this.submitDice(i);
-                    btns.appendChild(b);
+                // 3. Render
+                this.renderSpiral();
+                this.createTokens();
+                this.updatePositions();
+
+                // 4. Robustez
+                if (window.ResizeObserver) {
+                    const ro = new ResizeObserver(() => this.updatePositions());
+                    ro.observe(this.boardEl);
+                } else {
+                    setTimeout(() => this.updatePositions(), 500);
                 }
-                this.diceInput.appendChild(btns);
-                this.c.appendChild(this.diceInput);
             }
 
-            // Helper to get Spiral Coordinates (0-indexed 8x8 grid)
-            getGridPos(n) {
-                // Map linear 1..64 to spiral (0,0) inwards
-                // Spiral path: Right, Down, Left, Up
-                // 1 at (0,0)
+            renderSpiral() {
+                const matrix = Array(8).fill().map(() => Array(8).fill(0));
+                let x = 0, y = 0, dx = 1, dy = 0;
 
-                let x = 0, y = 0;
-                let dx = 1, dy = 0;
-                let xMin = 0, yMin = 0, xMax = 7, yMax = 7;
-
-                // Simulate walk to N
-                for (let i = 1; i < n; i++) {
-                    if (x + dx > xMax || x + dx < xMin || y + dy > yMax || y + dy < yMin) {
-                        // Turn right (Right->Down->Left->Up)
-                        if (dx === 1 && dy === 0) { dx = 0; dy = 1; yMin++; }
-                        else if (dx === 0 && dy === 1) { dx = -1; dy = 0; xMax--; }
-                        else if (dx === -1 && dy === 0) { dx = 0; dy = -1; yMax--; }
-                        else if (dx === 0 && dy === -1) { dx = 1; dy = 0; xMin++; }
+                for (let i = 1; i <= 64; i++) {
+                    matrix[y][x] = i;
+                    let nx = x + dx, ny = y + dy;
+                    if (nx < 0 || nx >= 8 || ny < 0 || ny >= 8 || matrix[ny][nx] !== 0) {
+                        [dx, dy] = [-dy, dx];
                     }
-                    x += dx;
-                    y += dy;
+                    x += dx; y += dy;
                 }
-                return { r: y, c: x };
+
+                for(let r=0; r<8; r++){
+                    for(let c=0; c<8; c++){
+                        let val = matrix[r][c];
+                        if(val > 63) continue;
+
+                        let cell = document.createElement('div');
+                        cell.dataset.index = val;
+                        cell.style.cssText = `
+                            grid-row: ${r+1}; grid-column: ${c+1};
+                            background:#ecf0f1; border-radius:2px; position:relative;
+                            display:flex; justify-content:center; align-items:center;
+                            font-size:1em; color:#7f8c8d; font-weight:bold;
+                            flex-direction:column;
+                        `;
+                        cell.innerHTML = `<span>${val}</span>`;
+
+                        // Iconos Grandes
+                        if(this.DINOS.includes(val)) { cell.style.background='#f1c40f'; cell.innerHTML += '<div style="font-size:1.8em">🦕</div>'; }
+                        else if(this.SPECIALS[val]) { cell.style.background='#e74c3c'; cell.style.color='white'; cell.innerHTML += '<div style="font-size:1.8em">⚠️</div>'; }
+                        else if(val===63) { cell.style.background='#2ecc71'; cell.innerHTML = '<div style="font-size:2em">🥚</div>'; }
+
+                        this.boardEl.append(cell);
+                    }
+                }
             }
 
-            renderCells(board) {
-                for (let i = 1; i <= 63; i++) {
-                    const cell = document.createElement('div');
-                    cell.style.cssText = 'border:1px solid #bdc3c7; position:relative; display:flex; justify-content:center; align-items:center; font-size:0.8em; color:#7f8c8d; background:white;';
-                    cell.innerHTML = i;
+            createTokens() {
+                this.tokens = [];
+                // User: Dino Pequeño (🦕)
+                let t1 = document.createElement('div');
+                t1.innerText = '🦕';
+                t1.style.cssText = 'position:absolute; font-size:2.2em; transition:all 0.5s; z-index:20; pointer-events:none; filter: drop-shadow(0 0 2px white);';
+                this.boardEl.append(t1);
+                this.tokens.push(t1);
 
-                    const pos = this.getGridPos(i);
-                    cell.style.gridRow = `${pos.r + 1}`;
-                    cell.style.gridColumn = `${pos.c + 1}`;
-
-                    // Styling
-                    if (this.DINOS.includes(i)) { cell.style.background = '#fad390'; cell.innerHTML = '🦕<br>' + i; }
-                    if (i === 6 || i === 12) { cell.style.background = '#74b9ff'; cell.innerHTML = '🌉<br>' + i; }
-                    if (i === 19) cell.innerHTML = '🏨<br>' + i;
-                    if (i === 31) cell.innerHTML = '🕳️<br>' + i;
-                    if (i === 42) cell.innerHTML = '🌀<br>' + i;
-                    if (i === 52) cell.innerHTML = '⛓️<br>' + i;
-                    if (i === 58) cell.innerHTML = '☄️<br>' + i;
-                    if (i === 63) { cell.style.background = '#55efc4'; cell.innerHTML = '🥚<br>' + i; }
-
-                    board.appendChild(cell);
-                }
+                // AI: Oca (🦆)
+                let t2 = document.createElement('div');
+                t2.innerText = '🦆';
+                t2.style.cssText = 'position:absolute; font-size:2.2em; transition:all 0.5s; z-index:20; pointer-events:none; filter: drop-shadow(0 0 2px white);';
+                this.boardEl.append(t2);
+                this.tokens.push(t2);
             }
 
-            updatePieces() {
-                // Clear old
-                this.boardEl.querySelectorAll('.oca-piece').forEach(e => e.remove());
+            updatePositions() {
+                this.tokens.forEach((token, idx) => {
+                    let pos = this.pieces[idx];
+                    let cell = this.boardEl.querySelector(`div[data-index='${pos}']`);
+                    if (!cell) cell = this.boardEl.querySelector(`div[data-index='1']`);
 
-                this.pieces.forEach((pos, idx) => {
-                    if (pos > 63) pos = 63; // Safety
-                    const p = document.createElement('div');
-                    p.className = 'oca-piece';
-                    p.textContent = idx === 0 ? '🔴' : '🟡';
-                    p.style.cssText = 'position:absolute; width: 40%; height: 40%; font-size:1.5em; z-index:10; transition: all 0.5s ease-out;';
+                    if(cell) {
+                        let x = cell.offsetLeft + (cell.offsetWidth / 2) - (token.offsetWidth / 2 || 15);
+                        let y = cell.offsetTop + (cell.offsetHeight / 2) - (token.offsetHeight / 2 || 15);
 
-                    const gridPos = this.getGridPos(pos);
-                    p.style.gridRow = `${gridPos.r + 1}`;
-                    p.style.gridColumn = `${gridPos.c + 1}`;
+                        if (this.pieces[0] === this.pieces[1] && idx === 1) {
+                            x += 8; y += 8;
+                        }
 
-                    if (idx === 0) p.style.justifySelf = 'start';
-                    else p.style.justifySelf = 'end';
-                    p.style.alignSelf = 'center';
-                    p.style.marginLeft = '5px';
-                    p.style.marginRight = '5px';
-
-                    this.boardEl.appendChild(p);
+                        token.style.left = x + 'px';
+                        token.style.top = y + 'px';
+                    }
                 });
             }
 
             rollDice() {
-                if (this.waitingRoll) {
-                    if (this.gameMode === 'pve' && this.turn !== 1) return;
-                    if (this.gameMode === 'hybrid') { this.diceInput.style.display = 'flex'; return; }
+                if (!this.waitingRoll) return;
 
-                    const val = Math.floor(Math.random() * 6) + 1;
-                    this.processDice(val);
-                }
-            }
-
-            submitDice(val) {
-                this.diceInput.style.display = 'none';
-                this.processDice(val);
-            }
-
-            processDice(val) {
-                this.diceEl.textContent = '🎲 ' + val;
-                this.waitingRoll = false;
-                this.statusEl.textContent = `Has sacado un ${val}`;
-
-                // --- VOZ ---
-                this.speak(`¡Has sacado un ${val}!`);
-
-                if (this.skipTurns[this.turn - 1] > 0) {
-                    this.skipTurns[this.turn - 1]--;
-                    setTimeout(() => {
-                        this.speak("¡Estás bloqueado!");
-                        this.nextTurn();
-                    }, 1000);
+                if (this.skip[this.turn] > 0) {
+                    this.skip[this.turn]--;
+                    this.statusEl.innerText = 'Turno perdido 🚫';
+                    this.app.audio.speak('Turno perdido');
+                    setTimeout(() => this.nextTurn(), 1500);
                     return;
                 }
-                setTimeout(() => this.movePiece(this.turn - 1, val), 500);
+
+                this.waitingRoll = false;
+                let val = Math.floor(Math.random()*6)+1;
+                this.diceEl.innerText = '🎲 ' + val;
+                this.app.audio.speak(val.toString());
+
+                setTimeout(() => this.move(val), 600);
             }
 
-            movePiece(pIdx, steps) {
-                let current = this.pieces[pIdx];
+            move(steps) {
+                let current = this.pieces[this.turn];
                 let target = current + steps;
 
-                if (target > 63) {
-                    const diff = target - 63;
-                    target = 63 - diff;
-                }
+                if(target > 63) target = 63 - (target - 63);
 
-                this.pieces[pIdx] = target;
-                this.updatePieces();
+                this.pieces[this.turn] = target;
+                this.updatePositions();
                 this.app.audio.playPop();
 
-                setTimeout(() => this.checkSpecials(pIdx, target, steps), 600);
+                setTimeout(() => this.checkRules(target), 600);
             }
 
-            checkSpecials(pIdx, pos, lastRoll) {
-                if (pos === 63) {
-                    this.win(pIdx);
-                    return;
-                }
-
-                if (this.DINOS.includes(pos)) {
-                    const nextIdx = this.DINOS.indexOf(pos) + 1;
-                    const nextOca = this.DINOS[nextIdx] || 63;
-
-                    this.statusEl.textContent = '¡De Dino a Dino! 🦕';
-                    this.speak("¡De Dino a Dino y tiro porque me toca!");
-
-                    this.pieces[pIdx] = nextOca;
-                    this.updatePieces();
+            checkRules(pos) {
+                if(pos === 63) {
+                    this.statusEl.innerText = this.turn === 0 ? '¡GANASTE! 🎉' : '¡Dino Gana! 🦆';
+                    this.app.audio.speak(this.turn === 0 ? 'Ganaste' : 'La Oca gana');
                     this.app.audio.playWin();
 
+                    // REPLAY BUTTON OVERLAY
                     setTimeout(() => {
-                        this.waitingRoll = true;
-                        this.statusEl.textContent = '¡Tira otra vez!';
-                        if (this.gameMode === 'pve' && this.turn === 2) this.dinoAI();
+                        const ov = document.createElement('div');
+                        ov.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:100; border-radius:10px;';
+                        ov.innerHTML = `
+                            <div style="font-size:5em;">${this.turn===0 ? '🏆' : '🦆'}</div>
+                            <h2 style="color:white; margin:20px;">${this.statusEl.innerText}</h2>
+                            <button class="mode-btn kid" style="background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
+                            <button class="mode-btn kid" style="margin-top:10px;" onclick="app.nav.goDashboard()">🏠 Salir</button>
+                        `;
+                        this.c.appendChild(ov);
                     }, 1000);
                     return;
                 }
 
-                const rule = this.SPECIALS[pos];
-                if (rule) {
-                    this.statusEl.textContent = rule.msg;
-                    this.speak(rule.msg);
-                    this.app.audio.playError();
+                if(this.DINOS.includes(pos)) {
+                    this.statusEl.innerText = '¡De Dino a Dino! 🦕';
+                    this.app.audio.speak('De dino a dino');
 
-                    if (rule.target) {
-                        this.pieces[pIdx] = rule.target;
-                        this.updatePieces();
+                    let idx = this.DINOS.indexOf(pos);
+                    let next = this.DINOS[idx+1] || 63;
 
-                        if (rule.type === 'puente') {
-                             this.speak("¡De puente a puente y tiro porque me lleva la corriente!");
-                             setTimeout(() => {
-                                this.waitingRoll = true;
-                                this.statusEl.textContent = '¡Tira otra vez!';
-                                if (this.gameMode === 'pve' && this.turn === 2) this.dinoAI();
-                            }, 1000);
-                            return;
-                        }
-                    } else if (rule.skip) {
-                        this.skipTurns[pIdx] = rule.skip;
-                    }
+                    this.pieces[this.turn] = next;
+                    this.updatePositions();
+                    this.waitingRoll = true;
+                    return;
                 }
 
-                setTimeout(() => this.nextTurn(), 1000);
+                if(this.SPECIALS[pos]) {
+                    let r = this.SPECIALS[pos];
+                    this.statusEl.innerText = r.msg;
+                    this.app.audio.speak(r.msg);
+
+                    if(r.t) {
+                        this.pieces[this.turn] = r.t;
+                        this.updatePositions();
+                    }
+                    if(r.skip) this.skip[this.turn] = r.skip;
+                }
+
+                this.nextTurn();
             }
 
             nextTurn() {
-                this.turn = (this.turn === 1) ? 2 : 1;
-                this.diceEl.textContent = '🎲';
+                this.turn = this.turn === 0 ? 1 : 0;
+                this.waitingRoll = true;
+                this.diceEl.innerText = '🎲';
+                this.statusEl.innerText = this.turn===0 ? 'Turno Jugador 🦕' : 'Turno Oca 🦆';
 
-                if (this.turn === 2) {
-                    if (this.gameMode === 'pve') {
-                        this.statusEl.textContent = 'Dino tira...';
-                        setTimeout(() => this.dinoAI(), 1000);
-                    } else {
-                        this.waitingRoll = true;
-                        this.statusEl.textContent = 'Turno Amarillo 🟡';
-                        this.c.style.background = '#fff9c4';
-                        this.speak("Turno Amarillo");
-                    }
-                } else {
-                    this.waitingRoll = true;
-                    this.statusEl.textContent = 'Turno Rojo 🔴';
-                    this.c.style.background = '#ecf0f1';
-                    this.speak("Turno Rojo");
+                if(this.turn === 1) {
+                    setTimeout(() => {
+                        let val = Math.floor(Math.random()*6)+1;
+                        this.diceEl.innerText = '🎲 ' + val;
+                        this.app.audio.speak('Oca saca ' + val);
+                        this.move(val);
+                    }, 1000);
                 }
-            }
-
-            dinoAI() {
-                const val = Math.floor(Math.random() * 6) + 1;
-                this.diceEl.textContent = '🎲 ' + val;
-                setTimeout(() => this.processDice(val), 500);
-            }
-
-            win(pIdx) {
-                this.gameOver = true;
-                const winner = (pIdx === 0) ? 'ROJO 🔴' : 'AMARILLO 🟡';
-                this.statusEl.innerHTML = `¡GANÓ ${winner}! 🏆`;
-                this.speak(`¡Ganó ${pIdx === 0 ? 'Rojo' : 'Amarillo'}!`);
-                this.app.audio.playWin();
-
-                setTimeout(() => {
-                    const ov = document.createElement('div');
-                    ov.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:100; border-radius:10px;';
-                    ov.innerHTML = `
-                        <div style="font-size:5em;">🏆</div>
-                        <h2 style="color:white; margin:20px;">¡${winner} GANA!</h2>
-                        <div style="display:flex; gap:20px; flex-direction:column;">
-                            <button class="mode-btn kid" style="background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
-                            <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
-                        </div>
-                    `;
-                    this.c.appendChild(ov);
-                }, 1000);
             }
 
             cleanup() { }
         }
+
         /**
-         * ♟️ CHESS GAME (Ajedrez Simplified)
-         * Human (White) vs Dino (Black)
-         */
-        class ChessGame {
+         * ♟️ CHESS GAME (Ajedrez Simplified)class ChessGame {
             constructor(data, container) {
                 this.data = data;
                 this.c = container;
