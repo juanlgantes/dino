@@ -1014,8 +1014,9 @@
                 // 2. Unlock Speech Synthesis (Mobile Wake-up)
                 if (window.speechSynthesis) {
                     // Speak silence to initialize the engine on user gesture
-                    const u = new SpeechSynthesisUtterance('');
-                    u.volume = 0;
+                    // Use a space ' ' instead of empty string to ensure processing
+                    const u = new SpeechSynthesisUtterance(' ');
+                    u.volume = 0; // Silent
                     window.speechSynthesis.speak(u);
                 }
 
@@ -1044,14 +1045,17 @@
             }
 
             speak(text) {
-                if (this.muted || !window.speechSynthesis) return;
+                if (this.muted || !window.speechSynthesis || !text) return;
 
-                // 1. Cancel previous
+                // 0. Resume (Fix for paused engine on Android/Chrome)
+                if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+
+                // 1. Cancel previous (Prevent queue stack up)
                 window.speechSynthesis.cancel();
 
                 // 2. Create Utterance
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 1.1; // Slight slow down for clarity
+                utterance.rate = 1.0; // Standard speed
                 utterance.volume = 1.0; // Force Max Volume
 
                 // 3. Select Voice Explicitly (Crucial for Mobile/Chrome)
