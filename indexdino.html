@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.5 "Dino Oca Remaster"</title>
+    <title>v17.6 "Dino Kart Patch"</title>
     <!--
+        CHANGELOG v17.6
+        - [FIX] Kart: Logic check optimization (active vs removed).
+
         CHANGELOG v17.5
         - [FIX] Oca: Tablero 8x8 corregido, tokens visuales (Dino/Oca) y movimiento suave.
         - [FEATURE] Oca: Botón "Jugar Otra Vez" añadido al finalizar.
@@ -2096,11 +2099,11 @@
 
                     if (item.y > this.height) {
                         item.el.remove();
-                        item.removed = true;
+                        item.active = false;
                     }
                 });
 
-                this.items = this.items.filter(i => !i.removed);
+                this.items = this.items.filter(i => i.active);
 
                 // Win?
                 if (this.timeLeft <= 0) {
@@ -2112,7 +2115,7 @@
 
             crash(item) {
                 item.el.remove();
-                item.removed = true;
+                item.active = false;
                 this.lives--;
                 app.audio.playError();
 
