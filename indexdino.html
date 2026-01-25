@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.14 "Goose Nav"</title>
+    <title>v17.15 "Goose AI Fix"</title>
     <!--
+        CHANGELOG v17.15
+        - [FIX] Oca: Corregido bloqueo del juego cuando la IA (Dino) cae en una casilla "De Dino a Dino".
+
         CHANGELOG v17.14
         - [FEATURE] Oca: Botón "Salir" en el menú de modos y botón "Volver" (🔙) durante el juego.
 
@@ -5561,9 +5564,19 @@
 
                     this.pieces[this.turn] = next;
                     this.updatePositions();
-                    this.waitingRoll = true; // Auto roll? usually Rules say roll again.
-                    // Simplified: Just move, keep turn? Or just move.
-                    // Code before said: waitingRoll = true; return; -> User rolls again.
+
+                    // If AI (PVE Turn 1), Auto Roll again
+                    if (this.gameMode === 'pve' && this.turn === 1) {
+                        this.wait(() => {
+                            let val = Math.floor(Math.random()*6)+1;
+                            this.diceEl.innerText = '🎲 ' + val;
+                            this.app.audio.speak('Oca saca ' + val);
+                            this.processRoll(val);
+                        }, 1000);
+                    } else {
+                        // Human or PVP: Wait for click
+                        this.waitingRoll = true;
+                    }
                     return;
                 }
 
