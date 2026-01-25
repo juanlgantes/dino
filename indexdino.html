@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.5 "Dino Oca Remaster"</title>
+    <title>v17.6 "Android Audio Fix"</title>
     <!--
+        CHANGELOG v17.6
+        - [SYS] AudioEngine: Mejora en desbloqueo de audio para Android.
+
         CHANGELOG v17.5
         - [FIX] Oca: Tablero 8x8 corregido, tokens visuales (Dino/Oca) y movimiento suave.
         - [FEATURE] Oca: Botón "Jugar Otra Vez" añadido al finalizar.
@@ -968,10 +971,18 @@
 
             unlock() {
                 if (!this.unlocked && this.ctx.state !== 'running') {
-                    this.ctx.resume().then(() => {
+                    // Android Audio Fix: Play silent buffer + Resume
+                    const buffer = this.ctx.createBuffer(1, 1, 22050);
+                    const source = this.ctx.createBufferSource();
+                    source.buffer = buffer;
+                    source.connect(this.ctx.destination);
+                    source.start(0);
+
+                    return this.ctx.resume().then(() => {
                         this.unlocked = true;
                     });
                 }
+                return Promise.resolve();
             }
 
             playTone(freq, type, duration) {
@@ -5691,12 +5702,11 @@
 
                 // Android Audio Fix: Unlock context on ANY first interaction
                 const unlockAudio = () => {
-                    this.audio.unlock();
-                    // Remove listeners once verified running is better, or just keep calling unlock (it shields itself)
-                    if (this.audio.ctx.state === 'running') {
+                    this.audio.unlock().then(() => {
+                        // Remove listeners only after successful unlock promise resolution
                         document.removeEventListener('touchstart', unlockAudio);
                         document.removeEventListener('click', unlockAudio);
-                    }
+                    });
                 };
                 document.addEventListener('touchstart', unlockAudio);
                 document.addEventListener('click', unlockAudio);
