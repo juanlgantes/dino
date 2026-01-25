@@ -14,8 +14,12 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.11 "Goose Fit"</title>
+    <title>v17.12 "Goose Stable"</title>
     <!--
+        CHANGELOG v17.12
+        - [FIX] Oca: Solucionado bloqueo/crash en móviles (ResizeObserver Loop).
+        - [FIX] Oca: Tablero responsive (aspect-ratio) para evitar cortes en pantallas verticales.
+
         CHANGELOG v17.11
         - [FIX] Oca: Ajustado tamaño del tablero (80vmin), alineación superior y scroll habilitado.
 
@@ -5326,8 +5330,8 @@
                     grid-template-columns: repeat(8, 1fr);
                     grid-template-rows: repeat(8, 1fr);
                     gap: 2px;
-            width: 80vmin; height: 80vmin;
-                    max-width: 500px; max-height: 500px;
+                    width: 98%; aspect-ratio: 1/1; height: auto;
+                    max-width: 600px; box-sizing: border-box;
                     background: #2c3e50; border: 4px solid #34495e;
                     border-radius: 10px; position: relative;
                     padding: 2px;
@@ -5342,7 +5346,15 @@
 
                 // 4. Robustez
                 if (window.ResizeObserver) {
-                    this.ro = new ResizeObserver(() => this.updatePositions());
+                    this.ro = new ResizeObserver(() => {
+                        if (!this.ticking) {
+                            window.requestAnimationFrame(() => {
+                                this.updatePositions();
+                                this.ticking = false;
+                            });
+                            this.ticking = true;
+                        }
+                    });
                     this.ro.observe(this.boardEl);
                 } else {
                     this.wait(() => this.updatePositions(), 500);
