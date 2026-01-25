@@ -1069,6 +1069,7 @@
                 // 2. Create Utterance
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.rate = 1.0; // Standard speed
+                utterance.pitch = 1.0; // Standard pitch
                 utterance.volume = 1.0; // Force Max Volume
 
                 // 3. Select Voice Explicitly (Crucial for Mobile/Chrome)
@@ -1083,7 +1084,9 @@
                     utterance.voice = voice;
                     utterance.lang = voice.lang; // Sync lang
                 } else {
-                    utterance.lang = "es-ES"; // Fallback
+                    // Fail-safe: If no voice found, do NOT set utterance.voice to undefined
+                    // Just set lang and let browser choose default
+                    utterance.lang = "es-ES";
                 }
 
                 // 4. GC Fix
@@ -5822,12 +5825,15 @@
                 const unlockAudio = () => {
                     this.audio.unlock().then(() => {
                         // Remove listeners only after successful unlock promise resolution
-                        document.removeEventListener('touchstart', unlockAudio);
+                        document.removeEventListener('touchend', unlockAudio);
                         document.removeEventListener('click', unlockAudio);
+                        document.removeEventListener('keydown', unlockAudio);
                     });
                 };
-                document.addEventListener('touchstart', unlockAudio);
+                // Use touchend for better mobile compatibility (gesture finish)
+                document.addEventListener('touchend', unlockAudio);
                 document.addEventListener('click', unlockAudio);
+                document.addEventListener('keydown', unlockAudio);
             }
 
             renderActivities(mode = 'root') {
