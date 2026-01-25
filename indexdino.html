@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.9 "Voice Boost"</title>
+    <title>v17.11 "Goose Fit"</title>
     <!--
+        CHANGELOG v17.11
+        - [FIX] Oca: Ajustado tamaño del tablero (80vmin), alineación superior y scroll habilitado.
+
         CHANGELOG v17.10
         - [FIX] Oca: Corregido tamaño del tablero y overflow en móviles (Landscape/Portrait).
 
@@ -5236,7 +5239,7 @@
 
             init() {
                 this.c.innerHTML = '';
-                this.c.style.cssText = 'display:flex; flex-direction:column; align-items:center; background:#ecf0f1; height:auto; min-height:100%; justify-content:center; overflow:hidden; font-family: "Fredoka", sans-serif; padding: 10px;';
+        this.c.style.cssText = 'display:flex; flex-direction:column; align-items:center; background:#ecf0f1; height:auto; min-height:100%; justify-content:flex-start; font-family: "Fredoka", sans-serif; padding: 10px; padding-bottom: 40px;';
 
                 // Title
                 const title = document.createElement('h2');
@@ -5323,11 +5326,12 @@
                     grid-template-columns: repeat(8, 1fr);
                     grid-template-rows: repeat(8, 1fr);
                     gap: 2px;
-                    width: 90vmin; height: 90vmin;
+            width: 80vmin; height: 80vmin;
                     max-width: 500px; max-height: 500px;
                     background: #2c3e50; border: 4px solid #34495e;
                     border-radius: 10px; position: relative;
                     padding: 2px;
+            margin-top: 10px;
                 `;
                 this.c.append(this.boardEl);
 
