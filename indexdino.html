@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.5 "Dino Oca Remaster"</title>
+    <title>v17.6 "Performance Patch"</title>
     <!--
+        CHANGELOG v17.6
+        - [PERF] Reloj: Solucionado problema de memoria (Event Listeners) en el juego del Reloj.
+
         CHANGELOG v17.5
         - [FIX] Oca: Tablero 8x8 corregido, tokens visuales (Dino/Oca) y movimiento suave.
         - [FEATURE] Oca: Botón "Jugar Otra Vez" añadido al finalizar.
@@ -3415,10 +3418,8 @@
                 }
             }
         }
-        }
 
         /**
-    /**
          * ⏰ CLOCK GAME (Responsive v12.0)
          * - Visuals: Cake Slices (conic-gradient)
          * - Layout: Auto-adaptive (vmin) + Flexbox Sidebar/Topbar
@@ -3742,12 +3743,15 @@
                     this.updateVisuals();
                 };
 
+                const onMouseUp = () => {
+                    el.removeEventListener('mousemove', handleMove);
+                    window.removeEventListener('mouseup', onMouseUp);
+                };
+
                 el.addEventListener('mousedown', (e) => {
                     el.addEventListener('mousemove', handleMove);
+                    window.addEventListener('mouseup', onMouseUp);
                     handleMove(e);
-                });
-                window.addEventListener('mouseup', () => {
-                    el.removeEventListener('mousemove', handleMove);
                 });
                 el.addEventListener('touchmove', handleMove, { passive: false });
                 el.addEventListener('touchstart', handleMove, { passive: false });
@@ -5320,7 +5324,9 @@
         }
 
         /**
-         * ♟️ CHESS GAME (Ajedrez Simplified)class ChessGame {
+         * ♟️ CHESS GAME (Ajedrez Simplified)
+         */
+        class ChessGame {
             constructor(data, container) {
                 this.data = data;
                 this.c = container;
