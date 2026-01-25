@@ -17,7 +17,7 @@
     <title>v17.16 "Goose Layout Fix"</title>
     <!--
         CHANGELOG v17.16
-        - [FIX] Oca: Tablero responsive en móviles landscape (horizontal). Ahora se adapta al alto de la pantalla.
+        - [FIX] Oca: Nuevo diseño horizontal (Side-by-Side) para móviles landscape. Tablero y controles visibles sin scroll.
 
         CHANGELOG v17.15
         - [FIX] Oca: Corregido bloqueo del juego cuando la IA (Dino) cae en una casilla "De Dino a Dino".
@@ -5272,6 +5272,35 @@
                 const s = document.createElement('style');
                 s.id = 'goose-game-style';
                 s.innerHTML = `
+                    /* --- GOOSE GAME STYLES --- */
+                    .goose-container {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        background: #ecf0f1;
+                        height: auto;
+                        min-height: 100%;
+                        justify-content: flex-start;
+                        font-family: "Fredoka", sans-serif;
+                        padding: 10px;
+                        padding-bottom: 40px;
+                        box-sizing: border-box;
+                    }
+
+                    .goose-header {
+                        width: 95%;
+                        max-width: 500px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 10px;
+                        background: white;
+                        padding: 10px;
+                        border-radius: 15px;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                        flex-shrink: 0;
+                    }
+
                     .goose-board {
                         display: grid;
                         grid-template-columns: repeat(8, 1fr);
@@ -5295,10 +5324,55 @@
                         margin-right: auto;
                     }
 
-                    @media (orientation: landscape) {
+                    /* --- MOBILE LANDSCAPE OPTIMIZATIONS --- */
+                    @media (orientation: landscape) and (max-height: 600px) {
+                        /* Force Container to shrink header margins */
+                        .container {
+                            margin-top: 5px !important;
+                        }
+
+                        /* Game Container becomes Row (Side-by-Side) */
+                        .goose-container {
+                            flex-direction: row;
+                            justify-content: center;
+                            align-items: flex-start;
+                            padding: 5px;
+                            gap: 15px;
+                            height: 100%;
+                        }
+
+                        /* Header becomes Sidebar */
+                        .goose-header {
+                            width: 140px;
+                            flex-direction: column;
+                            height: auto;
+                            padding: 15px 5px;
+                            gap: 15px;
+                            margin-bottom: 0;
+                        }
+
+                        /* Adjust Header Children alignment */
+                        .goose-header > div {
+                            flex-direction: column;
+                            align-items: center;
+                            text-align: center;
+                        }
+
+                        /* Board Constraints */
                         .goose-board {
+                            margin-top: 0;
                             width: auto;
-                            height: 80vh;
+                            /* Maximize height within viewport:
+                               100vh - (AppHeader ~60px) - (Padding ~10px) => ~85vh safe
+                            */
+                            height: 85vh;
+                            max-height: 95%; /* Prevent overflowing container */
+                        }
+
+                        /* Override main CSS fixed heights */
+                        #gameArea {
+                            height: auto !important;
+                            min-height: 0 !important;
                         }
                     }
                 `;
@@ -5306,8 +5380,10 @@
             }
 
             init() {
+                this.injectStyles();
                 this.c.innerHTML = '';
-        this.c.style.cssText = 'display:flex; flex-direction:column; align-items:center; background:#ecf0f1; height:auto; min-height:100%; justify-content:flex-start; font-family: "Fredoka", sans-serif; padding: 10px; padding-bottom: 40px;';
+                this.c.className = 'goose-container'; // Use Class
+                this.c.style.cssText = ''; // Clear inline
 
                 // Title
                 const title = document.createElement('h2');
@@ -5357,7 +5433,8 @@
 
                 // 1. Cabecera
                 const h = document.createElement('div');
-                h.style.cssText = 'width:95%; max-width:500px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; background:white; padding:10px; border-radius:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); flex-shrink:0;';
+                h.className = 'goose-header';
+                // h.style.cssText = ''; // Removed inline styles in favor of class
 
                 this.statusEl = document.createElement('h3');
                 this.statusEl.innerText = (mode === 'hybrid') ? 'Tira tu dado' : '¡Tira el dado!';
@@ -5414,7 +5491,6 @@
                 this.c.appendChild(this.diceInput);
 
                 // 2. Tablero
-                this.injectStyles();
                 this.boardEl = document.createElement('div');
                 this.boardEl.className = 'goose-board';
                 this.c.append(this.boardEl);
