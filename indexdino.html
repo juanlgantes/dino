@@ -1256,9 +1256,28 @@
                 card.style.cssText = 'background: white; padding: 30px; border-radius: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); margin-bottom: 20px;';
 
                 const questionH3 = document.createElement('h3');
-                questionH3.style.cssText = 'color: #667eea; font-size: 1.8em; margin-bottom: 30px;';
-                questionH3.textContent = game.question;
+                questionH3.style.cssText = 'color: #667eea; font-size: 1.8em; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; gap: 15px;';
+
+                const qText = document.createElement('span');
+                qText.textContent = game.question;
+                questionH3.appendChild(qText);
+
+                const btnSpeak = document.createElement('button');
+                btnSpeak.innerText = '🔊';
+                btnSpeak.style.cssText = 'background: #e0c3fc; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2em; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.1s;';
+                btnSpeak.active = () => btnSpeak.style.transform = 'scale(0.9)';
+                btnSpeak.onclick = (e) => {
+                    e.stopPropagation();
+                    this.speakCurrent();
+                    btnSpeak.style.transform = 'scale(0.9)';
+                    setTimeout(() => btnSpeak.style.transform = 'scale(1)', 100);
+                };
+                questionH3.appendChild(btnSpeak);
+
                 card.appendChild(questionH3);
+
+                // Speak Auto
+                setTimeout(() => this.speakCurrent(), 500);
 
                 // Options
                 game.options.forEach((opt, i) => {
@@ -1300,6 +1319,13 @@
                 // Let's force it on the container for this button to stick.
                 this.container.style.position = 'relative';
                 this.container.appendChild(navBtn);
+            }
+
+            speakCurrent() {
+                const game = this.data.games[this.currentIndex];
+                if (!game) return;
+                const text = `${game.question}. ${game.options.join('. ')}`;
+                this.app.audio.speak(text);
             }
 
             skipQuestion() {
@@ -5303,8 +5329,8 @@
 
                     .goose-board {
                         display: grid;
-                        grid-template-columns: repeat(8, 1fr);
-                        grid-template-rows: repeat(8, 1fr);
+                        grid-template-columns: repeat(8, minmax(0, 1fr));
+                        grid-template-rows: repeat(8, minmax(0, 1fr));
                         gap: 2px;
                         box-sizing: border-box;
                         background: #2c3e50;
@@ -5315,13 +5341,21 @@
                         margin-top: 10px;
 
                         /* Default Portrait / Desktop */
-                        width: 95%;
+                        width: min(95%, 75vh);
                         aspect-ratio: 1/1;
                         height: auto;
                         max-width: 600px;
-                        max-height: 600px;
                         margin-left: auto;
                         margin-right: auto;
+                    }
+
+                    .goose-board > div {
+                        overflow: hidden;
+                        font-size: clamp(0.8em, 3vw, 1.2em);
+                    }
+                    .goose-board > div > div {
+                        max-width: 100%;
+                        overflow: hidden;
                     }
 
                     /* --- MOBILE LANDSCAPE OPTIMIZATIONS --- */
