@@ -980,7 +980,7 @@
 
                 const load = () => {
                     this._voices = window.speechSynthesis.getVoices();
-                    console.log('Voces cargadas:', this._voices.length);
+                    // console.log('Voces cargadas:', this._voices.length);
                 };
 
                 // Chrome loads async
@@ -989,6 +989,16 @@
                 }
                 // Try now anyway
                 load();
+
+                // Aggressive Retry for Samsung/Android
+                if (this._voices.length === 0) {
+                    let attempts = 0;
+                    const interval = setInterval(() => {
+                        load();
+                        attempts++;
+                        if (this._voices.length > 0 || attempts > 10) clearInterval(interval);
+                    }, 500);
+                }
             }
 
             get ctx() {
@@ -1013,10 +1023,13 @@
 
                 // 2. Unlock Speech Synthesis (Mobile Wake-up)
                 if (window.speechSynthesis) {
+                    // Clear queue first
+                    window.speechSynthesis.cancel();
+
                     // Speak silence to initialize the engine on user gesture
-                    // Use a space ' ' instead of empty string to ensure processing
                     const u = new SpeechSynthesisUtterance(' ');
                     u.volume = 0; // Silent
+                    u.rate = 1.0;
                     window.speechSynthesis.speak(u);
                 }
 
