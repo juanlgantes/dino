@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.22 "Maze Freeze Fix"</title>
+    <title>v17.23 "Maze Robustness"</title>
     <!--
+        CHANGELOG v17.23
+        - [FIX] Laberinto: Corrección robusta para "Freeze" (Limpieza de memoria y eventos).
+
         CHANGELOG v17.22
         - [FIX] Laberinto: Solucionado "Freeze" al completar el nivel final.
 
@@ -3344,6 +3347,11 @@
 
             loop() {
                 if (!this.running) return;
+                // Safety: Stop if canvas is gone
+                if (!this.canvas.isConnected) {
+                    this.running = false;
+                    return;
+                }
 
                 if (this.dragTarget) {
                     // Vector to target
@@ -3449,11 +3457,12 @@
                     window.removeEventListener('mouseup', this.handlers.end);
                     window.removeEventListener('touchmove', this.handlers.move);
                     window.removeEventListener('touchend', this.handlers.end);
+                    this.handlers = null;
                 }
             }
 
             winGame() {
-                this.running = false; // Stop Loop
+                this.cleanup(); // Stop Loop & Remove Listeners
                 this.c.innerHTML = '';
                 const winDiv = document.createElement('div');
                 winDiv.style.textAlign = 'center';
