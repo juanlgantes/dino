@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.32 "Emociones"</title>
+    <title>v17.33 "El Cuerpo"</title>
     <!--
+        CHANGELOG v17.33
+        - [CONTENT] Nueva Actividad: "El Cuerpo / Body" 🦵. Preguntas bilingües (Español/Inglés) para aprender las partes del cuerpo (Nariz, Ojos, Boca, etc.).
+
         CHANGELOG v17.32
         - [CONTENT] Nueva Actividad: "Las Emociones" 😊. Un juego de preguntas para aprender a identificar sentimientos (Felicidad, Tristeza, Miedo, etc.) usando emojis.
 
@@ -1007,6 +1010,22 @@
                     { question: '¿Quién está SORPRENDIDO? 😲', options: ['😐', '😲', '😴', '😆'], correct: 1 },
                     { question: '¿Quién tiene SUEÑO? 😴', options: ['😄', '😴', '😠', '😨'], correct: 1 },
                     { question: '¿Quién siente AMOR? 😍', options: ['😍', '😢', '😠', '😐'], correct: 0 }
+                ]
+            },
+            cuerpo: {
+                title: '🦵 El Cuerpo / Body',
+                description: 'Español e Inglés 🇪🇸🇬🇧',
+                type: 'quiz',
+                icon: '🦵',
+                theme: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
+                games: [
+                    { question: '¿Dónde está la NARIZ? (Nose)', options: ['👁️ Ojo', '👃 Nariz', '👂 Oreja', '👄 Boca'], correct: 1 },
+                    { question: 'Where are the EYES? (Ojos)', options: ['👃 Nose', '🦵 Leg', '👁️ Eyes', '✋ Hand'], correct: 2 },
+                    { question: '¿Cuál es la BOCA? (Mouth)', options: ['👄 Boca', '👁️ Ojo', '👂 Oreja', '🦶 Pie'], correct: 0 },
+                    { question: 'Where is the HAND? (Mano)', options: ['🦶 Foot', '✋ Hand', '👃 Nose', '🦵 Leg'], correct: 1 },
+                    { question: '¿Dónde está la OREJA? (Ear)', options: ['👂 Oreja', '👄 Boca', '👁️ Ojo', '✋ Mano'], correct: 0 },
+                    { question: 'Where is the FOOT? (Pie)', options: ['✋ Hand', '👃 Nose', '🦶 Foot', '👁️ Eye'], correct: 2 },
+                    { question: '¿Dónde está la PIERNA? (Leg)', options: ['💪 Brazo', '🦵 Pierna', '🦶 Pie', '👃 Nariz'], correct: 1 }
                 ]
             },
             reloj: {
