@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.26 "Save Game Feature"</title>
+    <title>v17.27 "Level Nav"</title>
     <!--
+        CHANGELOG v17.27
+        - [FEATURE] Navegación de Niveles: Botones "⬅️" y "➡️" añadidos en Laberinto y Unir Puntos para cambiar de nivel libremente.
+
         CHANGELOG v17.26
         - [FEATURE] Guardado de Partida: Ahora puedes guardar y continuar partidas en Parchís, Oca, Damas, Ajedrez y 4 en Raya.
         - [UI] Añadido botón "💾 Guardar" en los juegos de mesa.
@@ -3212,13 +3215,47 @@
                 this.c.style.justifyContent = 'flex-start';
                 this.c.style.overflow = 'hidden';
 
-                // Title
+                // Title & Nav
+                const header = document.createElement('div');
+                header.style.display = 'flex';
+                header.style.alignItems = 'center';
+                header.style.gap = '20px';
+                header.style.margin = '10px 0';
+
+                const btnPrev = document.createElement('button');
+                btnPrev.textContent = '⬅️';
+                btnPrev.style.fontSize = '1.5em';
+                btnPrev.style.background = 'none';
+                btnPrev.style.border = 'none';
+                btnPrev.style.cursor = 'pointer';
+                if (this.level > 0) {
+                    btnPrev.onclick = () => this.prevLevel();
+                } else {
+                    btnPrev.style.opacity = '0.3';
+                }
+
                 const title = document.createElement('h2');
                 title.id = 'mazeTitle';
                 title.style.color = '#ecf0f1';
-                title.style.margin = '10px 0';
+                title.style.margin = '0';
                 title.textContent = `Nivel ${this.level + 1}`;
-                this.c.appendChild(title);
+
+                const btnNext = document.createElement('button');
+                btnNext.textContent = '➡️';
+                btnNext.style.fontSize = '1.5em';
+                btnNext.style.background = 'none';
+                btnNext.style.border = 'none';
+                btnNext.style.cursor = 'pointer';
+                if (this.level < this.levels.length - 1) {
+                    btnNext.onclick = () => this.nextLevel();
+                } else {
+                    btnNext.style.opacity = '0.3';
+                }
+
+                header.appendChild(btnPrev);
+                header.appendChild(title);
+                header.appendChild(btnNext);
+                this.c.appendChild(header);
 
                 // Instruction
                 const inst = document.createElement('p');
@@ -3433,6 +3470,20 @@
                 }
             }
 
+            prevLevel() {
+                if (this.level > 0) {
+                    this.level--;
+                    this.init();
+                }
+            }
+
+            nextLevel() {
+                if (this.level < this.levels.length - 1) {
+                    this.level++;
+                    this.init();
+                }
+            }
+
             draw() {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -3571,11 +3622,39 @@
                 this.c.style.alignItems = "center";
                 this.c.style.justifyContent = "center";
 
+                // Nav Header
+                const header = document.createElement('div');
+                header.style.display = 'flex';
+                header.style.alignItems = 'center';
+                header.style.gap = '20px';
+                header.style.marginBottom = '10px';
+
+                const btnPrev = document.createElement('button');
+                btnPrev.textContent = '⬅️';
+                btnPrev.style.fontSize = '1.5em';
+                btnPrev.style.background = 'none';
+                btnPrev.style.border = 'none';
+                btnPrev.style.cursor = 'pointer';
+                btnPrev.onclick = () => this.prevLevel();
+
                 const title = document.createElement("h2");
                 title.id = "dotsTitle";
                 title.style.color = "#2980b9";
+                title.style.margin = '0';
                 title.textContent = `Nivel ${this.level + 1}`;
-                this.c.appendChild(title);
+
+                const btnNext = document.createElement('button');
+                btnNext.textContent = '➡️';
+                btnNext.style.fontSize = '1.5em';
+                btnNext.style.background = 'none';
+                btnNext.style.border = 'none';
+                btnNext.style.cursor = 'pointer';
+                btnNext.onclick = () => this.nextLevel();
+
+                header.appendChild(btnPrev);
+                header.appendChild(title);
+                header.appendChild(btnNext);
+                this.c.appendChild(header);
 
                 const canvasContainer = document.createElement("div");
                 canvasContainer.style.position = "relative";
@@ -3631,9 +3710,17 @@
                 this.maxDots = this.dots.length;
                 this.currentDot = 1;
                 this.documentTitle = document.getElementById("dotsTitle");
-                this.documentTitle.textContent = `Nivel ${this.level + 1}: ${this.currentDot} ➡️ ${this.currentDot + 1}`;
+                if(this.documentTitle) this.documentTitle.textContent = `Nivel ${this.level + 1}: ${this.currentDot} ➡️ ${this.currentDot + 1}`;
                 this.lines = [];
                 this.draw();
+            }
+
+            prevLevel() {
+                if (this.level > 0) this.loadLevel(this.level - 1);
+            }
+
+            nextLevel() {
+                if (this.level < this.levels.length - 1) this.loadLevel(this.level + 1);
             }
 
             draw() {
