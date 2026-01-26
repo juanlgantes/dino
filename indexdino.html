@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.23 "Maze Robustness"</title>
+    <title>v17.24 "Maze Button Fix"</title>
     <!--
+        CHANGELOG v17.24
+        - [FIX] Laberinto: Solucionado bloqueo de botones (Salir/Volver) en móviles.
+
         CHANGELOG v17.23
         - [FIX] Laberinto: Corrección robusta para "Freeze" (Limpieza de memoria y eventos).
 
@@ -3255,14 +3258,18 @@
                         this.updateDragTarget(e);
                     },
                     move: (e) => {
-                        // Only prevent default if interacting with game to allow other interactions?
-                        // Actually for this game mode we want to capture everything.
-                        if(e.cancelable) e.preventDefault();
-                        if(this.dragTarget) this.updateDragTarget(e);
+                        // Only prevent default if we are actively dragging the dino
+                        if(this.dragTarget) {
+                            if(e.cancelable) e.preventDefault();
+                            this.updateDragTarget(e);
+                        }
                     },
                     end: (e) => {
-                        e.preventDefault();
-                        this.dragTarget = null;
+                        // Only prevent default if we were dragging
+                        if(this.dragTarget) {
+                            if(e.cancelable) e.preventDefault();
+                            this.dragTarget = null;
+                        }
                     }
                 };
 
