@@ -14,8 +14,13 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.25 "Parchis Corner Fix"</title>
+    <title>v17.26 "Save Game Feature"</title>
     <!--
+        CHANGELOG v17.26
+        - [FEATURE] Guardado de Partida: Ahora puedes guardar y continuar partidas en Parchís, Oca, Damas, Ajedrez y 4 en Raya.
+        - [UI] Añadido botón "💾 Guardar" en los juegos de mesa.
+        - [UI] Menú de inicio en Damas y Ajedrez para permitir cargar partidas.
+
         CHANGELOG v17.25
         - [FIX] Parchis: Solucionado error visual donde las fichas desaparecían en ciertas casillas (esquinas).
 
@@ -4157,9 +4162,10 @@
          * 🔴 CONNECT FOUR GAME (Classic Strategy)
          */
         class ConnectFourGame {
-            constructor(data, container) {
+            constructor(data, container, savedState) {
                 this.data = data;
                 this.c = container;
+                this.savedState = savedState;
                 this.cols = 7;
                 this.rows = 6;
                 this.board = []; // 0=Empty, 1=Player, 2=Dino/P2
@@ -4205,17 +4211,45 @@
 
                 btnContainer.appendChild(btnPVE);
                 btnContainer.appendChild(btnPVP);
+
+                if (this.savedState) {
+                    const btnResume = document.createElement('button');
+                    btnResume.className = 'mode-btn kid';
+                    btnResume.style.background = '#2ecc71';
+                    btnResume.innerHTML = '📂 Continuar';
+                    btnResume.onclick = () => this.resumeGame();
+                    btnContainer.appendChild(btnResume);
+                }
+
                 this.c.appendChild(btnContainer);
 
                 const exit = document.createElement('button');
                 exit.textContent = '🏠 Salir';
                 exit.className = 'mode-btn kid';
                 exit.style.marginTop = '40px';
-                exit.onclick = () => app.nav.goDashboard();
+                exit.onclick = () => window.app.nav.goDashboard();
                 this.c.appendChild(exit);
             }
 
-            startGame(mode) {
+            resumeGame() {
+                if (this.savedState) {
+                    this.gameMode = this.savedState.gameMode || 'pve';
+                    this.board = this.savedState.board;
+                    this.turn = this.savedState.turn;
+                    this.startGame(this.gameMode, true);
+                }
+            }
+
+            save() {
+                const state = {
+                    gameMode: this.gameMode,
+                    board: this.board,
+                    turn: this.turn
+                };
+                window.app.saveGame('connect_four', state);
+            }
+
+            startGame(mode, isRestore = false) {
                 this.gameMode = mode;
                 this.c.innerHTML = '';
 
@@ -4225,6 +4259,19 @@
                 title.style.color = 'white';
                 title.style.marginBottom = '10px';
                 this.c.appendChild(title);
+
+                // Controls
+                const controls = document.createElement('div');
+                controls.style.marginBottom = '10px';
+                const saveBtn = document.createElement('button');
+                saveBtn.innerText = '💾 Guardar';
+                saveBtn.className = 'mode-btn kid';
+                saveBtn.style.padding = '5px 15px';
+                saveBtn.style.fontSize = '1em';
+                saveBtn.style.background = '#3498db';
+                saveBtn.onclick = () => this.save();
+                controls.appendChild(saveBtn);
+                this.c.appendChild(controls);
 
                 // Game Board Container
                 const boardEl = document.createElement('div');
@@ -4245,7 +4292,9 @@
 
                 this.slots = [];
                 // Init Logic Board
-                this.board = Array(this.rows).fill(null).map(() => Array(this.cols).fill(0));
+                if (!isRestore) {
+                    this.board = Array(this.rows).fill(null).map(() => Array(this.cols).fill(0));
+                }
 
                 // Create Slots
                 for (let r = 0; r < this.rows; r++) {
@@ -4270,6 +4319,13 @@
                             width: 100%; height: 100%; border-radius: 50%;
                             transform: scale(0); transition: transform 0.3s cubic-bezier(1.000, 0.005, 0.295, 1.225);
                         `;
+
+                        // Restore Visuals
+                        if (isRestore && this.board[r][c] !== 0) {
+                            piece.style.transform = 'scale(1)';
+                            piece.style.background = (this.board[r][c] === 1) ? '#e74c3c' : '#f1c40f';
+                        }
+
                         slot.appendChild(piece);
                         this.slots.push({ el: slot, piece: piece, row: r, col: c });
                         boardEl.appendChild(slot);
@@ -4281,13 +4337,13 @@
                 exit.textContent = '🏠 Salir';
                 exit.className = 'mode-btn kid';
                 exit.style.marginTop = '20px';
-                exit.onclick = () => app.nav.goDashboard();
+                exit.onclick = () => window.app.nav.goDashboard();
                 this.c.appendChild(exit);
 
                 // Status Message
                 this.statusEl = document.createElement('div');
                 this.statusEl.style.cssText = 'color: white; font-size: 1.5em; margin-top: 10px; height: 30px;';
-                this.statusEl.textContent = 'Tu turno 🔴';
+                this.statusEl.textContent = (this.turn === 1) ? 'Tu turno 🔴' : 'Turno Amarillo 🟡';
                 this.c.appendChild(this.statusEl);
             }
 
@@ -4515,9 +4571,10 @@
          * 🏁 CHECKERS GAME (Damas)
          */
         class CheckersGame {
-            constructor(data, container) {
+            constructor(data, container, savedState) {
                 this.data = data;
                 this.c = container;
+                this.savedState = savedState;
                 this.board = []; // 8x8: 0=Empty, 1=Red(Player), 2=Black(Dino), 3=RedKing, 4=BlackKing
                 this.turn = 1; // 1=Player, 2=Dino
                 this.selectedPiece = null; // {r, c}
@@ -4529,7 +4586,7 @@
 
             init() {
                 this.c.innerHTML = '';
-                this.c.style.background = '#eecbad'; // Wood-like background
+                this.c.style.background = '#eecbad';
                 this.c.style.display = 'flex';
                 this.c.style.flexDirection = 'column';
                 this.c.style.alignItems = 'center';
@@ -4538,8 +4595,69 @@
                 const title = document.createElement('h2');
                 title.textContent = '🏁 Damas 🦖';
                 title.style.color = '#5d4037';
-                title.style.marginBottom = '10px';
+                title.style.marginBottom = '20px';
                 this.c.appendChild(title);
+
+                const btnPlay = document.createElement('button');
+                btnPlay.className = 'mode-btn kid';
+                btnPlay.style.background = '#e74c3c';
+                btnPlay.textContent = '🎮 Jugar';
+                btnPlay.onclick = () => this.startGame(false);
+                this.c.appendChild(btnPlay);
+
+                if (this.savedState) {
+                    const btnResume = document.createElement('button');
+                    btnResume.className = 'mode-btn kid';
+                    btnResume.style.background = '#2ecc71';
+                    btnResume.style.marginTop = '10px';
+                    btnResume.textContent = '📂 Continuar';
+                    btnResume.onclick = () => this.resumeGame();
+                    this.c.appendChild(btnResume);
+                }
+
+                const exit = document.createElement('button');
+                exit.textContent = '🏠 Salir';
+                exit.className = 'mode-btn kid';
+                exit.style.marginTop = '20px';
+                exit.onclick = () => window.app.nav.goDashboard();
+                this.c.appendChild(exit);
+            }
+
+            resumeGame() {
+                this.board = this.savedState.board;
+                this.turn = this.savedState.turn;
+                this.startGame(true);
+            }
+
+            save() {
+                const state = {
+                    board: this.board,
+                    turn: this.turn
+                };
+                window.app.saveGame('checkers', state);
+            }
+
+            startGame(isRestore) {
+                this.c.innerHTML = '';
+
+                // Controls Header
+                const controls = document.createElement('div');
+                controls.style.cssText = 'display:flex; justify-content:space-between; width:95%; max-width:600px; margin-bottom:5px;';
+
+                const btnBack = document.createElement('button');
+                btnBack.textContent = '🔙';
+                btnBack.style.cssText = 'background:none; border:none; font-size:1.5em; cursor:pointer;';
+                btnBack.onclick = () => this.init(); // Back to Menu
+
+                const btnSave = document.createElement('button');
+                btnSave.textContent = '💾 Guardar';
+                btnSave.className = 'mode-btn kid';
+                btnSave.style.cssText = 'padding: 5px 15px; font-size: 1em; background: #3498db;';
+                btnSave.onclick = () => this.save();
+
+                controls.appendChild(btnBack);
+                controls.appendChild(btnSave);
+                this.c.appendChild(controls);
 
                 const boardEl = document.createElement('div');
                 boardEl.className = 'checkers-board';
@@ -4553,7 +4671,7 @@
                 this.c.appendChild(boardEl);
 
                 this.cells = [];
-                this.board = this.createBoard();
+                if (!isRestore) this.board = this.createBoard();
 
                 // Render Grid
                 for (let r = 0; r < 8; r++) {
@@ -4586,20 +4704,19 @@
                     }
                 }
 
-                // Exit
-                const exit = document.createElement('button');
-                exit.textContent = '🏠 Salir';
-                exit.className = 'mode-btn kid';
-                exit.style.marginTop = '10px';
-                exit.onclick = () => app.nav.goDashboard();
-                this.c.appendChild(exit);
-
                 this.statusEl = document.createElement('div');
                 this.statusEl.style.cssText = 'color: #5d4037; font-weight: bold; font-size: 1.5em; margin-top: 5px;';
-                this.statusEl.textContent = 'Tu turno (Rojos) 🔴';
+
+                if (this.turn === 1) this.statusEl.textContent = 'Tu turno (Rojos) 🔴';
+                else this.statusEl.textContent = 'Dino piensa... 🤔';
+
                 this.c.appendChild(this.statusEl);
 
                 this.updateView();
+
+                if (isRestore && this.turn === 2) {
+                    setTimeout(() => this.dinoTurn(), 1000);
+                }
             }
 
             createBoard() {
@@ -4868,18 +4985,15 @@
          * 2 Players: Red (Human) vs Yellow (Dino).
          */
         class ParchisGame {
-            constructor(data, container) {
+            constructor(data, container, savedState) {
                 this.data = data;
                 this.c = container;
+                this.savedState = savedState;
                 // Game State
                 this.turn = 1; // 1=Red, 2=Yellow
                 this.diceVal = null;
                 this.waitingRoll = true;
                 // Pieces: 0-3 Red, 4-7 Yellow. Value = position index (0=Home, 1..68=Path, >100=Goal)
-                // Let's us a simple path model:
-                // Shared Path: 1 to 68.
-                // Red Start: 5. Red Goal Entry: 68 -> 101..107 (Winner).
-                // Yellow Start: 22. Yellow Goal Entry: 17 -> 201..207 (Winner).
                 this.pieces = [0, 0, 0, 0, 0, 0, 0, 0]; // 0=Home
                 this.msg = 'Selecciona Modo 🎮';
                 this.gameOver = false;
@@ -4932,6 +5046,17 @@
                 btnContainer.appendChild(btn1);
                 btnContainer.appendChild(btn2);
                 btnContainer.appendChild(btn3);
+
+                // Restore Button
+                if (this.savedState) {
+                    const btnResume = document.createElement('button');
+                    btnResume.className = 'mode-btn kid';
+                    btnResume.style.background = '#2ecc71';
+                    btnResume.innerHTML = '📂 Continuar<br><span style="font-size:0.6em">Partida Guardada</span>';
+                    btnResume.onclick = () => this.resumeGame();
+                    btnContainer.appendChild(btnResume);
+                }
+
                 this.c.appendChild(btnContainer);
 
                 // Exit Button
@@ -4939,8 +5064,41 @@
                 exit.textContent = '🏠 Salir';
                 exit.className = 'mode-btn kid';
                 exit.style.marginTop = '40px';
-                exit.onclick = () => this.app.nav.goDashboard();
+                exit.onclick = () => window.app.nav.goDashboard();
                 this.c.appendChild(exit);
+            }
+
+            resumeGame() {
+                if (this.savedState) {
+                    this.gameMode = this.savedState.gameMode || 'pve';
+                    this.pieces = this.savedState.pieces || [0,0,0,0,0,0,0,0];
+                    this.turn = this.savedState.turn || 1;
+                    this.msg = (this.gameMode === 'hybrid') ? 'Tira tu dado y anota 📝' : 'Tira el dado 🎲';
+                    this.setupBoard();
+                    // Restore turn message
+                    if (this.turn === 1) {
+                        this.statusEl.textContent = 'Turno Rojo 🔴';
+                        this.c.style.background = '#fad390';
+                        this.waitingRoll = true;
+                    } else {
+                        this.statusEl.textContent = 'Turno Amarillo 🟡';
+                        this.c.style.background = '#fff9c4';
+                        if (this.gameMode === 'pve') {
+                            this.dinoAI();
+                        } else {
+                            this.waitingRoll = true;
+                        }
+                    }
+                }
+            }
+
+            save() {
+                const state = {
+                    gameMode: this.gameMode,
+                    pieces: this.pieces,
+                    turn: this.turn
+                };
+                window.app.saveGame('parchis', state);
             }
 
             startGame(mode) {
@@ -5041,13 +5199,32 @@
                 }
                 this.updatePieces();
 
+                // Controls Row
+                const controls = document.createElement('div');
+                controls.style.display = 'flex';
+                controls.style.gap = '10px';
+                controls.style.marginTop = '10px';
+
+                // Save
+                const saveBtn = document.createElement('button');
+                saveBtn.textContent = '💾 Guardar';
+                saveBtn.className = 'mode-btn kid';
+                saveBtn.style.background = '#3498db'; // Blue
+                saveBtn.style.padding = '10px 20px';
+                saveBtn.style.fontSize = '1em';
+                saveBtn.onclick = () => this.save();
+                controls.appendChild(saveBtn);
+
                 // Exit
                 const exit = document.createElement('button');
                 exit.textContent = '🏠 Salir';
                 exit.className = 'mode-btn kid';
-                exit.style.marginTop = '10px';
-                exit.onclick = () => app.nav.goDashboard();
-                this.c.appendChild(exit);
+                exit.style.padding = '10px 20px';
+                exit.style.fontSize = '1em';
+                exit.onclick = () => window.app.nav.goDashboard();
+                controls.appendChild(exit);
+
+                this.c.appendChild(controls);
             }
 
             renderBoard(container) {
@@ -5469,9 +5646,10 @@
          * - Rules: Oca, Puente, Posada, Pozo, Laberinto, Cárcel, Muerte.
          */
         class GooseGame {
-            constructor(data, container) {
+            constructor(data, container, savedState) {
                 this.data = data;
                 this.c = container;
+                this.savedState = savedState;
                 this.app = window.app;
                 this.pieces = [1, 1]; // P1 (User/Dino), P2 (AI/Human)
                 this.turn = 0; // 0 = P1, 1 = P2
@@ -5657,6 +5835,16 @@
                 btnContainer.appendChild(btn1);
                 btnContainer.appendChild(btn2);
                 btnContainer.appendChild(btn3);
+
+                if (this.savedState) {
+                    const btnResume = document.createElement('button');
+                    btnResume.className = 'mode-btn kid';
+                    btnResume.style.background = '#2ecc71';
+                    btnResume.innerHTML = '📂 Continuar<br><span style="font-size:0.6em">Partida Guardada</span>';
+                    btnResume.onclick = () => this.resumeGame();
+                    btnContainer.appendChild(btnResume);
+                }
+
                 this.c.appendChild(btnContainer);
 
                 // Exit Button
@@ -5668,7 +5856,27 @@
                 this.c.appendChild(exit);
             }
 
-            startGame(mode) {
+            resumeGame() {
+                if (this.savedState) {
+                    this.gameMode = this.savedState.gameMode || 'pve';
+                    this.pieces = this.savedState.pieces || [1, 1];
+                    this.turn = this.savedState.turn || 0;
+                    this.skip = this.savedState.skip || [0, 0];
+                    this.startGame(this.gameMode, true);
+                }
+            }
+
+            save() {
+                const state = {
+                    gameMode: this.gameMode,
+                    pieces: this.pieces,
+                    turn: this.turn,
+                    skip: this.skip
+                };
+                window.app.saveGame('goose', state);
+            }
+
+            startGame(mode, isRestore = false) {
                 this.gameMode = mode;
                 this.c.innerHTML = '';
                 this.waitingRoll = true;
@@ -5683,22 +5891,44 @@
                 this.statusEl.style.fontSize = '1.1em';
                 this.statusEl.style.margin = '0';
 
+                if (isRestore && this.turn !== 0 && this.gameMode === 'pve') {
+                    // If resuming and it was AI turn?
+                    // Let's just reset to waiting for roll to avoid instant AI move confusion or just set text
+                    this.statusEl.innerText = `Turno ${this.turn===0 ? 'Dino 🦕' : 'Oca 🦆'}`;
+                } else if (isRestore) {
+                     this.statusEl.innerText = `Turno ${this.turn===0 ? 'Dino 🦕' : ((this.gameMode === 'pve') ? 'Oca 🦆' : 'J2 🦖')}`;
+                }
+
                 this.diceEl = document.createElement('div');
                 this.diceEl.innerText = '🎲';
                 this.diceEl.style.fontSize = '2.5em';
                 this.diceEl.style.cursor = 'pointer';
                 this.diceEl.onclick = () => this.rollDice();
 
+                // Left Control Group
+                const leftDiv = document.createElement('div');
+                leftDiv.style.display = 'flex';
+                leftDiv.style.alignItems = 'center';
+                leftDiv.style.gap = '5px';
+
                 // Back Button (New)
                 const backBtn = document.createElement('button');
                 backBtn.innerText = '🔙';
-                backBtn.style.cssText = 'background:none; border:none; font-size:2em; cursor:pointer; margin-right:10px;';
+                backBtn.style.cssText = 'background:none; border:none; font-size:2em; cursor:pointer;';
                 backBtn.onclick = () => {
                     if(confirm('¿Salir al menú de la Oca?')) {
                         this.cleanup();
                         this.init();
                     }
                 };
+
+                // Save Button
+                const saveBtn = document.createElement('button');
+                saveBtn.innerText = '💾';
+                saveBtn.style.cssText = 'background:none; border:none; font-size:2em; cursor:pointer;';
+                saveBtn.onclick = () => this.save();
+
+                leftDiv.append(backBtn, saveBtn);
 
                 // Wrap status and dice
                 const rightDiv = document.createElement('div');
@@ -5707,7 +5937,7 @@
                 rightDiv.style.gap = '10px';
                 rightDiv.append(this.statusEl, this.diceEl);
 
-                h.append(backBtn, rightDiv);
+                h.append(leftDiv, rightDiv);
                 this.c.append(h);
 
                 // Manual Input (Hidden)
@@ -5977,28 +6207,14 @@
          * ♟️ CHESS GAME (Ajedrez Simplified)
          */
         class ChessGame {
-            constructor(data, container) {
+            constructor(data, container, savedState) {
                 this.data = data;
                 this.c = container;
+                this.savedState = savedState;
                 this.turn = 'white'; // white | black
                 this.selected = null; // {r, c}
                 this.moves = []; // Valid moves for selected
                 this.gameOver = false;
-
-                // Representation:
-                // lower = black (dino), UPPER = WHITE (Player)
-                // r,n,b,q,k,p
-                // Board 8x8
-                this.board = [
-                    ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-                    ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-                    ['', '', '', '', '', '', '', ''],
-                    ['', '', '', '', '', '', '', ''],
-                    ['', '', '', '', '', '', '', ''],
-                    ['', '', '', '', '', '', '', ''],
-                    ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-                    ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
-                ];
 
                 this.piecesMap = {
                     'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟',
@@ -6019,7 +6235,69 @@
                 const title = document.createElement('h2');
                 title.textContent = '♟️ Ajedrez 🦖';
                 title.style.color = '#ecf0f1';
+                title.style.marginBottom = '20px';
                 this.c.appendChild(title);
+
+                const btnPlay = document.createElement('button');
+                btnPlay.className = 'mode-btn kid';
+                btnPlay.style.background = '#e74c3c';
+                btnPlay.textContent = '🎮 Jugar';
+                btnPlay.onclick = () => this.startGame(false);
+                this.c.appendChild(btnPlay);
+
+                if (this.savedState) {
+                    const btnResume = document.createElement('button');
+                    btnResume.className = 'mode-btn kid';
+                    btnResume.style.background = '#2ecc71';
+                    btnResume.style.marginTop = '10px';
+                    btnResume.textContent = '📂 Continuar';
+                    btnResume.onclick = () => this.resumeGame();
+                    this.c.appendChild(btnResume);
+                }
+
+                const exit = document.createElement('button');
+                exit.textContent = '🏠 Salir';
+                exit.className = 'mode-btn kid';
+                exit.style.marginTop = '20px';
+                exit.onclick = () => window.app.nav.goDashboard();
+                this.c.appendChild(exit);
+            }
+
+            resumeGame() {
+                this.board = this.savedState.board;
+                this.turn = this.savedState.turn;
+                this.startGame(true);
+            }
+
+            save() {
+                const state = {
+                    board: this.board,
+                    turn: this.turn
+                };
+                window.app.saveGame('chess', state);
+            }
+
+            startGame(isRestore) {
+                this.c.innerHTML = '';
+
+                // Controls
+                const controls = document.createElement('div');
+                controls.style.cssText = 'display:flex; justify-content:space-between; width:95%; max-width:600px; margin-bottom:5px;';
+
+                const btnBack = document.createElement('button');
+                btnBack.textContent = '🔙';
+                btnBack.style.cssText = 'background:none; border:none; font-size:1.5em; cursor:pointer; margin-right: 10px;';
+                btnBack.onclick = () => this.init();
+
+                const btnSave = document.createElement('button');
+                btnSave.textContent = '💾 Guardar';
+                btnSave.className = 'mode-btn kid';
+                btnSave.style.cssText = 'padding: 5px 15px; font-size: 1em; background: #3498db;';
+                btnSave.onclick = () => this.save();
+
+                controls.appendChild(btnBack);
+                controls.appendChild(btnSave);
+                this.c.appendChild(controls);
 
                 const boardEl = document.createElement('div');
                 boardEl.style.cssText = `
@@ -6029,6 +6307,21 @@
                     border: 5px solid #2c3e50;
                 `;
                 this.c.appendChild(boardEl);
+
+                // Init Board State if not restoring
+                if (!isRestore) {
+                    this.board = [
+                        ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+                        ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+                        ['', '', '', '', '', '', '', ''],
+                        ['', '', '', '', '', '', '', ''],
+                        ['', '', '', '', '', '', '', ''],
+                        ['', '', '', '', '', '', '', ''],
+                        ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+                        ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+                    ];
+                    this.turn = 'white';
+                }
 
                 this.cells = [];
                 for (let r = 0; r < 8; r++) {
@@ -6052,18 +6345,14 @@
 
                 this.statusEl = document.createElement('div');
                 this.statusEl.style.cssText = 'color:white; margin-top:10px; font-size:1.5em;';
-                this.statusEl.textContent = 'Tu turno (Blancas)';
+                this.statusEl.textContent = this.turn === 'white' ? 'Tu turno (Blancas)' : 'Dino piensa...';
                 this.c.appendChild(this.statusEl);
 
-                // Exit
-                const exit = document.createElement('button');
-                exit.textContent = '🏠 Salir';
-                exit.className = 'mode-btn kid';
-                exit.style.marginTop = '10px';
-                exit.onclick = () => app.nav.goDashboard();
-                this.c.appendChild(exit);
-
                 this.render();
+
+                if (isRestore && this.turn === 'black') {
+                    setTimeout(() => this.dinoAI(), 500);
+                }
             }
 
             render() {
@@ -6423,6 +6712,25 @@
                 });
             }
 
+            saveGame(gameKey, state) {
+                try {
+                    localStorage.setItem(`savedGame_${gameKey}`, JSON.stringify(state));
+                    this.showToast('💾 Partida Guardada');
+                } catch (e) {
+                    console.error('Save failed', e);
+                    this.showToast('❌ Error al guardar');
+                }
+            }
+
+            getSavedGame(gameKey) {
+                try {
+                    const raw = localStorage.getItem(`savedGame_${gameKey}`);
+                    return raw ? JSON.parse(raw) : null;
+                } catch (e) {
+                    return null;
+                }
+            }
+
             startGame(key) {
                 this.currentGameKey = key; // Save for Replay
                 this.nav.show('game');
@@ -6433,6 +6741,9 @@
                 if (this.gameInstance && typeof this.gameInstance.cleanup === 'function') {
                     this.gameInstance.cleanup();
                 }
+
+                // Check for save
+                const savedState = this.getSavedGame(key);
 
                 if (data.type === 'movement') {
                     this.gameInstance = new MovementGame(data, canvas);
@@ -6455,15 +6766,15 @@
                 } else if (data.type === 'clock') {
                     this.gameInstance = new ClockGame(data, canvas);
                 } else if (data.type === 'connect_four') {
-                    this.gameInstance = new ConnectFourGame(data, canvas);
+                    this.gameInstance = new ConnectFourGame(data, canvas, savedState);
                 } else if (data.type === 'checkers') {
-                    this.gameInstance = new CheckersGame(data, canvas);
+                    this.gameInstance = new CheckersGame(data, canvas, savedState);
                 } else if (data.type === 'parchis') {
-                    this.gameInstance = new ParchisGame(data, canvas);
+                    this.gameInstance = new ParchisGame(data, canvas, savedState);
                 } else if (data.type === 'chess') {
-                    this.gameInstance = new ChessGame(data, canvas);
+                    this.gameInstance = new ChessGame(data, canvas, savedState);
                 } else if (data.type === 'goose') {
-                    this.gameInstance = new GooseGame(data, canvas);
+                    this.gameInstance = new GooseGame(data, canvas, savedState);
                 } else {
                     this.gameInstance = new QuizGame(data, this);
                 }
