@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.24 "Maze Button Fix"</title>
+    <title>v17.25 "Parchis Corner Fix"</title>
     <!--
+        CHANGELOG v17.25
+        - [FIX] Parchis: Solucionado error visual donde las fichas desaparecían en ciertas casillas (esquinas).
+
         CHANGELOG v17.24
         - [FIX] Laberinto: Solucionado bloqueo de botones (Salir/Volver) en móviles.
 
@@ -5146,18 +5149,18 @@
                     }
                 } else {
                     // Outer Loop (1-40)
-                    // Hardcoded segments for robustness
-                    if (pos <= 5) { y = 4; x = pos - 1; } // 0..4
+                    if (pos <= 5) { y = 4; x = pos - 1; }
                     else if (pos <= 9) { y = 4 - (pos - 5); x = 4; }
                     else if (pos <= 11) { y = 0; x = 4 + (pos - 9); }
                     else if (pos <= 15) { y = (pos - 11); x = 6; }
-                    else if (pos <= 20) { y = 4; x = 6 + (pos - 15); }
-                    else if (pos <= 22) { y = 4 + (pos - 20); x = 10; }
-                    else if (pos <= 25) { y = 6; x = 10 - (pos - 22); }
+                    else if (pos <= 19) { y = 4; x = 6 + (pos - 15); }
+                    else if (pos <= 21) { y = 4 + (pos - 19); x = 10; }
+                    else if (pos <= 25) { y = 6; x = 10 - (pos - 21); }
                     else if (pos <= 29) { y = 6 + (pos - 25); x = 6; }
                     else if (pos <= 31) { y = 10; x = 6 - (pos - 29); }
                     else if (pos <= 35) { y = 10 - (pos - 31); x = 4; }
-                    else if (pos <= 40) { y = 6; x = 4 - (pos - 35); } // Back to near start
+                    else if (pos <= 39) { y = 6; x = 4 - (pos - 35); }
+                    else if (pos === 40) { y = 5; x = 0; }
                 }
 
                 return { x, y };
