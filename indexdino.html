@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.29 "10 Dots Levels"</title>
+    <title>v17.30 "Quiz Nav"</title>
     <!--
+        CHANGELOG v17.30
+        - [FEATURE] Navegación Quiz: Botones "⬅️" y "➡️" añadidos en todas las actividades de preguntas (Desafío, Jardín, etc.) para repasar sin contestar.
+
         CHANGELOG v17.29
         - [CONTENT] Unir Puntos: Restaurados niveles clásicos (Pez, Mariposa) y añadidos nuevos (Sol, Árbol, Coche) para un total de 10 niveles.
 
@@ -1278,6 +1281,8 @@
             }
 
             renderQuestion() {
+                // Safety check
+                if (this.currentIndex < 0) this.currentIndex = 0;
                 if (this.currentIndex >= this.data.games.length) {
                     this.finishQuiz();
                     return;
@@ -1330,7 +1335,11 @@
                     const btn = document.createElement('button');
                     btn.className = 'option-btn';
                     btn.textContent = opt;
-                    btn.onclick = () => this.checkAnswer(i);
+
+                    // Mark if already answered correctly? (Not tracking per question persistence yet, but logic is here)
+                    if (game.answered && i === game.correct) btn.classList.add('correct');
+
+                    btn.onclick = () => this.checkAnswer(i, btn);
                     card.appendChild(btn);
                 });
 
@@ -1344,27 +1353,39 @@
 
                 this.container.appendChild(wrapper);
 
-                // --- NAVIGATION (New v13) ---
-                const navBtn = document.createElement('button');
-                navBtn.innerHTML = '➡️';
-                navBtn.style.cssText = `
-                    position: absolute; bottom: 20px; right: 20px;
+                // --- NAVIGATION (Prev / Next) ---
+                const navContainer = document.createElement('div');
+                navContainer.style.cssText = 'position:absolute; bottom:20px; width:100%; display:flex; justify-content:space-between; padding:0 20px; pointer-events:none;';
+
+                // Prev
+                const btnPrev = document.createElement('button');
+                btnPrev.innerHTML = '⬅️';
+                btnPrev.style.cssText = `
+                    background: #3498db; color: white; border: none;
+                    width: 60px; height: 60px; border-radius: 50%;
+                    font-size: 2em; cursor: pointer; box-shadow: 0 4px 0 #2980b9;
+                    display: flex; align-items: center; justify-content: center;
+                    pointer-events: auto; visibility: ${this.currentIndex > 0 ? 'visible' : 'hidden'};
+                `;
+                btnPrev.onclick = () => this.prevQuestion();
+
+                // Next
+                const btnNext = document.createElement('button');
+                btnNext.innerHTML = '➡️';
+                btnNext.style.cssText = `
                     background: #f1c40f; color: white; border: none;
                     width: 60px; height: 60px; border-radius: 50%;
                     font-size: 2em; cursor: pointer; box-shadow: 0 4px 0 #d35400;
                     display: flex; align-items: center; justify-content: center;
-                    transition: transform 0.1s;
+                    pointer-events: auto; visibility: ${this.currentIndex < this.data.games.length - 1 ? 'visible' : 'hidden'};
                 `;
-                navBtn.onclick = () => this.skipQuestion();
-                navBtn.onmousedown = () => navBtn.style.transform = 'translateY(4px)';
-                navBtn.onmouseup = () => navBtn.style.transform = 'translateY(0)';
+                btnNext.onclick = () => this.nextQuestion();
 
-                // wrapper is padded, maybe append to container to be absolute relative to gameArea?
-                // gameArea is 'game-canvas-container' which usually has relative positioning?
-                // Let's check CSS. .game-canvas-container in Dino 9/11 usually doesn't have position relative.
-                // Let's force it on the container for this button to stick.
+                navContainer.appendChild(btnPrev);
+                navContainer.appendChild(btnNext);
+
                 this.container.style.position = 'relative';
-                this.container.appendChild(navBtn);
+                this.container.appendChild(navContainer);
             }
 
             speakCurrent() {
@@ -1374,37 +1395,49 @@
                 this.app.audio.speak(text);
             }
 
-            skipQuestion() {
-                // Clear any pending transition from a previous answer if user clicks fast
+            prevQuestion() {
                 if (this.feedbackTimeout) clearTimeout(this.feedbackTimeout);
-
-                this.currentIndex++;
-                this.renderQuestion();
+                if (this.currentIndex > 0) {
+                    this.currentIndex--;
+                    this.renderQuestion();
+                }
             }
 
-            checkAnswer(selectedIndex) {
-                const game = this.data.games[this.currentIndex];
-                const buttons = this.container.querySelectorAll('.option-btn');
+            nextQuestion() {
+                if (this.feedbackTimeout) clearTimeout(this.feedbackTimeout);
+                if (this.currentIndex < this.data.games.length - 1) {
+                    this.currentIndex++;
+                    this.renderQuestion();
+                }
+            }
 
-                buttons.forEach(b => b.style.pointerEvents = 'none'); // Lock
+            checkAnswer(selectedIndex, btnElement) {
+                const game = this.data.games[this.currentIndex];
+
+                // If already answered, don't score again
+                if (game.answered) return;
 
                 if (selectedIndex === game.correct) {
-                    buttons[selectedIndex].classList.add('correct');
+                    btnElement.classList.add('correct');
+                    game.answered = true; // Mark as answered
                     this.app.addScore(10);
                     this.app.audio.playPop();
                     this.showFeedback('¡Bien hecho! ⭐', true);
+
+                    // Auto-advance after delay
+                    this.feedbackTimeout = setTimeout(() => {
+                        if (this.currentIndex < this.data.games.length - 1) {
+                            this.nextQuestion();
+                        } else {
+                            this.finishQuiz();
+                        }
+                    }, 2000);
+
                 } else {
-                    buttons[selectedIndex].classList.add('incorrect');
-                    buttons[game.correct].classList.add('correct');
+                    btnElement.classList.add('incorrect');
                     this.app.audio.playError();
                     this.showFeedback('¡Casi!', false);
                 }
-
-                // Store timeout to clear it if skipped
-                this.feedbackTimeout = setTimeout(() => {
-                    this.currentIndex++;
-                    this.renderQuestion();
-                }, 2000);
             }
 
             showFeedback(msg, isCorrect) {
