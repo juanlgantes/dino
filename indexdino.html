@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.30 "Quiz Nav"</title>
+    <title>v17.31 "Oca Mobile Fix"</title>
     <!--
+        CHANGELOG v17.31
+        - [FIX] Oca: Corregido desbordamiento del tablero en móviles (ajuste robusto de tamaño y aspect-ratio).
+
         CHANGELOG v17.30
         - [FEATURE] Navegación Quiz: Botones "⬅️" y "➡️" añadidos en todas las actividades de preguntas (Desafío, Jardín, etc.) para repasar sin contestar.
 
@@ -5889,21 +5892,19 @@
                         position: relative;
                         padding: 2px;
 
-                        /* Responsive Sizing */
-                        width: auto;
-                        height: auto;
+                        /* Responsive Sizing v17.31 */
+                        width: 95%;
+                        max-width: 55vh; /* Limit width based on viewport height (safe proxy for container) */
+                        min-width: 280px; /* Minimum playable size */
+
+                        max-height: calc(100% - 90px); /* Leave room for header */
                         aspect-ratio: 1/1;
 
-                        /* Max Constraints to fit in container */
-                        max-width: 100%;
-                        max-height: calc(100% - 100px); /* Leave room for header (approx 80px) */
-
                         /* Flex centering */
-                        margin: 0 auto 20px auto;
+                        margin: 0 auto 10px auto;
 
                         /* Ensure it shrinks */
                         min-height: 0;
-                        min-width: 0;
                     }
 
                     .goose-board > div {
