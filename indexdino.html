@@ -5515,7 +5515,8 @@
                         font-family: "Fredoka", sans-serif;
                         padding: 5px;
                         box-sizing: border-box;
-                        overflow: hidden; /* Prevent internal scroll */
+                        overflow-y: auto; /* Allow internal scroll if needed */
+                        -webkit-overflow-scrolling: touch;
                     }
 
                     .goose-header {
@@ -5551,10 +5552,10 @@
 
                         /* Max Constraints to fit in container */
                         max-width: 100%;
-                        max-height: calc(100% - 10px); /* Leave room for header interaction if needed */
+                        max-height: calc(100% - 100px); /* Leave room for header (approx 80px) */
 
                         /* Flex centering */
-                        margin: 0 auto;
+                        margin: 0 auto 20px auto;
 
                         /* Ensure it shrinks */
                         min-height: 0;
