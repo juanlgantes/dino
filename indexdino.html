@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.31 "Oca Mobile Fix"</title>
+    <title>v17.32 "Emociones"</title>
     <!--
+        CHANGELOG v17.32
+        - [CONTENT] Nueva Actividad: "Las Emociones" 😊. Un juego de preguntas para aprender a identificar sentimientos (Felicidad, Tristeza, Miedo, etc.) usando emojis.
+
         CHANGELOG v17.31
         - [FIX] Oca: Corregido desbordamiento del tablero en móviles (ajuste robusto de tamaño y aspect-ratio).
 
@@ -144,6 +147,7 @@
 
     <!-- PWA MANIFEST & META -->
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
     <meta name="theme-color" content="#667eea">
     <link rel="apple-touch-icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦕</text></svg>">
@@ -987,6 +991,22 @@
                 games: [
                     { question: '¿Quién nació en Navidad?', options: ['🎅 Santa Claus', '👼 Jesús', '⛄ Muñeco de nieve', '🦌 Rodolfo'], correct: 1 },
                     { question: '¿Dónde nació Jesús?', options: ['🏰 Castillo', '🏠 Casa', '⭐ Belén', '🏫 Escuela'], correct: 2 }
+                ]
+            },
+            emociones: {
+                title: '😊 Las Emociones',
+                description: '¡Identifica cómo se sienten!',
+                type: 'quiz',
+                icon: '🎭',
+                theme: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
+                games: [
+                    { question: '¿Quién está FELIZ? 😄', options: ['😠', '😢', '😄', '😴'], correct: 2 },
+                    { question: '¿Quién está TRISTE? 😢', options: ['😄', '😢', '😲', '😡'], correct: 1 },
+                    { question: '¿Quién tiene MIEDO? 😨', options: ['😨', '😎', '😆', '😐'], correct: 0 },
+                    { question: '¿Quién está ENFADADO? 😠', options: ['😴', '😠', '😄', '😢'], correct: 1 },
+                    { question: '¿Quién está SORPRENDIDO? 😲', options: ['😐', '😲', '😴', '😆'], correct: 1 },
+                    { question: '¿Quién tiene SUEÑO? 😴', options: ['😄', '😴', '😠', '😨'], correct: 1 },
+                    { question: '¿Quién siente AMOR? 😍', options: ['😍', '😢', '😠', '😐'], correct: 0 }
                 ]
             },
             reloj: {
