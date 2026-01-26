@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.28 "Better Dots"</title>
+    <title>v17.29 "10 Dots Levels"</title>
     <!--
+        CHANGELOG v17.29
+        - [CONTENT] Unir Puntos: Restaurados niveles clásicos (Pez, Mariposa) y añadidos nuevos (Sol, Árbol, Coche) para un total de 10 niveles.
+
         CHANGELOG v17.28
         - [VISUAL] Unir Puntos: Formas geométricas simplificadas (Estrella, Corazón, Casa, Barco, Luna) para mejorar la jugabilidad y el resultado visual.
 
@@ -3570,6 +3573,22 @@
                 // Normalized Coordinates (0.0 to 1.0)
                 this.levels = [
                     {
+                        name: "PEZ 🐟",
+                        points: [
+                            { x: 0.2, y: 0.5 }, { x: 0.4, y: 0.3 }, { x: 0.6, y: 0.3 }, { x: 0.8, y: 0.5 },
+                            { x: 0.9, y: 0.3 }, { x: 0.9, y: 0.7 }, { x: 0.8, y: 0.5 }, { x: 0.6, y: 0.7 },
+                            { x: 0.4, y: 0.7 }, { x: 0.2, y: 0.5 }
+                        ]
+                    },
+                    {
+                        name: "MARIPOSA 🦋",
+                        points: [
+                            { x: 0.5, y: 0.5 }, { x: 0.3, y: 0.2 }, { x: 0.2, y: 0.5 }, { x: 0.3, y: 0.8 },
+                            { x: 0.5, y: 0.6 }, { x: 0.7, y: 0.8 }, { x: 0.8, y: 0.5 }, { x: 0.7, y: 0.2 },
+                            { x: 0.5, y: 0.4 }, { x: 0.5, y: 0.2 }
+                        ]
+                    },
+                    {
                         name: "ESTRELLA ⭐",
                         points: [
                             {x:0.5, y:0.1}, {x:0.6, y:0.4}, {x:0.9, y:0.4}, {x:0.65, y:0.6},
@@ -3606,6 +3625,31 @@
                             {x:0.5, y:0.1}, {x:0.7, y:0.2}, {x:0.8, y:0.5}, {x:0.7, y:0.8},
                             {x:0.5, y:0.9}, {x:0.6, y:0.7}, {x:0.65, y:0.5}, {x:0.6, y:0.3},
                             {x:0.5, y:0.1}
+                        ]
+                    },
+                    {
+                        name: "SOL ☀️",
+                        points: [
+                            {x:0.5, y:0.2}, {x:0.65, y:0.25}, {x:0.8, y:0.5}, {x:0.65, y:0.75},
+                            {x:0.5, y:0.8}, {x:0.35, y:0.75}, {x:0.2, y:0.5}, {x:0.35, y:0.25},
+                            {x:0.5, y:0.2}
+                        ]
+                    },
+                    {
+                        name: "ÁRBOL 🌲",
+                        points: [
+                            {x:0.5, y:0.1}, {x:0.7, y:0.4}, {x:0.6, y:0.4}, {x:0.8, y:0.7},
+                            {x:0.6, y:0.7}, {x:0.6, y:0.9}, {x:0.4, y:0.9}, {x:0.4, y:0.7},
+                            {x:0.2, y:0.7}, {x:0.4, y:0.4}, {x:0.3, y:0.4}, {x:0.5, y:0.1}
+                        ]
+                    },
+                    {
+                        name: "COCHE 🚗",
+                        points: [
+                            {x:0.2, y:0.7}, {x:0.1, y:0.5}, {x:0.2, y:0.5}, {x:0.3, y:0.3},
+                            {x:0.6, y:0.3}, {x:0.7, y:0.5}, {x:0.9, y:0.5}, {x:0.9, y:0.7},
+                            {x:0.2, y:0.7}, {x:0.3, y:0.8}, {x:0.4, y:0.7}, {x:0.7, y:0.7},
+                            {x:0.8, y:0.8}, {x:0.9, y:0.7}
                         ]
                     }
                 ];
