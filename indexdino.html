@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.33 "El Cuerpo"</title>
+    <title>v17.34 "Colors"</title>
     <!--
+        CHANGELOG v17.34
+        - [CONTENT] Nueva Actividad: "Colors / Colores" 🎨. Aprende los colores en inglés (Red, Blue, Green, Yellow, etc.) con bloques visuales.
+
         CHANGELOG v17.33
         - [CONTENT] Nueva Actividad: "El Cuerpo / Body" 🦵. Preguntas bilingües (Español/Inglés) para aprender las partes del cuerpo (Nariz, Ojos, Boca, etc.).
 
@@ -1026,6 +1029,23 @@
                     { question: '¿Dónde está la OREJA? (Ear)', options: ['👂 Oreja', '👄 Boca', '👁️ Ojo', '✋ Mano'], correct: 0 },
                     { question: 'Where is the FOOT? (Pie)', options: ['✋ Hand', '👃 Nose', '🦶 Foot', '👁️ Eye'], correct: 2 },
                     { question: '¿Dónde está la PIERNA? (Leg)', options: ['💪 Brazo', '🦵 Pierna', '🦶 Pie', '👃 Nariz'], correct: 1 }
+                ]
+            },
+            colores: {
+                title: '🎨 Colors / Colores',
+                description: '¡Aprende los colores en Inglés!',
+                type: 'quiz',
+                icon: '🎨',
+                theme: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)',
+                games: [
+                    { question: 'Which one is RED? 🔴 (Rojo)', options: ['🟦', '🟥', '🟩', '🟨'], correct: 1 },
+                    { question: 'Which one is BLUE? 🔵 (Azul)', options: ['🟥', '🟨', '🟦', '🟧'], correct: 2 },
+                    { question: 'Which one is GREEN? 🟢 (Verde)', options: ['🟩', '🟪', '🟦', '🟫'], correct: 0 },
+                    { question: 'Which one is YELLOW? 🟡 (Amarillo)', options: ['🟧', '🟨', '⬛', '🟥'], correct: 1 },
+                    { question: 'Which one is ORANGE? 🟠 (Naranja)', options: ['🟧', '🟥', '🟪', '🟦'], correct: 0 },
+                    { question: 'Which one is PURPLE? 🟣 (Morado)', options: ['🟦', '🟩', '🟪', '⬛'], correct: 2 },
+                    { question: 'Which one is BLACK? ⚫ (Negro)', options: ['⬜', '⬛', '🟫', '🟥'], correct: 1 },
+                    { question: 'Which one is WHITE? ⚪ (Blanco)', options: ['⬛', '⬜', '🟨', '🟦'], correct: 1 }
                 ]
             },
             reloj: {
