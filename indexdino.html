@@ -14,8 +14,12 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.34 "Colors"</title>
+    <title>v17.35 "Robotics Plus"</title>
     <!--
+        CHANGELOG v17.35
+        - [FEATURE] Robótica: Actualización con 6 Niveles (ZigZag, Vuelta, Espiral).
+        - [UI] Robótica: Botones de Navegación (⬅️/➡️) y Borrado (⌫/🗑️).
+
         CHANGELOG v17.34
         - [CONTENT] Nueva Actividad: "Colors / Colores" 🎨. Aprende los colores en inglés (Red, Blue, Green, Yellow, etc.) con bloques visuales.
 
@@ -739,21 +743,7 @@
             </div>
         </section>
 
-        <!-- AGE SELECTION (New) -->
-        <section id="view-age-select" class="content-section hidden">
-            <h2 style="text-align: center; color: var(--text-dark); margin-bottom: 30px;">¿Cuántos años tienes?</h2>
-            <div style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
-                <button class="mode-btn" onclick="app.selectAge(3)"
-                    style="background: #ff9ff3; color: white; font-size: 1.5em; display:flex; align-items:center; justify-content:center; gap:10px;">
-                    <span style="font-size: 1.5em;">🍼</span> 3 Años
-                </button>
-                <button class="mode-btn" onclick="app.selectAge(5)"
-                    style="background: #54a0ff; color: white; font-size: 1.5em; display:flex; align-items:center; justify-content:center; gap:10px;">
-                    <span style="font-size: 1.5em;">🎒</span> 5 Años
-                </button>
-            </div>
-            <button class="nav-btn" onclick="app.nav.goHome()" style="margin-top: 30px; margin-left: auto; margin-right: auto; position: static;">⬅️</button>
-        </section>
+
 
         <!-- KID DASHBOARD -->
         <section id="view-kid-dash" class="content-section hidden">
@@ -761,8 +751,7 @@
                 style="position: absolute; top: 20px; right: 20px; font-size: 1.5em; background: #fff3cd; padding: 5px 15px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                 ⭐ <span id="kidDashScore">0</span>
             </div>
-            <!-- Back Button for Age Selection -->
-            <button class="nav-btn" onclick="app.nav.show('age-select')" style="position: absolute; top: 20px; left: 20px; width:40px; height:40px; font-size:1.2em;">⬅️</button>
+
 
             <div class="dino-mascot" id="mascotDino">🦕</div>
             <h2 style="text-align: center; margin-bottom: 20px;">¡Elige tu aventura!</h2>
@@ -912,71 +901,62 @@
                 type: 'movement',
                 icon: '🎮', // Added for v9 UI
                 theme: 'var(--theme-aventura)', // Added for v9 UI
-                age: 3
             },
             surf: {
                 title: '🏄‍♂️ Dino Surfer',
                 description: '¡Consigue 10 estrellas para ganar!',
                 type: 'surf',
                 icon: '🌊',
-                theme: 'linear-gradient(180deg, #4facfe 0%, #00f2fe 100%)',
-                age: 5
+                theme: 'linear-gradient(180deg, #4facfe 0%, #00f2fe 100%)'
             },
             soccer: {
                 title: '⚽ Dino Penaltis',
                 description: '¡Marca 3 goles para ganar!',
                 type: 'soccer',
                 icon: '🥅',
-                theme: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-                age: 5
+                theme: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
             },
             kart: {
                 title: '🏎️ Dino Karts',
                 description: '¡Sobrevive 2 minutos!',
                 type: 'kart',
                 icon: '⏱️',
-                theme: 'linear-gradient(180deg, #dd3e54 0%, #6be585 100%)',
-                age: 5
+                theme: 'linear-gradient(180deg, #dd3e54 0%, #6be585 100%)'
             },
             fighter: {
                 title: '🥋 Dino Fighter',
                 description: '¡Vence al T-Rex en combate!',
                 type: 'fighter',
                 icon: '🥊',
-                theme: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                age: 5
+                theme: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
             },
             musica: {
                 title: '🎹 Piano Mágico',
                 description: '¡Toca Estrellita y gana 100⭐!',
                 type: 'music',
                 icon: '🎹',
-                theme: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
-                age: 3
+                theme: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)'
             },
             pintar: {
                 title: '🎨 Dino Pintor',
                 description: '¡Dibuja y colorea con Dino!',
                 type: 'painter',
                 icon: '🎨',
-                theme: 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)',
-                age: 3
+                theme: 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)'
             },
             laberinto: {
                 title: '🧩 Dino Laberinto',
                 description: '¡Encuentra el camino al Huevo!',
                 type: 'maze',
                 icon: '🧩',
-                theme: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-                age: 5
+                theme: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
             },
             unir_puntos: {
                 title: '✏️ Unir Puntos',
                 description: '¡Conecta del 1 al 10!',
                 type: 'connect_dots',
                 icon: '✏️',
-                theme: 'linear-gradient(135deg, #3498db 0%, #8e44ad 100%)',
-                age: 5
+                theme: 'linear-gradient(135deg, #3498db 0%, #8e44ad 100%)'
             },
             armonia: {
                 title: '🌟 Desafío de Dino',
@@ -984,7 +964,6 @@
                 type: 'quiz',
                 icon: '🌟',
                 theme: 'var(--theme-quiz)',
-                age: 3,
                 games: [
                     { question: '¿Qué hace Dino antes de comer?', options: ['🧼 Lavarse las manos', '📺 Ver TV', '🏃 Correr', '😴 Dormir'], correct: 0 },
                     { question: '¿Qué parte del cuerpo usa Dino para caminar?', options: ['👂 Orejas', '👃 Nariz', '🦵 Piernas', '👀 Ojos'], correct: 2 },
@@ -1001,7 +980,6 @@
                 type: 'quiz',
                 icon: '🌳',
                 theme: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-                age: 3,
                 games: [
                     { question: '¿Qué es más GRANDE?', options: ['🐘 Elefante', '🐜 Hormiga', '🐱 Gato', '🐭 Ratón'], correct: 0 },
                     { question: '¿Cuántas manzanas hay? 🍎', options: ['0️⃣', '1️⃣', '2️⃣', '3️⃣'], correct: 1 }
@@ -1013,7 +991,6 @@
                 type: 'quiz',
                 icon: '📚',
                 theme: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-                age: 5,
                 games: [
                     { question: '¿Qué número es este? 1️⃣', options: ['Cero', 'Uno', 'Dos', 'Tres'], correct: 1 },
                     { question: 'En inglés, ¿cómo se dice "Rojo"?', options: ['Blue', 'Red', 'Green', 'Yellow'], correct: 1 }
@@ -1025,7 +1002,6 @@
                 type: 'quiz',
                 icon: '⭐',
                 theme: 'linear-gradient(135deg, #fff1eb 0%, #ace0f9 100%)',
-                age: 3,
                 games: [
                     { question: '¿Quién nació en Navidad?', options: ['🎅 Santa Claus', '👼 Jesús', '⛄ Muñeco de nieve', '🦌 Rodolfo'], correct: 1 },
                     { question: '¿Dónde nació Jesús?', options: ['🏰 Castillo', '🏠 Casa', '⭐ Belén', '🏫 Escuela'], correct: 2 }
@@ -1037,7 +1013,6 @@
                 type: 'quiz',
                 icon: '🎭',
                 theme: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
-                age: 3,
                 games: [
                     { question: '¿Quién está FELIZ? 😄', options: ['😠', '😢', '😄', '😴'], correct: 2 },
                     { question: '¿Quién está TRISTE? 😢', options: ['😄', '😢', '😲', '😡'], correct: 1 },
@@ -1054,7 +1029,6 @@
                 type: 'quiz',
                 icon: '🦵',
                 theme: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
-                age: 3,
                 games: [
                     { question: '¿Dónde está la NARIZ? (Nose)', options: ['👁️ Ojo', '👃 Nariz', '👂 Oreja', '👄 Boca'], correct: 1 },
                     { question: 'Where are the EYES? (Ojos)', options: ['👃 Nose', '🦵 Leg', '👁️ Eyes', '✋ Hand'], correct: 2 },
@@ -1071,7 +1045,6 @@
                 type: 'quiz',
                 icon: '🎨',
                 theme: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)',
-                age: 3,
                 games: [
                     { question: 'Which one is RED? 🔴 (Rojo)', options: ['🟦', '🟥', '🟩', '🟨'], correct: 1 },
                     { question: 'Which one is BLUE? 🔵 (Azul)', options: ['🟥', '🟨', '🟦', '🟧'], correct: 2 },
@@ -1088,56 +1061,49 @@
                 description: '¡Aprende la hora con Dino!',
                 type: 'clock',
                 icon: '⏰',
-                theme: 'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)',
-                age: 5
+                theme: 'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)'
             },
             connect_four: {
                 title: '🔴 4 en Raya',
                 description: '¡Gana a Dino!',
                 type: 'connect_four',
                 icon: '🔴',
-                theme: 'linear-gradient(135deg, #2980b9 0%, #6dd5fa 100%)',
-                age: 5
+                theme: 'linear-gradient(135deg, #2980b9 0%, #6dd5fa 100%)'
             },
             checkers: {
                 title: '🏁 Damas',
                 description: '¡Salta y gana!',
                 type: 'checkers',
                 icon: '🏁',
-                theme: 'linear-gradient(135deg, #8e44ad 0%, #c0392b 100%)',
-                age: 5
+                theme: 'linear-gradient(135deg, #8e44ad 0%, #c0392b 100%)'
             },
             parchis: {
                 title: '🎲 Parchís',
                 description: '¡Corre a casa!',
                 type: 'parchis',
                 icon: '🎲',
-                theme: 'linear-gradient(135deg, #f1c40f 0%, #e67e22 100%)',
-                age: 5
+                theme: 'linear-gradient(135deg, #f1c40f 0%, #e67e22 100%)'
             },
             oca: {
                 title: '🦆 Oca',
                 description: '¡Llega al 63!',
                 type: 'goose',
                 icon: '🦆',
-                theme: 'linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%)',
-                age: 5
+                theme: 'linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%)'
             },
             chess: {
                 title: '♟️ Ajedrez',
                 description: 'Jaque Mate 🦖',
                 type: 'chess',
                 icon: '♟️',
-                theme: 'linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%)',
-                age: 5
+                theme: 'linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%)'
             },
             robotica: {
                 title: '🤖 Robótica / Coding',
                 description: '¡Programa al Robot!',
                 type: 'robotics',
                 icon: '🤖',
-                theme: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)',
-                age: 5
+                theme: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)'
             }
         };
 
@@ -1347,7 +1313,7 @@
          */
         class Navigation {
             constructor() {
-                this.views = ['splash', 'age-select', 'kid-dash', 'game', 'parent', 'cinema'];
+                this.views = ['splash', 'kid-dash', 'game', 'parent', 'cinema'];
             }
             show(viewId) {
                 this.views.forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
@@ -7187,8 +7153,7 @@
                     movementStars: 0,
                     cinemaLocked: false,
                     magicWord: null,
-                    cinemaUrls: VIDEOS_DATA.map(v => v.url),
-                    age: 3, // Default age
+                    cinemaUrls: VIDEOS_DATA.map(v => v.url), // Default age
                     ...(savedState || {})
                 };
 
@@ -7246,13 +7211,7 @@
                 document.addEventListener('keydown', unlockAudio);
             }
 
-            selectAge(age) {
-                this.state.age = age;
-                this.persistState();
-                this.audio.playPop();
-                this.renderActivities('root');
-                this.nav.show('kid-dash');
-            }
+
 
             renderActivities(mode = 'root') {
                 const grid = document.getElementById('activitiesGrid');
@@ -7275,14 +7234,7 @@
                 }
 
                 // 2. Render "Games Folder" in Root (PREPENDED)
-                // Filter: Check if any arcade games are available for this age
-                const visibleArcadeGames = ARCADE_KEYS.filter(k => {
-                    const d = ACTIVITIES_DATA[k];
-                    // If age 3, show only age 3 games. If age 5, show all.
-                    return this.state.age >= 5 || (d.age && d.age <= this.state.age);
-                });
-
-                if (mode === 'root' && visibleArcadeGames.length > 0) {
+                if (mode === 'root') {
                     const gamesCard = document.createElement('div');
                     gamesCard.className = 'area-card';
                     gamesCard.style.cssText = `
@@ -7306,14 +7258,9 @@
                     const data = ACTIVITIES_DATA[key];
                     const isArcade = ARCADE_KEYS.includes(key);
 
-                    // Filter Mode
+                    // Filter Logic
                     if (mode === 'root' && isArcade) return; // Hide games in root
                     if (mode === 'arcade' && !isArcade) return; // Hide quizzes in arcade
-
-                    // Filter Age
-                    // If age 3, show only age 3 games. If age 5, show all (age <= 5 covers 3 too).
-                    // Actually, let's keep it simple: if state.age < data.age, hide it.
-                    if (this.state.age < data.age) return;
 
                     const div = document.createElement('div');
                     div.className = 'area-card';
@@ -7535,8 +7482,9 @@
 
             checkKidAccess() {
                 if (!this.state.magicWord) {
-                    // No PIN set, go to Age Selection
-                    this.nav.show('age-select');
+                    // No PIN set, enter directly
+                    this.renderActivities('root');
+                    this.nav.show('kid-dash');
                     return;
                 }
 
@@ -7556,7 +7504,8 @@
                 if (input && input.toUpperCase() === this.state.magicWord.toUpperCase()) {
                     this.audio.playWin();
                     this.closeMagicGate();
-                    this.nav.show('age-select');
+                    this.renderActivities('root');
+                    this.nav.show('kid-dash');
                 } else {
                     this.audio.playError();
                     const inp = document.getElementById('magicInputDisplay');
