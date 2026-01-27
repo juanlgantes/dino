@@ -6032,7 +6032,7 @@
             init() {
                 this.injectStyles();
                 this.c.innerHTML = '';
-                this.c.className = 'goose-container'; // Use Class
+                this.c.classList.add('goose-container'); // Add class
                 this.c.style.cssText = ''; // Clear inline
 
                 // Title
@@ -6430,6 +6430,7 @@
                 if (this.ro) this.ro.disconnect();
                 this.timeouts.forEach(clearTimeout);
                 this.timeouts = [];
+                this.c.classList.remove('goose-container');
             }
         }
 
@@ -6916,7 +6917,7 @@
 
                         // Robot
                         if(this.robot.x === c && this.robot.y === r) {
-                            cell.innerHTML = '🤖';
+                            cell.innerHTML = '<span>🤖</span>';
                             const rot = this.robot.dir * 90;
                             cell.firstChild.style.transform = `rotate(${rot}deg)`;
                             cell.firstChild.style.display = 'block';
