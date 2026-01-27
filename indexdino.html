@@ -6916,11 +6916,29 @@
                 this.c.style.justifyContent = 'flex-start';
                 this.c.style.padding = '10px';
 
-                // Header
+                // Header & Level Nav
+                const header = document.createElement('div');
+                header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; width:100%; max-width:400px; margin-bottom:10px;';
+
+                const btnPrev = document.createElement('button');
+                btnPrev.innerHTML = '⬅️';
+                btnPrev.style.cssText = `background:none; border:none; font-size:2em; cursor:pointer; opacity: ${this.level > 0 ? 1 : 0.3};`;
+                btnPrev.onclick = () => { if(this.level > 0) { this.level--; this.init(); } };
+
                 const h = document.createElement('h2');
                 h.innerHTML = `🤖 Nivel ${this.level + 1}`;
                 h.style.color = '#00d2d3';
-                this.c.appendChild(h);
+                h.style.margin = '0';
+
+                const btnNext = document.createElement('button');
+                btnNext.innerHTML = '➡️';
+                btnNext.style.cssText = `background:none; border:none; font-size:2em; cursor:pointer; opacity: ${this.level < this.levels.length - 1 ? 1 : 0.3};`;
+                btnNext.onclick = () => { if(this.level < this.levels.length - 1) { this.level++; this.init(); } };
+
+                header.appendChild(btnPrev);
+                header.appendChild(h);
+                header.appendChild(btnNext);
+                this.c.appendChild(header);
 
                 // Grid Container
                 const gridEl = document.createElement('div');
@@ -6980,12 +6998,13 @@
 
                 // Controls
                 const controls = document.createElement('div');
-                controls.style.cssText = `display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 95%; max-width: 400px;`;
+                controls.style.cssText = `display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; width: 95%; max-width: 400px;`;
 
                 this.createBtn(controls, '⬆️', '#2ecc71', () => this.addCmd('F'));
                 this.createBtn(controls, '↺', '#f1c40f', () => this.addCmd('L'));
                 this.createBtn(controls, '↻', '#f1c40f', () => this.addCmd('R'));
-                this.createBtn(controls, '❌', '#e74c3c', () => { this.program = []; this.render(); }); // Clear
+                this.createBtn(controls, '⌫', '#e67e22', () => { this.program.pop(); this.render(); }); // Backspace
+                this.createBtn(controls, '🗑️', '#e74c3c', () => { this.program = []; this.render(); }); // Clear All
 
                 this.c.appendChild(controls);
 
