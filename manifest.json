@@ -3,7 +3,7 @@
   "short_name": "DinoApp",
   "start_url": "./indexdino.html",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#667eea",
   "theme_color": "#667eea",
   "icons": [
