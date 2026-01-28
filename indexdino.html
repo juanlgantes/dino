@@ -5263,9 +5263,9 @@
             }
         }
 
-        /**
+                /**
          * 🎲 PARCHIS GAME (Ludo Simplified)
-         * 2 Players: Red (Human) vs Yellow (Dino).
+         * 2-4 Players.
          */
         class ParchisGame {
             constructor(data, container, savedState) {
@@ -5273,14 +5273,14 @@
                 this.c = container;
                 this.savedState = savedState;
                 // Game State
-                this.turn = 1; // 1=Red, 2=Yellow
+                this.turn = 1; // 1=Red, 2=Yellow, 3=Green, 4=Blue
                 this.diceVal = null;
                 this.waitingRoll = true;
-                // Pieces: 0-3 Red, 4-7 Yellow. Value = position index (0=Home, 1..68=Path, >100=Goal)
-                this.pieces = [0, 0, 0, 0, 0, 0, 0, 0]; // 0=Home
+                // Pieces: 0-3 Red, 4-7 Yellow, 8-11 Green, 12-15 Blue.
+                this.pieces = Array(16).fill(0);
                 this.msg = 'Selecciona Modo 🎮';
                 this.gameOver = false;
-                this.gameMode = 'pve'; // pve | pvp
+                this.gameMode = 'pve'; // pve | pvp | pvp4
 
                 this.init();
             }
@@ -5320,14 +5320,21 @@
                 btn2.innerHTML = '👥 2 Jugadores<br><span style="font-size:0.6em">Amigos</span>';
                 btn2.onclick = () => this.startGame('pvp');
 
+                const btn4 = document.createElement('button');
+                btn4.className = 'mode-btn kid';
+                btn4.style.background = '#2ecc71';
+                btn4.innerHTML = '👥 4 Jugadores<br><span style="font-size:0.6em">Fiesta</span>';
+                btn4.onclick = () => this.startGame('pvp4');
+
                 const btn3 = document.createElement('button');
                 btn3.className = 'mode-btn kid';
                 btn3.style.background = '#9b59b6';
-                btn3.innerHTML = '🎲 2 Jugadores<br><span style="font-size:0.6em">Dado Real</span>';
+                btn3.innerHTML = '🎲 Híbrido<br><span style="font-size:0.6em">Dado Real</span>';
                 btn3.onclick = () => this.startGame('hybrid');
 
                 btnContainer.appendChild(btn1);
                 btnContainer.appendChild(btn2);
+                btnContainer.appendChild(btn4);
                 btnContainer.appendChild(btn3);
 
                 // Restore Button
@@ -5354,23 +5361,16 @@
             resumeGame() {
                 if (this.savedState) {
                     this.gameMode = this.savedState.gameMode || 'pve';
-                    this.pieces = this.savedState.pieces || [0,0,0,0,0,0,0,0];
+                    this.pieces = this.savedState.pieces || Array(16).fill(0);
                     this.turn = this.savedState.turn || 1;
                     this.msg = (this.gameMode === 'hybrid') ? 'Tira tu dado y anota 📝' : 'Tira el dado 🎲';
                     this.setupBoard();
-                    // Restore turn message
-                    if (this.turn === 1) {
-                        this.statusEl.textContent = 'Turno Rojo 🔴';
-                        this.c.style.background = '#fad390';
-                        this.waitingRoll = true;
+                    this.updateTurnUI();
+
+                    if (this.gameMode === 'pve' && this.turn === 2) {
+                        this.dinoAI();
                     } else {
-                        this.statusEl.textContent = 'Turno Amarillo 🟡';
-                        this.c.style.background = '#fff9c4';
-                        if (this.gameMode === 'pve') {
-                            this.dinoAI();
-                        } else {
-                            this.waitingRoll = true;
-                        }
+                        this.waitingRoll = true;
                     }
                 }
             }
@@ -5386,8 +5386,11 @@
 
             startGame(mode) {
                 this.gameMode = mode;
+                this.pieces = Array(16).fill(0);
+                this.turn = 1;
                 this.msg = (mode === 'hybrid') ? 'Tira tu dado y anota 📝' : 'Tira el dado 🎲';
                 this.setupBoard();
+                this.updateTurnUI();
             }
 
             setupBoard() {
@@ -5455,22 +5458,22 @@
                 `;
                 this.c.appendChild(board);
 
-
-
-                // We map visuals dynamically or static?
-                // Let's create cells. 11x11 is simpler and standard for Ludo/Parchis is usually 15x15 but 11x11 works for "Fast Ludo".
-                // Let's use 11x11 for better visible size on mobile.
-                // Path: Outer ring + Cross.
                 this.renderBoard(board);
 
                 // Pieces Render
                 this.pieceEls = [];
-                for (let i = 0; i < 8; i++) {
+                const colors = ['#e74c3c', '#f1c40f', '#2ecc71', '#3498db']; // Red, Yellow, Green, Blue
+
+                // Show pieces based on mode
+                const totalPieces = (this.gameMode === 'pvp4') ? 16 : 8; // 8 for 2P modes
+
+                for (let i = 0; i < totalPieces; i++) {
+                    const pIdx = Math.floor(i / 4); // 0, 1, 2, 3
                     const p = document.createElement('div');
                     p.className = 'parchis-piece';
                     p.style.cssText = `
                         width: 5.5%; height: 5.5%; border-radius: 50%;
-                        background: ${i < 4 ? '#e74c3c' : '#f1c40f'};
+                        background: ${colors[pIdx]};
                         border: 2px solid white; box-shadow: 0 3px 5px rgba(0,0,0,0.3);
                         position: absolute; transition: all 0.5s;
                         z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 0.8em; color:white; font-weight:bold;
@@ -5512,9 +5515,6 @@
 
             renderBoard(container) {
                 // 11x11 Grid.
-                // Corners are Homes (4x4 areas).
-                // Cross is Path.
-
                 for (let r = 0; r < 11; r++) {
                     for (let c = 0; c < 11; c++) {
                         const div = document.createElement('div');
@@ -5524,8 +5524,8 @@
                         // Corners (Homes)
                         if (r < 4 && c < 4) div.style.background = '#e74c3c'; // Red Home
                         else if (r < 4 && c > 6) div.style.background = '#f1c40f'; // Yellow Home
-                        else if (r > 6 && c < 4) div.style.background = '#3498db'; // Blue (Unused)
-                        else if (r > 6 && c > 6) div.style.background = '#2ecc71'; // Green (Unused)
+                        else if (r > 6 && c < 4) div.style.background = '#3498db'; // Blue (Unused in 2P but shown)
+                        else if (r > 6 && c > 6) div.style.background = '#2ecc71'; // Green (Unused in 2P but shown)
 
                         // Center
                         else if (r === 5 && c === 5) div.style.background = 'conic-gradient(#e74c3c, #f1c40f, #2ecc71, #3498db)';
@@ -5552,140 +5552,99 @@
                 }
             }
 
-            // Coordinate Mapper (Simple 11x11 Ludo)
             getCoord(pos, playerIdx) {
-                // Returns {left: %, top: %} based on pos logic.
-                // 0 = Home.
-                // 1..40 = Outer Loop.
-                // >100 = Final Path.
+                // Returns {x, y} grid indices (0-10)
+                // pos: 0=Home, 1..40=Loop, 100+=Goal
 
-                // Normalize visual pos for simplicty.
-                // Let's implement static mapping for key milestones to avoid complex math.
-                // Or simplified cycle.
-
-                /*
-                   Grid 11x11.
-                   Outer Path clockwise:
-                   (4,0)->(4,4)->(0,4)->(0,6)->(4,6)->(4,10)->(6,10)->(6,6)->(10,6)->(10,4)->(6,4)->(6,0)->Loop
-                */
-
+                // HOMES
                 if (pos === 0) {
-                    // Home Positions
-                    const isRed = playerIdx < 4;
-                    const offset = playerIdx % 4;
-                    // Red Top-Left (actually standard Ludo Red is top-left? Let's say yes).
-                    // Wait, standard has Red Top-Left.
-                    // 2x2 grid inside 4x4 area.
-                    const r = isRed ? (Math.floor(offset / 2) + 1) : (Math.floor(offset / 2) + 1);
-                    const c = isRed ? (offset % 2 + 1) : (offset % 2 + 7);
+                    const p = Math.floor(playerIdx / 4); // 0..3 (Red, Yel, Grn, Blu)
+                    const sub = playerIdx % 4;
+                    // Grid 11x11. Corners 4x4.
+                    let bx = 0, by = 0;
+                    if (p === 0) { bx=1; by=1; } // Red: TL
+                    if (p === 1) { bx=7; by=1; } // Yel: TR
+                    if (p === 2) { bx=7; by=7; } // Grn: BR
+                    if (p === 3) { bx=1; by=7; } // Blu: BL
+
+                    const r = by + Math.floor(sub / 2);
+                    const c = bx + (sub % 2);
                     return { x: c, y: r };
                 }
 
-                // Map linear path index to (x,y)
-                // This is the tricky part. For a pure Agent approach, let's look-up table or logic?
-                // Logic:
-                // Segments:
-                // 1. Red Start (4,0) -> Right to (4,4) -> Up to (0,4) -> Right (0,6) -> Down (4,6) -> Right (4,10) ...
-
-                // Let's define key waypoints and interpolate.
-                // Actually, for robust movement, let's hardcode the ~40 cells coords is safest.
-                // Or use a "Walk" function.
-
-                // SIMPLIFIED MAP (11x11):
-                // 04,00 (Start Red) -> 04,01 -> 04,02 -> 04,03 -> 04,04
-                // 03,04 -> 02,04 -> 01,04 -> 00,04
-                // 00,05 (Top Mid) -> 00,06 ...
-
-                // To save tokens, I will implement a visual approximator function.
-                let x = 0, y = 0;
-
-                // Goal Paths
+                // GOALS (100+)
                 if (pos > 100) {
-                    const step = pos - 100; // 1 to 5
-                    if (playerIdx < 4) { // Red (Left -> Center)
-                        y = 5; x = step;
-                    } else { // Yellow (Top -> Center)
-                        x = 5; y = step;
-                    }
-                } else {
-                    // Outer Loop (1-40)
-                    if (pos <= 5) { y = 4; x = pos - 1; }
-                    else if (pos <= 9) { y = 4 - (pos - 5); x = 4; }
-                    else if (pos <= 11) { y = 0; x = 4 + (pos - 9); }
-                    else if (pos <= 15) { y = (pos - 11); x = 6; }
-                    else if (pos <= 19) { y = 4; x = 6 + (pos - 15); }
-                    else if (pos <= 21) { y = 4 + (pos - 19); x = 10; }
-                    else if (pos <= 25) { y = 6; x = 10 - (pos - 21); }
-                    else if (pos <= 29) { y = 6 + (pos - 25); x = 6; }
-                    else if (pos <= 31) { y = 10; x = 6 - (pos - 29); }
-                    else if (pos <= 35) { y = 10 - (pos - 31); x = 4; }
-                    else if (pos <= 39) { y = 6; x = 4 - (pos - 35); }
-                    else if (pos === 40) { y = 5; x = 0; }
+                    const step = pos - 100; // 1..5
+                    const p = Math.floor(playerIdx / 4);
+                    if (p === 0) return { x: step, y: 5 }; // Red -> Right
+                    if (p === 1) return { x: 5, y: step }; // Yel -> Down
+                    if (p === 2) return { x: 10 - step, y: 5 }; // Grn -> Left
+                    if (p === 3) return { x: 5, y: 10 - step }; // Blu -> Up
                 }
+
+                // PATH (1..40)
+                // Normalize 1..40 to Grid Coords
+                let x = 0, y = 0;
+                if (pos <= 5) { y = 4; x = pos - 1; }
+                else if (pos <= 9) { y = 4 - (pos - 5); x = 4; }
+                else if (pos <= 11) { y = 0; x = 4 + (pos - 9); }
+                else if (pos <= 15) { y = (pos - 11); x = 6; }
+                else if (pos <= 19) { y = 4; x = 6 + (pos - 15); }
+                else if (pos <= 21) { y = 4 + (pos - 19); x = 10; }
+                else if (pos <= 25) { y = 6; x = 10 - (pos - 21); }
+                else if (pos <= 29) { y = 6 + (pos - 25); x = 6; }
+                else if (pos <= 31) { y = 10; x = 6 - (pos - 29); }
+                else if (pos <= 35) { y = 10 - (pos - 31); x = 4; }
+                else if (pos <= 39) { y = 6; x = 4 - (pos - 35); }
+                else if (pos === 40) { y = 5; x = 0; }
 
                 return { x, y };
             }
 
             updatePieces() {
-                this.pieces.forEach((pos, i) => {
-                    // Logic to Visual
-                    let coords;
-                    if (pos === 0) {
-                        // Home
-                        coords = this.getCoord(0, i);
-                    } else {
-                        // Path Mapping
-                        // Red Start is 1.
-                        // Yellow Start is 11 (Top).
-                        // Loop length 40.
-                        let visualPos = pos;
-                        if (i >= 4) { // Yellow
-                            // If raw pos is relative to own start?
-                            // Let's use absolute path 1..40.
-                            // 1 = Red Start (4,0).
-                            // 11 = Yellow Start (0,6).
-                            // 21 = Button Right.
-                            // 31 = Bottom Left.
+                if(!this.pieceEls) return;
 
-                            // Visual Pos specific mapping? No, simplify:
-                            // pieces array holds ABSOLUTE board position (1-40).
-                            // 0 = Home.
-                            // > 100 = Inside Goal.
-                        }
-                        coords = this.getCoord(visualPos, i);
-                    }
+                this.pieceEls.forEach((el, i) => {
+                    const pos = this.pieces[i];
+                    const coords = this.getCoord(pos, i);
 
-                    if (!coords) coords = { x: 5, y: 5 }; // Center fallback
-
-                    const el = this.pieceEls[i];
-                    // Grid coords are 1-based? No, CSS Grid starts at 1. My updates are 0-based.
                     el.style.left = `calc(${coords.x * 9.09}% + 1%)`;
                     el.style.top = `calc(${coords.y * 9.09}% + 1%)`;
 
-                    // Highlight Active
-                    if (this.turn === 1 && i < 4 && this.diceVal && !this.waitingRoll) {
+                    // Highlight Active Player's Pieces
+                    const pIdx = Math.floor(i / 4) + 1; // 1,2,3,4
+                    const isMyTurn = (this.turn === pIdx);
+
+                    let canInteract = false;
+                    if (isMyTurn && this.diceVal && !this.waitingRoll) {
+                        if (this.gameMode === 'pve') {
+                            canInteract = (pIdx === 1); // Only Human Red
+                        } else {
+                            canInteract = true; // Any human turn
+                        }
+                    }
+
+                    if (canInteract) {
                         el.style.border = '2px solid white';
-                        el.style.transform = 'scale(1.1)';
+                        el.style.transform = 'scale(1.2)';
                         el.style.cursor = 'pointer';
+                        el.style.zIndex = '20';
                     } else {
                         el.style.border = '2px solid white';
                         el.style.transform = 'scale(1)';
                         el.style.cursor = 'default';
-                        if (i < 4) el.style.opacity = '1';
-                        else el.style.opacity = '0.9'; // Dino
+                        el.style.zIndex = '10';
                     }
                 });
             }
 
             rollDice() {
                 if (this.waitingRoll) {
-                    // Check turn validity (PVP allows P2 to roll)
-                    if (this.gameMode === 'pve' && this.turn !== 1) return; // Prevent rolling for Dino
+                    if (this.gameMode === 'pve' && this.turn !== 1) return;
 
                     if (this.gameMode === 'hybrid') {
-                        // Show Manual Input
                         this.diceInput.style.display = 'flex';
-                        return; // Wait for submitDice
+                        return;
                     }
 
                     this.diceVal = Math.floor(Math.random() * 6) + 1;
@@ -5704,7 +5663,6 @@
                 this.waitingRoll = false;
                 this.statusEl.textContent = `Has sacado un ${val}`;
 
-                // Check if moves possible
                 const playerToCheck = this.turn;
                 if (!this.canMoveAny(playerToCheck)) {
                     setTimeout(() => {
@@ -5712,32 +5670,37 @@
                         this.nextTurn();
                     }, 1000);
                 } else {
-                    // Wait for click
                     this.statusEl.textContent = 'Mueve tu ficha...';
+                    this.updatePieces(); // Refresh highlights
                 }
             }
 
+            canMoveAny(player) {
+                const start = (player - 1) * 4;
+                for (let i = start; i < start + 4; i++) {
+                    if (this.validateMove(i, this.diceVal) !== false) return true;
+                }
+                return false;
+            }
+
             clickPiece(idx) {
-                if (this.waitingRoll || this.turn !== 1 && this.gameMode === 'pve') return;
-                // Strict Turn Check for PVP
-                if (this.gameMode !== 'pve' && this.turn === 1 && idx >= 4) return;
-                if (this.gameMode !== 'pve' && this.turn === 2 && idx < 4) return;
+                const pieceOwner = Math.floor(idx / 4) + 1;
+
+                if (this.turn !== pieceOwner) return;
+                if (this.waitingRoll) return;
+                if (this.gameMode === 'pve' && pieceOwner !== 1) return;
 
                 if (this.tryMove(idx, this.diceVal)) {
-                    // Store val for check before clearing
                     const rolled = this.diceVal;
                     this.diceVal = null;
                     this.waitingRoll = true;
 
                     this.checkWin();
                     if (!this.gameOver) {
-                        if (rolled === 6) { // Check stored value
+                        if (rolled === 6) {
                             this.waitingRoll = true;
-                            this.statusEl.textContent = '¡Sacas un 6! Tira otra vez.';
-                            // For Hybrid/PVP, we need to ensure dice is clickable again
-                            if (this.gameMode === 'hybrid') {
-                                // Keep roll enabled
-                            }
+                            this.statusEl.textContent = '¡6! Repite turno 🎲';
+                            this.updatePieces();
                         } else {
                             this.nextTurn();
                         }
@@ -5751,7 +5714,6 @@
                 const newPos = this.validateMove(pIdx, steps);
                 if (newPos === false) return false;
 
-                // Execute
                 this.pieces[pIdx] = newPos;
                 this.updatePieces();
                 app.audio.playPop();
@@ -5759,115 +5721,85 @@
             }
 
             validateMove(pIdx, steps) {
-                let pos = this.pieces[pIdx];
-                let newPos = pos;
-                const isRed = pIdx < 4;
+                const pos = this.pieces[pIdx];
+                const playerNum = Math.floor(pIdx / 4); // 0,1,2,3
 
                 // 1. Leave Home
                 if (pos === 0) {
                     if (steps === 5) {
-                        // Move to Start. Red Start = 1. Yellow Start = 11.
-                        return isRed ? 1 : 11;
+                        const starts = [1, 11, 21, 31];
+                        return starts[playerNum];
                     } else {
                         return false;
                     }
                 }
 
-                // 2. In Goal Already
+                // 2. In Goal Already (>100)
                 if (pos > 100) {
-                    // Red Goal: 100+, Yellow Goal: 200+
-                    const goalMax = isRed ? 107 : 207; // 100 + 7 steps logic?
-                    // Let's assume path logic led to 100+ being safely inside.
-                    // If we just add steps, we need to check limit.
-                    // Original code: if (pos + steps <= 105) ...
-                    // Let's standardise: 100-104 are steps. 105 is center?
-                    // Code said: if (pos + steps <= 105)
-                    if (pos + steps <= (isRed ? 106 : 206)) return pos + steps;
-                    else return false;
+                    const stepInGoal = pos - 100;
+                    if (stepInGoal + steps <= 6) return pos + steps;
+                    return false;
                 }
 
                 // 3. Normal Path
-                // Logic for Red (Start 1, Goal Entry @ 40)
-                if (isRed) {
-                    if (pos + steps > 40) {
-                        // Enter Goal?
-                        let diff = (pos + steps) - 40;
-                        if (diff <= 5) return 100 + diff;
-                        else return false; // Overshoot
-                    } else {
-                        return pos + steps;
-                    }
-                } else {
-                    // Yellow (Start 11, Goal Entry @ 10)
-                    // Wrap 40->1.
-                    let raw = pos + steps;
-                    // Check wrap
-                    if (pos <= 40 && raw > 40) raw -= 40;
+                // Robust Generic Logic:
+                const absStart = [1, 11, 21, 31][playerNum];
 
-                    // Goal Logic for Yellow: Enters at 10.
-                    // If we were <= 10 and now > 10? No, we start at 11.
-                    // We approach 10 from 9, 8... No, 1..10.
-                    // If pos is in range 1..10 (after wrap) and we pass 10.
+                // Current Distance from Start (0..39)
+                // Need to handle wrap logic correctly for modulo arithmetic on negative numbers if necessary,
+                // but here numbers are positive.
+                // pos 1..40. Start 1..40.
+                // Distance = (pos - absStart + 40) % 40
 
-                    // Case: pos=8, steps=5 -> 13. >10.
-                    // But wait, Yellow starts at 11. Moves 11..40, then 1..10.
-                    // So if pos <= 10 (meaning we wrapped) and pos+steps > 10
-                    if (pos <= 10 && pos + steps > 10) {
-                        let diff = (pos + steps) - 10;
-                        if (diff <= 5) return 200 + diff;
-                        else return false;
-                    }
+                // Example: Red Start 1. Pos 1. Dist = 0.
+                // Example: Yel Start 11. Pos 11. Dist = 0.
+                // Example: Yel Pos 10. Dist = (10 - 11 + 40)%40 = 39. Correct (just before entry).
 
-                    // Otherwise regular move
-                    return raw;
+                let dist = (pos - absStart + 40) % 40;
+                let nextDist = dist + steps;
+
+                if (nextDist >= 40) {
+                    // Entering Goal
+                    const excess = nextDist - 40; // 0..5 (Steps into goal)
+                    if (excess < 6) return 100 + (excess + 1);
+                    return false; // Overshoot
                 }
+
+                // Just moving on path (Wrap 40 -> 1)
+                let nextPos = pos + steps;
+                if (nextPos > 40) nextPos -= 40;
+                return nextPos;
             }
 
-            canMoveAny(player) {
-                // Check if any piece can move with current dice
-                const start = player === 1 ? 0 : 4;
-                for (let i = start; i < start + 4; i++) {
-                    if (this.validateMove(i, this.diceVal) !== false) return true;
-                }
-                return false;
+            updateTurnUI() {
+                const colors = ['#fad390', '#fff9c4', '#a5d6a7', '#81d4fa'];
+                const names = ['Rojo 🔴', 'Amarillo 🟡', 'Verde 🟢', 'Azul 🔵'];
+
+                this.statusEl.textContent = `Turno ${names[this.turn - 1]}`;
+                this.c.style.background = colors[this.turn - 1];
             }
 
             nextTurn() {
-                this.turn = (this.turn === 1) ? 2 : 1;
-                this.diceEl.textContent = '🎲';
+                const maxP = (this.gameMode === 'pvp4') ? 4 : 2;
+                this.turn = (this.turn % maxP) + 1;
 
-                if (this.turn === 2) {
-                    if (this.gameMode === 'pve') {
-                        this.statusEl.textContent = 'Dino tira...';
-                        setTimeout(() => this.dinoAI(), 1000);
-                    } else {
-                        // PVP or Hybrid
-                        this.waitingRoll = true;
-                        this.statusEl.textContent = 'Turno Amarillo 🟡';
-                        this.c.style.background = '#fff9c4'; // Subtle Hint
-                    }
+                this.diceEl.textContent = '🎲';
+                this.updateTurnUI();
+
+                if (this.gameMode === 'pve' && this.turn === 2) {
+                    this.statusEl.textContent = 'Dino tira...';
+                    setTimeout(() => this.dinoAI(), 1000);
                 } else {
                     this.waitingRoll = true;
-                    this.statusEl.textContent = 'Turno Rojo 🔴';
-                    this.c.style.background = '#fad390'; // Subtle Hint
                 }
             }
 
             dinoAI() {
-                // Roll
                 this.diceVal = Math.floor(Math.random() * 6) + 1;
                 this.diceEl.textContent = '🎲 ' + this.diceVal;
 
-                // Move Priority:
-                // 1. Leave Home (if 5)
-                // 2. Capture (not impl yet)
-                // 3. Enter Goal
-                // 4. Advance Furthest
-
                 setTimeout(() => {
                     let moved = false;
-                    // Try pieces 4,5,6,7
-                    // Shuffle order to vary
                     const pIds = [4, 5, 6, 7].sort(() => Math.random() - 0.5);
 
                     for (let id of pIds) {
@@ -5891,32 +5823,34 @@
             }
 
             checkWin() {
-                const redWins = this.pieces.slice(0, 4).every(p => p > 100);
-                const yellowWins = this.pieces.slice(4, 8).every(p => p > 200);
+                for(let p=0; p<4; p++) {
+                    const start = p*4;
+                    // Check if all 4 pieces are in goal (>100)
+                    const wins = this.pieces.slice(start, start+4).every(pos => pos > 100);
 
-                if (redWins || yellowWins) {
-                    this.gameOver = true;
-                    this.statusEl.textContent = redWins ? '¡GANASTE! 🔴🏆' : '¡Dino Gana! 🦖';
-                    if (redWins) {
+                    if (wins) {
+                        this.gameOver = true;
+                        const names = ['Rojo 🔴', 'Amarillo 🟡', 'Verde 🟢', 'Azul 🔵'];
+                        this.statusEl.textContent = `¡${names[p]} GANA! 🏆`;
+
                         app.audio.playWin();
-                        app.addScore(40);
-                    } else {
-                        app.audio.playError();
-                    }
+                        if (p === 0 && this.gameMode === 'pve') app.addScore(40);
 
-                    setTimeout(() => {
-                        const ov = document.createElement('div');
-                        ov.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:100; border-radius:10px;';
-                        ov.innerHTML = `
-                            <div style="font-size:5em;">${redWins ? '🏆' : '🦖'}</div>
-                            <h2 style="color:white; margin:20px;">${this.statusEl.textContent}</h2>
-                            <div style="display:flex; gap:20px; flex-direction:column;">
-                                <button class="mode-btn kid" style="background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
-                                <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
-                            </div>
-                        `;
-                        this.c.appendChild(ov);
-                    }, 1500);
+                        setTimeout(() => {
+                            const ov = document.createElement('div');
+                            ov.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:100; border-radius:10px;';
+                            ov.innerHTML = `
+                                <div style="font-size:5em;">🏆</div>
+                                <h2 style="color:white; margin:20px;">${names[p]} GANA</h2>
+                                <div style="display:flex; gap:20px; flex-direction:column;">
+                                    <button class="mode-btn kid" style="background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
+                                    <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
+                                </div>
+                            `;
+                            this.c.appendChild(ov);
+                        }, 1500);
+                        return;
+                    }
                 }
             }
 
