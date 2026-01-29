@@ -7,7 +7,7 @@ def check_goose():
         # Explicitly set without preset to be sure
         context = browser.new_context(viewport={'width': 667, 'height': 375})
         page = context.new_page()
-        path = os.path.abspath('indexdino.html')
+        path = os.path.abspath('index.html')
         page.goto(f'file://{path}')
 
         # Check viewport
