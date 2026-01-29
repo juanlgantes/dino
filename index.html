@@ -6921,8 +6921,19 @@
                 seqDiv.style.cssText = `
                     display: flex; gap: 10px; margin-top: 50px; justify-content: center;
                     background: white; padding: 20px; border-radius: 20px;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 90%; max-width: 600px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 90%; max-width: 600px; position: relative;
                 `;
+
+                // Speaker Button
+                const speakBtn = document.createElement('button');
+                speakBtn.innerHTML = '🔊';
+                speakBtn.style.cssText = `
+                    position: absolute; top: -20px; right: -20px; background: #f1c40f;
+                    border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 1.5em;
+                    cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+                `;
+                speakBtn.onclick = () => this.speakSequence();
+                seqDiv.appendChild(speakBtn);
 
                 levelData.seq.forEach(item => {
                     const el = document.createElement('div');
@@ -6957,12 +6968,33 @@
                     optDiv.appendChild(btn);
                 });
                 this.c.appendChild(optDiv);
+
+                // Auto Speak
+                setTimeout(() => this.speakSequence(), 500);
+            }
+
+            speakSequence() {
+                const levelData = this.DATA[this.mode][this.level];
+                // Map special chars to words
+                const map = {
+                    '🔺': 'Triángulo', '🟦': 'Cuadrado', '⭐': 'Estrella', '🌙': 'Luna', '☀️': 'Sol',
+                    '🟥': 'Cuadrado Rojo', '🔵': 'Círculo Azul', '🔴': 'Rojo', '🟢': 'Verde',
+                    '🟡': 'Amarillo', '🟣': 'Morado', '⚫': 'Negro', '⚪': 'Blanco', '🟤': 'Marrón'
+                };
+
+                const text = levelData.seq.map(i => {
+                    if (i === '?') return '¿Qué sigue?';
+                    return map[i] || i;
+                }).join(', ');
+
+                window.app.audio.speak(text);
             }
 
             check(val, ans) {
                 if (val === ans) {
                     window.app.audio.playWin();
                     window.app.addScore(10);
+                    window.app.audio.speak('¡Correcto!');
 
                     const f = document.createElement('div');
                     f.textContent = 'Correcto! 🎉';
@@ -6983,6 +7015,7 @@
                     }, 1500);
                 } else {
                     window.app.audio.playError();
+                    window.app.audio.speak('Inténtalo de nuevo');
                 }
             }
 
