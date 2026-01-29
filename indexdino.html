@@ -5330,13 +5330,20 @@
                 const btn3 = document.createElement('button');
                 btn3.className = 'mode-btn kid';
                 btn3.style.background = '#9b59b6';
-                btn3.innerHTML = '🎲 Híbrido<br><span style="font-size:0.6em">Dado Real</span>';
+                btn3.innerHTML = '🎲 Híbrido<br><span style="font-size:0.6em">2P Real</span>';
                 btn3.onclick = () => this.startGame('hybrid');
+
+                const btn5 = document.createElement('button');
+                btn5.className = 'mode-btn kid';
+                btn5.style.background = '#8e44ad';
+                btn5.innerHTML = '🎲 Híbrido 4<br><span style="font-size:0.6em">4P Real</span>';
+                btn5.onclick = () => this.startGame('hybrid4');
 
                 btnContainer.appendChild(btn1);
                 btnContainer.appendChild(btn2);
                 btnContainer.appendChild(btn4);
                 btnContainer.appendChild(btn3);
+                btnContainer.appendChild(btn5);
 
                 // Restore Button
                 if (this.savedState) {
@@ -5364,7 +5371,7 @@
                     this.gameMode = this.savedState.gameMode || 'pve';
                     this.pieces = this.savedState.pieces || Array(16).fill(0);
                     this.turn = this.savedState.turn || 1;
-                    this.msg = (this.gameMode === 'hybrid') ? 'Tira tu dado y anota 📝' : 'Tira el dado 🎲';
+                    this.msg = (this.gameMode === 'hybrid' || this.gameMode === 'hybrid4') ? 'Tira tu dado y anota 📝' : 'Tira el dado 🎲';
                     this.setupBoard();
                     this.updateTurnUI();
 
@@ -5389,7 +5396,7 @@
                 this.gameMode = mode;
                 this.pieces = Array(16).fill(0);
                 this.turn = 1;
-                this.msg = (mode === 'hybrid') ? 'Tira tu dado y anota 📝' : 'Tira el dado 🎲';
+                this.msg = (mode === 'hybrid' || mode === 'hybrid4') ? 'Tira tu dado y anota 📝' : 'Tira el dado 🎲';
                 this.setupBoard();
                 this.updateTurnUI();
             }
@@ -5466,7 +5473,7 @@
                 const colors = ['#e74c3c', '#f1c40f', '#2ecc71', '#3498db']; // Red, Yellow, Green, Blue
 
                 // Show pieces based on mode
-                const totalPieces = (this.gameMode === 'pvp4') ? 16 : 8; // 8 for 2P modes
+                const totalPieces = (this.gameMode === 'pvp4' || this.gameMode === 'hybrid4') ? 16 : 8; // 8 for 2P modes
 
                 for (let i = 0; i < totalPieces; i++) {
                     const pIdx = Math.floor(i / 4); // 0, 1, 2, 3
@@ -5643,7 +5650,7 @@
                 if (this.waitingRoll) {
                     if (this.gameMode === 'pve' && this.turn !== 1) return;
 
-                    if (this.gameMode === 'hybrid') {
+                    if (this.gameMode === 'hybrid' || this.gameMode === 'hybrid4') {
                         this.diceInput.style.display = 'flex';
                         return;
                     }
@@ -5781,7 +5788,7 @@
             }
 
             nextTurn() {
-                const maxP = (this.gameMode === 'pvp4') ? 4 : 2;
+                const maxP = (this.gameMode === 'pvp4' || this.gameMode === 'hybrid4') ? 4 : 2;
                 this.turn = (this.turn % maxP) + 1;
 
                 this.diceEl.textContent = '🎲';
