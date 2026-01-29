@@ -14,9 +14,10 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.35 "Robotics Plus"</title>
+    <title>v17.36 "Goose Mobile"</title>
     <!--
-        CHANGELOG v17.35
+        CHANGELOG v17.36
+        - [FIX] Oca: Tablero ajustado para móviles en modo horizontal (Landscape).
         - [FEATURE] Robótica: Actualización con 6 Niveles (ZigZag, Vuelta, Espiral).
         - [UI] Robótica: Botones de Navegación (⬅️/➡️) y Borrado (⌫/🗑️).
 
@@ -6000,8 +6001,12 @@
                         }
 
                         .goose-board {
-                            max-height: 98%;
+                            width: auto;
+                            height: auto;
+                            max-height: 90vh;
                             max-width: calc(100% - 130px);
+                            min-width: 200px;
+                            aspect-ratio: 1/1;
                         }
 
                         #gameArea {
