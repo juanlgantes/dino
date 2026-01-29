@@ -14,8 +14,96 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.9 "Voice Boost"</title>
+    <title>v17.36 "Goose Mobile"</title>
     <!--
+        CHANGELOG v17.36
+        - [FIX] Oca: Tablero ajustado para móviles en modo horizontal (Landscape).
+        - [FEATURE] Robótica: Actualización con 6 Niveles (ZigZag, Vuelta, Espiral).
+        - [UI] Robótica: Botones de Navegación (⬅️/➡️) y Borrado (⌫/🗑️).
+
+        CHANGELOG v17.34
+        - [CONTENT] Nueva Actividad: "Colors / Colores" 🎨. Aprende los colores en inglés (Red, Blue, Green, Yellow, etc.) con bloques visuales.
+
+        CHANGELOG v17.33
+        - [CONTENT] Nueva Actividad: "El Cuerpo / Body" 🦵. Preguntas bilingües (Español/Inglés) para aprender las partes del cuerpo (Nariz, Ojos, Boca, etc.).
+
+        CHANGELOG v17.32
+        - [CONTENT] Nueva Actividad: "Las Emociones" 😊. Un juego de preguntas para aprender a identificar sentimientos (Felicidad, Tristeza, Miedo, etc.) usando emojis.
+
+        CHANGELOG v17.31
+        - [FIX] Oca: Corregido desbordamiento del tablero en móviles (ajuste robusto de tamaño y aspect-ratio).
+
+        CHANGELOG v17.30
+        - [FEATURE] Navegación Quiz: Botones "⬅️" y "➡️" añadidos en todas las actividades de preguntas (Desafío, Jardín, etc.) para repasar sin contestar.
+
+        CHANGELOG v17.29
+        - [CONTENT] Unir Puntos: Restaurados niveles clásicos (Pez, Mariposa) y añadidos nuevos (Sol, Árbol, Coche) para un total de 10 niveles.
+
+        CHANGELOG v17.28
+        - [VISUAL] Unir Puntos: Formas geométricas simplificadas (Estrella, Corazón, Casa, Barco, Luna) para mejorar la jugabilidad y el resultado visual.
+
+        CHANGELOG v17.27
+        - [FEATURE] Navegación de Niveles: Botones "⬅️" y "➡️" añadidos en Laberinto y Unir Puntos para cambiar de nivel libremente.
+
+        CHANGELOG v17.26
+        - [FEATURE] Guardado de Partida: Ahora puedes guardar y continuar partidas en Parchís, Oca, Damas, Ajedrez y 4 en Raya.
+        - [UI] Añadido botón "💾 Guardar" en los juegos de mesa.
+        - [UI] Menú de inicio en Damas y Ajedrez para permitir cargar partidas.
+
+        CHANGELOG v17.25
+        - [FIX] Parchis: Solucionado error visual donde las fichas desaparecían en ciertas casillas (esquinas).
+
+        CHANGELOG v17.24
+        - [FIX] Laberinto: Solucionado bloqueo de botones (Salir/Volver) en móviles.
+
+        CHANGELOG v17.23
+        - [FIX] Laberinto: Corrección robusta para "Freeze" (Limpieza de memoria y eventos).
+
+        CHANGELOG v17.22
+        - [FIX] Laberinto: Solucionado "Freeze" al completar el nivel final.
+
+        CHANGELOG v17.21
+        - [FEATURE] Laberinto: Nuevo control fluido "Aventura" (Arrastrar para mover).
+        - [FIX] Laberinto: Movimiento suave en lugar de paso a paso.
+
+        CHANGELOG v17.20
+        - [FIX] Oca: Tablero ajustado para móviles (evita desbordamiento vertical).
+        - [FIX] Laberinto: Diseño responsive y controles táctiles (Swipe).
+
+        CHANGELOG v17.19
+        - [FEATURE] 4 en Raya: Modo 2 Jugadores (PvP) añadido.
+        - [FEATURE] 4 en Raya: Menú de selección de modo (1P/2P) al iniciar.
+
+        CHANGELOG v17.18
+        - [FEATURE] Global Quiz: TTS (Audio) activado para "Jardín Secreto" y todas las actividades de preguntas.
+        - [FIX] Quiz: Botón de audio verificado en todas las instancias.
+
+        CHANGELOG v17.17
+        - [FEATURE] Desafío Dino: Lectura de preguntas (TTS) y botón de repetición 🔊.
+        - [FIX] Oca: Nuevo diseño responsive (minmax) para evitar desbordamiento en móviles pequeños.
+
+        CHANGELOG v17.16
+        - [FIX] Oca: Nuevo diseño horizontal (Side-by-Side) para móviles landscape. Tablero y controles visibles sin scroll.
+
+        CHANGELOG v17.15
+        - [FIX] Oca: Corregido bloqueo del juego cuando la IA (Dino) cae en una casilla "De Dino a Dino".
+
+        CHANGELOG v17.14
+        - [FEATURE] Oca: Botón "Salir" en el menú de modos y botón "Volver" (🔙) durante el juego.
+
+        CHANGELOG v17.13
+        - [FIX] Oca: Optimizado padding y ancho del tablero para pantallas móviles pequeñas.
+
+        CHANGELOG v17.12
+        - [FIX] Oca: Solucionado bloqueo/crash en móviles (ResizeObserver Loop).
+        - [FIX] Oca: Tablero responsive (aspect-ratio) para evitar cortes en pantallas verticales.
+
+        CHANGELOG v17.11
+        - [FIX] Oca: Ajustado tamaño del tablero (80vmin), alineación superior y scroll habilitado.
+
+        CHANGELOG v17.10
+        - [FIX] Oca: Corregido tamaño del tablero y overflow en móviles (Landscape/Portrait).
+
         CHANGELOG v17.9
         - [FIX] AudioEngine: Carga explícita de voces y "warm-up" del motor de voz para garantizar sonido en móviles/Chrome.
 
@@ -70,6 +158,7 @@
 
     <!-- PWA MANIFEST & META -->
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
     <meta name="theme-color" content="#667eea">
     <link rel="apple-touch-icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦕</text></svg>">
@@ -178,6 +267,12 @@
             opacity: 0;
             transform: translateY(20px);
             animation: slideIn 0.5s forwards ease-out;
+        }
+
+        @media (max-width: 600px) {
+            .content-section {
+                padding: 10px;
+            }
         }
 
         @keyframes slideIn {
@@ -649,12 +744,16 @@
             </div>
         </section>
 
+
+
         <!-- KID DASHBOARD -->
         <section id="view-kid-dash" class="content-section hidden">
             <div
                 style="position: absolute; top: 20px; right: 20px; font-size: 1.5em; background: #fff3cd; padding: 5px 15px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                 ⭐ <span id="kidDashScore">0</span>
             </div>
+
+
             <div class="dino-mascot" id="mascotDino">🦕</div>
             <h2 style="text-align: center; margin-bottom: 20px;">¡Elige tu aventura!</h2>
 
@@ -667,6 +766,11 @@
                 <button class="mode-btn" onclick="app.openCinema()"
                     style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); color: #d63384; font-size: 1.3em;">
                     🎟️ IR AL CINE DINO 🍿
+                </button>
+                <!-- Evaluations Button (Moved from Parent) -->
+                <button class="mode-btn" onclick="app.nav.show('eval-root')"
+                    style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #5d4037; font-size: 1.3em; margin-top: 15px;">
+                    📊 EVALUACIONES 🏫
                 </button>
             </div>
         </section>
@@ -757,6 +861,39 @@
             <button class="mode-btn parent" style="margin-top: 20px;" onclick="app.nav.goHome()">⬅️ Volver al
                 Inicio</button>
         </section>
+
+        <!-- EVALUATIONS ROOT -->
+        <section id="view-eval-root" class="content-section hidden">
+            <h2 style="text-align:center; color:#2c3e50; margin-bottom:20px;">Evaluaciones</h2>
+            <div style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
+                <button class="mode-btn" onclick="alert('Próximamente')" style="background: #3498db; color: white;">1º Infantil</button>
+                <button class="mode-btn" onclick="app.nav.show('eval-level-3')" style="background: #e74c3c; color: white;">3º Infantil</button>
+            </div>
+            <button class="nav-btn" onclick="app.nav.show('kid-dash')" style="margin-top: 30px; margin-left: auto; margin-right: auto; position: static;">⬅️</button>
+        </section>
+
+        <!-- EVAL LEVEL 3 -->
+        <section id="view-eval-level-3" class="content-section hidden">
+            <h2 style="text-align:center; color:#e74c3c; margin-bottom:20px;">3º Infantil</h2>
+            <div style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
+                <button class="mode-btn" onclick="app.nav.show('eval-term-2')" style="background: #f1c40f; color: white;">2º Trimestre</button>
+            </div>
+            <button class="nav-btn" onclick="app.nav.show('eval-root')" style="margin-top: 30px; margin-left: auto; margin-right: auto; position: static;">⬅️</button>
+        </section>
+
+        <!-- EVAL TERM 2 -->
+        <section id="view-eval-term-2" class="content-section hidden">
+            <h2 style="text-align:center; color:#f1c40f; margin-bottom:20px;">2º Trimestre</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <button class="mode-btn" style="background: #95a5a6; color: white; font-size: 1.2em;">📝 Manual</button>
+                <button class="mode-btn" style="background: #2ecc71; color: white; font-size: 1.2em;">🌱 Crecimiento en Armonía</button>
+                <button class="mode-btn" style="background: #3498db; color: white; font-size: 1.2em;">🌍 Descubrimiento del Entorno</button>
+                <button class="mode-btn" style="background: #9b59b6; color: white; font-size: 1.2em;">🗣️ Comunicación y Representación</button>
+                <button class="mode-btn" style="background: #e67e22; color: white; font-size: 1.2em;">🇬🇧 Inglés</button>
+                <button class="mode-btn" style="background: #f39c12; color: white; font-size: 1.2em;">✝️ Religión</button>
+            </div>
+            <button class="nav-btn" onclick="app.nav.show('eval-level-3')" style="margin-top: 30px; margin-left: auto; margin-right: auto; position: static;">⬅️</button>
+        </section>
     </div>
 
     <!-- PARENTAL GATE MODAL -->
@@ -802,7 +939,7 @@
                 description: 'Mueve a Dino por toda la pantalla',
                 type: 'movement',
                 icon: '🎮', // Added for v9 UI
-                theme: 'var(--theme-aventura)' // Added for v9 UI
+                theme: 'var(--theme-aventura)', // Added for v9 UI
             },
             surf: {
                 title: '🏄‍♂️ Dino Surfer',
@@ -909,6 +1046,55 @@
                     { question: '¿Dónde nació Jesús?', options: ['🏰 Castillo', '🏠 Casa', '⭐ Belén', '🏫 Escuela'], correct: 2 }
                 ]
             },
+            emociones: {
+                title: '😊 Las Emociones',
+                description: '¡Identifica cómo se sienten!',
+                type: 'quiz',
+                icon: '🎭',
+                theme: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
+                games: [
+                    { question: '¿Quién está FELIZ? 😄', options: ['😠', '😢', '😄', '😴'], correct: 2 },
+                    { question: '¿Quién está TRISTE? 😢', options: ['😄', '😢', '😲', '😡'], correct: 1 },
+                    { question: '¿Quién tiene MIEDO? 😨', options: ['😨', '😎', '😆', '😐'], correct: 0 },
+                    { question: '¿Quién está ENFADADO? 😠', options: ['😴', '😠', '😄', '😢'], correct: 1 },
+                    { question: '¿Quién está SORPRENDIDO? 😲', options: ['😐', '😲', '😴', '😆'], correct: 1 },
+                    { question: '¿Quién tiene SUEÑO? 😴', options: ['😄', '😴', '😠', '😨'], correct: 1 },
+                    { question: '¿Quién siente AMOR? 😍', options: ['😍', '😢', '😠', '😐'], correct: 0 }
+                ]
+            },
+            cuerpo: {
+                title: '🦵 El Cuerpo / Body',
+                description: 'Español e Inglés 🇪🇸🇬🇧',
+                type: 'quiz',
+                icon: '🦵',
+                theme: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
+                games: [
+                    { question: '¿Dónde está la NARIZ? (Nose)', options: ['👁️ Ojo', '👃 Nariz', '👂 Oreja', '👄 Boca'], correct: 1 },
+                    { question: 'Where are the EYES? (Ojos)', options: ['👃 Nose', '🦵 Leg', '👁️ Eyes', '✋ Hand'], correct: 2 },
+                    { question: '¿Cuál es la BOCA? (Mouth)', options: ['👄 Boca', '👁️ Ojo', '👂 Oreja', '🦶 Pie'], correct: 0 },
+                    { question: 'Where is the HAND? (Mano)', options: ['🦶 Foot', '✋ Hand', '👃 Nose', '🦵 Leg'], correct: 1 },
+                    { question: '¿Dónde está la OREJA? (Ear)', options: ['👂 Oreja', '👄 Boca', '👁️ Ojo', '✋ Mano'], correct: 0 },
+                    { question: 'Where is the FOOT? (Pie)', options: ['✋ Hand', '👃 Nose', '🦶 Foot', '👁️ Eye'], correct: 2 },
+                    { question: '¿Dónde está la PIERNA? (Leg)', options: ['💪 Brazo', '🦵 Pierna', '🦶 Pie', '👃 Nariz'], correct: 1 }
+                ]
+            },
+            colores: {
+                title: '🎨 Colors / Colores',
+                description: '¡Aprende los colores en Inglés!',
+                type: 'quiz',
+                icon: '🎨',
+                theme: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)',
+                games: [
+                    { question: 'Which one is RED? 🔴 (Rojo)', options: ['🟦', '🟥', '🟩', '🟨'], correct: 1 },
+                    { question: 'Which one is BLUE? 🔵 (Azul)', options: ['🟥', '🟨', '🟦', '🟧'], correct: 2 },
+                    { question: 'Which one is GREEN? 🟢 (Verde)', options: ['🟩', '🟪', '🟦', '🟫'], correct: 0 },
+                    { question: 'Which one is YELLOW? 🟡 (Amarillo)', options: ['🟧', '🟨', '⬛', '🟥'], correct: 1 },
+                    { question: 'Which one is ORANGE? 🟠 (Naranja)', options: ['🟧', '🟥', '🟪', '🟦'], correct: 0 },
+                    { question: 'Which one is PURPLE? 🟣 (Morado)', options: ['🟦', '🟩', '🟪', '⬛'], correct: 2 },
+                    { question: 'Which one is BLACK? ⚫ (Negro)', options: ['⬜', '⬛', '🟫', '🟥'], correct: 1 },
+                    { question: 'Which one is WHITE? ⚪ (Blanco)', options: ['⬛', '⬜', '🟨', '🟦'], correct: 1 }
+                ]
+            },
             reloj: {
                 title: '⏰ Dino Reloj',
                 description: '¡Aprende la hora con Dino!',
@@ -950,6 +1136,13 @@
                 type: 'chess',
                 icon: '♟️',
                 theme: 'linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%)'
+            },
+            robotica: {
+                title: '🤖 Robótica / Coding',
+                description: '¡Programa al Robot!',
+                type: 'robotics',
+                icon: '🤖',
+                theme: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)'
             }
         };
 
@@ -1159,13 +1352,18 @@
          */
         class Navigation {
             constructor() {
-                this.views = ['splash', 'kid-dash', 'game', 'parent', 'cinema'];
+                this.views = ['splash', 'kid-dash', 'game', 'parent', 'cinema', 'eval-root', 'eval-level-3', 'eval-term-2'];
             }
             show(viewId) {
-                this.views.forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
+                this.views.forEach(v => {
+                    const el = document.getElementById(`view-${v}`);
+                    if (el) el.classList.add('hidden');
+                });
                 const target = document.getElementById(`view-${viewId}`);
-                target.classList.remove('hidden');
-                void target.offsetWidth;
+                if (target) {
+                    target.classList.remove('hidden');
+                    void target.offsetWidth;
+                }
             }
             goHome() {
                 if (app.gameInstance && typeof app.gameInstance.cleanup === 'function') {
@@ -1204,6 +1402,8 @@
             }
 
             renderQuestion() {
+                // Safety check
+                if (this.currentIndex < 0) this.currentIndex = 0;
                 if (this.currentIndex >= this.data.games.length) {
                     this.finishQuiz();
                     return;
@@ -1228,16 +1428,39 @@
                 card.style.cssText = 'background: white; padding: 30px; border-radius: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); margin-bottom: 20px;';
 
                 const questionH3 = document.createElement('h3');
-                questionH3.style.cssText = 'color: #667eea; font-size: 1.8em; margin-bottom: 30px;';
-                questionH3.textContent = game.question;
+                questionH3.style.cssText = 'color: #667eea; font-size: 1.8em; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; gap: 15px;';
+
+                const qText = document.createElement('span');
+                qText.textContent = game.question;
+                questionH3.appendChild(qText);
+
+                const btnSpeak = document.createElement('button');
+                btnSpeak.innerText = '🔊';
+                btnSpeak.style.cssText = 'background: #e0c3fc; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2em; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.1s;';
+                btnSpeak.active = () => btnSpeak.style.transform = 'scale(0.9)';
+                btnSpeak.onclick = (e) => {
+                    e.stopPropagation();
+                    this.speakCurrent();
+                    btnSpeak.style.transform = 'scale(0.9)';
+                    setTimeout(() => btnSpeak.style.transform = 'scale(1)', 100);
+                };
+                questionH3.appendChild(btnSpeak);
+
                 card.appendChild(questionH3);
+
+                // Speak Auto
+                setTimeout(() => this.speakCurrent(), 500);
 
                 // Options
                 game.options.forEach((opt, i) => {
                     const btn = document.createElement('button');
                     btn.className = 'option-btn';
                     btn.textContent = opt;
-                    btn.onclick = () => this.checkAnswer(i);
+
+                    // Mark if already answered correctly? (Not tracking per question persistence yet, but logic is here)
+                    if (game.answered && i === game.correct) btn.classList.add('correct');
+
+                    btn.onclick = () => this.checkAnswer(i, btn);
                     card.appendChild(btn);
                 });
 
@@ -1251,60 +1474,91 @@
 
                 this.container.appendChild(wrapper);
 
-                // --- NAVIGATION (New v13) ---
-                const navBtn = document.createElement('button');
-                navBtn.innerHTML = '➡️';
-                navBtn.style.cssText = `
-                    position: absolute; bottom: 20px; right: 20px;
+                // --- NAVIGATION (Prev / Next) ---
+                const navContainer = document.createElement('div');
+                navContainer.style.cssText = 'position:absolute; bottom:20px; width:100%; display:flex; justify-content:space-between; padding:0 20px; pointer-events:none;';
+
+                // Prev
+                const btnPrev = document.createElement('button');
+                btnPrev.innerHTML = '⬅️';
+                btnPrev.style.cssText = `
+                    background: #3498db; color: white; border: none;
+                    width: 60px; height: 60px; border-radius: 50%;
+                    font-size: 2em; cursor: pointer; box-shadow: 0 4px 0 #2980b9;
+                    display: flex; align-items: center; justify-content: center;
+                    pointer-events: auto; visibility: ${this.currentIndex > 0 ? 'visible' : 'hidden'};
+                `;
+                btnPrev.onclick = () => this.prevQuestion();
+
+                // Next
+                const btnNext = document.createElement('button');
+                btnNext.innerHTML = '➡️';
+                btnNext.style.cssText = `
                     background: #f1c40f; color: white; border: none;
                     width: 60px; height: 60px; border-radius: 50%;
                     font-size: 2em; cursor: pointer; box-shadow: 0 4px 0 #d35400;
                     display: flex; align-items: center; justify-content: center;
-                    transition: transform 0.1s;
+                    pointer-events: auto; visibility: ${this.currentIndex < this.data.games.length - 1 ? 'visible' : 'hidden'};
                 `;
-                navBtn.onclick = () => this.skipQuestion();
-                navBtn.onmousedown = () => navBtn.style.transform = 'translateY(4px)';
-                navBtn.onmouseup = () => navBtn.style.transform = 'translateY(0)';
+                btnNext.onclick = () => this.nextQuestion();
 
-                // wrapper is padded, maybe append to container to be absolute relative to gameArea?
-                // gameArea is 'game-canvas-container' which usually has relative positioning?
-                // Let's check CSS. .game-canvas-container in Dino 9/11 usually doesn't have position relative.
-                // Let's force it on the container for this button to stick.
+                navContainer.appendChild(btnPrev);
+                navContainer.appendChild(btnNext);
+
                 this.container.style.position = 'relative';
-                this.container.appendChild(navBtn);
+                this.container.appendChild(navContainer);
             }
 
-            skipQuestion() {
-                // Clear any pending transition from a previous answer if user clicks fast
-                if (this.feedbackTimeout) clearTimeout(this.feedbackTimeout);
-
-                this.currentIndex++;
-                this.renderQuestion();
-            }
-
-            checkAnswer(selectedIndex) {
+            speakCurrent() {
                 const game = this.data.games[this.currentIndex];
-                const buttons = this.container.querySelectorAll('.option-btn');
+                if (!game) return;
+                const text = `${game.question}. ${game.options.join('. ')}`;
+                this.app.audio.speak(text);
+            }
 
-                buttons.forEach(b => b.style.pointerEvents = 'none'); // Lock
+            prevQuestion() {
+                if (this.feedbackTimeout) clearTimeout(this.feedbackTimeout);
+                if (this.currentIndex > 0) {
+                    this.currentIndex--;
+                    this.renderQuestion();
+                }
+            }
+
+            nextQuestion() {
+                if (this.feedbackTimeout) clearTimeout(this.feedbackTimeout);
+                if (this.currentIndex < this.data.games.length - 1) {
+                    this.currentIndex++;
+                    this.renderQuestion();
+                }
+            }
+
+            checkAnswer(selectedIndex, btnElement) {
+                const game = this.data.games[this.currentIndex];
+
+                // If already answered, don't score again
+                if (game.answered) return;
 
                 if (selectedIndex === game.correct) {
-                    buttons[selectedIndex].classList.add('correct');
+                    btnElement.classList.add('correct');
+                    game.answered = true; // Mark as answered
                     this.app.addScore(10);
                     this.app.audio.playPop();
                     this.showFeedback('¡Bien hecho! ⭐', true);
+
+                    // Auto-advance after delay
+                    this.feedbackTimeout = setTimeout(() => {
+                        if (this.currentIndex < this.data.games.length - 1) {
+                            this.nextQuestion();
+                        } else {
+                            this.finishQuiz();
+                        }
+                    }, 2000);
+
                 } else {
-                    buttons[selectedIndex].classList.add('incorrect');
-                    buttons[game.correct].classList.add('correct');
+                    btnElement.classList.add('incorrect');
                     this.app.audio.playError();
                     this.showFeedback('¡Casi!', false);
                 }
-
-                // Store timeout to clear it if skipped
-                this.feedbackTimeout = setTimeout(() => {
-                    this.currentIndex++;
-                    this.renderQuestion();
-                }, 2000);
             }
 
             showFeedback(msg, isCorrect) {
@@ -3035,8 +3289,12 @@
                 this.c = container;
                 this.level = 0;
                 this.grid = [];
-                this.playerPos = { x: 1, y: 1 };
+                // Player is pixel-based now. Center point.
+                this.p = { x: 0, y: 0 };
                 this.tileSize = 40;
+                this.speed = 3; // px per frame
+                this.running = false;
+                this.dragTarget = null; // {x, y} or null
 
                 this.levels = [
                     // Level 1: Easy
@@ -3114,37 +3372,129 @@
                 this.c.style.display = 'flex';
                 this.c.style.flexDirection = 'column';
                 this.c.style.alignItems = 'center';
-                this.c.style.justifyContent = 'center';
+                this.c.style.justifyContent = 'flex-start';
+                this.c.style.overflow = 'hidden';
 
-                // Title
+                // Title & Nav
+                const header = document.createElement('div');
+                header.style.display = 'flex';
+                header.style.alignItems = 'center';
+                header.style.gap = '20px';
+                header.style.margin = '10px 0';
+
+                const btnPrev = document.createElement('button');
+                btnPrev.textContent = '⬅️';
+                btnPrev.style.fontSize = '1.5em';
+                btnPrev.style.background = 'none';
+                btnPrev.style.border = 'none';
+                btnPrev.style.cursor = 'pointer';
+                if (this.level > 0) {
+                    btnPrev.onclick = () => this.prevLevel();
+                } else {
+                    btnPrev.style.opacity = '0.3';
+                }
+
                 const title = document.createElement('h2');
                 title.id = 'mazeTitle';
                 title.style.color = '#ecf0f1';
+                title.style.margin = '0';
                 title.textContent = `Nivel ${this.level + 1}`;
-                this.c.appendChild(title);
+
+                const btnNext = document.createElement('button');
+                btnNext.textContent = '➡️';
+                btnNext.style.fontSize = '1.5em';
+                btnNext.style.background = 'none';
+                btnNext.style.border = 'none';
+                btnNext.style.cursor = 'pointer';
+                if (this.level < this.levels.length - 1) {
+                    btnNext.onclick = () => this.nextLevel();
+                } else {
+                    btnNext.style.opacity = '0.3';
+                }
+
+                header.appendChild(btnPrev);
+                header.appendChild(title);
+                header.appendChild(btnNext);
+                this.c.appendChild(header);
+
+                // Instruction
+                const inst = document.createElement('p');
+                inst.textContent = '👆 Arrastra a Dino para moverlo';
+                inst.style.color = '#bdc3c7';
+                inst.style.margin = '0 0 10px 0';
+                this.c.appendChild(inst);
 
                 // Canvas
                 this.canvas = document.createElement('canvas');
                 this.canvas.style.background = '#95a5a6';
                 this.canvas.style.borderRadius = '10px';
                 this.canvas.style.boxShadow = '0 10px 20px rgba(0,0,0,0.3)';
+                this.canvas.style.touchAction = 'none'; // Prevents scrolling
                 this.c.appendChild(this.canvas);
                 this.ctx = this.canvas.getContext('2d');
 
-                // Controls
-                this.createControls();
+                // Bind Input
+                this.bindInput();
 
                 // Start Level
                 this.loadLevel(this.level);
 
-                // Keyboard support
-                this.keyHandler = (e) => {
-                    if (e.key === 'ArrowUp') this.move(0, -1);
-                    if (e.key === 'ArrowDown') this.move(0, 1);
-                    if (e.key === 'ArrowLeft') this.move(-1, 0);
-                    if (e.key === 'ArrowRight') this.move(1, 0);
+                // Loop
+                this.running = true;
+                this.loop();
+
+                // Responsive
+                this.ro = new ResizeObserver(() => this.resizeCanvas());
+                this.ro.observe(this.c);
+
+                // Exit
+                const exit = document.createElement('button');
+                exit.textContent = '🏠 Salir';
+                exit.className = 'mode-btn kid';
+                exit.style.marginTop = '10px';
+                exit.onclick = () => app.nav.goDashboard();
+                this.c.appendChild(exit);
+            }
+
+            bindInput() {
+                this.handlers = {
+                    start: (e) => {
+                        e.preventDefault();
+                        this.updateDragTarget(e);
+                    },
+                    move: (e) => {
+                        // Only prevent default if we are actively dragging the dino
+                        if(this.dragTarget) {
+                            if(e.cancelable) e.preventDefault();
+                            this.updateDragTarget(e);
+                        }
+                    },
+                    end: (e) => {
+                        // Only prevent default if we were dragging
+                        if(this.dragTarget) {
+                            if(e.cancelable) e.preventDefault();
+                            this.dragTarget = null;
+                        }
+                    }
                 };
-                document.addEventListener('keydown', this.keyHandler);
+
+                this.canvas.addEventListener('mousedown', this.handlers.start);
+                window.addEventListener('mousemove', this.handlers.move);
+                window.addEventListener('mouseup', this.handlers.end);
+
+                this.canvas.addEventListener('touchstart', this.handlers.start, { passive: false });
+                window.addEventListener('touchmove', this.handlers.move, { passive: false });
+                window.addEventListener('touchend', this.handlers.end);
+            }
+
+            updateDragTarget(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                this.dragTarget = {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
+                };
             }
 
             loadLevel(idx) {
@@ -3153,34 +3503,145 @@
                     return;
                 }
                 this.level = idx;
-                document.getElementById('mazeTitle').textContent = `Nivel ${this.level + 1}`;
+                const t = document.getElementById('mazeTitle');
+                if(t) t.textContent = `Nivel ${this.level + 1}`;
 
                 const map = this.levels[idx];
                 this.grid = map.map(row => row.split(''));
 
-                // Find Start
+                this.resizeCanvas(); // Recalc grid size
+
+                // Find Start Pixel
                 for (let y = 0; y < this.grid.length; y++) {
                     for (let x = 0; x < this.grid[y].length; x++) {
                         if (this.grid[y][x] === 'S') {
-                            this.playerPos = { x, y };
+                            this.p = {
+                                x: x * this.tileSize + this.tileSize/2,
+                                y: y * this.tileSize + this.tileSize/2
+                            };
                         }
                     }
                 }
-
-                this.resizeCanvas();
-                this.draw();
             }
 
             resizeCanvas() {
+                if(!this.grid || this.grid.length === 0) return;
+
+                // Capture current relative pos
+                let relX = 0.5, relY = 0.5;
+                if (this.tileSize > 0 && this.p.x > 0) {
+                    relX = this.p.x / (this.grid[0].length * this.tileSize);
+                    relY = this.p.y / (this.grid.length * this.tileSize);
+                }
+
                 const rows = this.grid.length;
                 const cols = this.grid[0].length;
-                // Max size depends on screen, lets pick a reasonable tile size
-                // small screens: 300px width?
-                const maxWidth = this.c.clientWidth - 40;
-                this.tileSize = Math.min(60, Math.floor(maxWidth / cols));
+
+                const rect = this.c.getBoundingClientRect();
+                const availW = rect.width - 20;
+                const availH = rect.height - 150;
+
+                const tileW = Math.floor(availW / cols);
+                const tileH = Math.floor(availH / rows);
+
+                this.tileSize = Math.min(60, tileW, tileH);
+                this.tileSize = Math.max(20, this.tileSize);
 
                 this.canvas.width = cols * this.tileSize;
                 this.canvas.height = rows * this.tileSize;
+
+                // Restore pos scaled
+                if (this.running && relX > 0) {
+                    this.p.x = relX * this.canvas.width;
+                    this.p.y = relY * this.canvas.height;
+                }
+            }
+
+            loop() {
+                if (!this.running) return;
+                // Safety: Stop if canvas is gone
+                if (!this.canvas.isConnected) {
+                    this.running = false;
+                    return;
+                }
+
+                if (this.dragTarget) {
+                    // Vector to target
+                    const dx = this.dragTarget.x - this.p.x;
+                    const dy = this.dragTarget.y - this.p.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+
+                    if (dist > 5) { // Deadzone
+                        // Normalize
+                        const speed = Math.min(dist, this.speed); // Slow down near finger
+                        const vx = (dx / dist) * speed;
+                        const vy = (dy / dist) * speed;
+
+                        // Move X
+                        if (!this.checkWall(this.p.x + vx, this.p.y)) {
+                            this.p.x += vx;
+                        }
+                        // Move Y
+                        if (!this.checkWall(this.p.x, this.p.y + vy)) {
+                            this.p.y += vy;
+                        }
+
+                        // Check Events
+                        this.checkEvents();
+                    }
+                }
+
+                this.draw();
+                requestAnimationFrame(() => this.loop());
+            }
+
+            checkWall(x, y) {
+                // Check bounding box (Player is size * 0.6)
+                const rad = this.tileSize * 0.3;
+                const testPoints = [
+                    {x: x - rad, y: y - rad},
+                    {x: x + rad, y: y - rad},
+                    {x: x - rad, y: y + rad},
+                    {x: x + rad, y: y + rad}
+                ];
+
+                for (let pt of testPoints) {
+                    const gx = Math.floor(pt.x / this.tileSize);
+                    const gy = Math.floor(pt.y / this.tileSize);
+
+                    // Out of bounds
+                    if (gy < 0 || gy >= this.grid.length || gx < 0 || gx >= this.grid[0].length) return true;
+                    // Wall
+                    if (this.grid[gy][gx] === '#') return true;
+                }
+                return false;
+            }
+
+            checkEvents() {
+                const gx = Math.floor(this.p.x / this.tileSize);
+                const gy = Math.floor(this.p.y / this.tileSize);
+
+                if (gy >= 0 && gy < this.grid.length && gx >= 0 && gx < this.grid[0].length) {
+                    if (this.grid[gy][gx] === 'E') {
+                        app.audio.playPop();
+                        this.dragTarget = null; // Stop moving
+                        this.loadLevel(this.level + 1);
+                    }
+                }
+            }
+
+            prevLevel() {
+                if (this.level > 0) {
+                    this.level--;
+                    this.init();
+                }
+            }
+
+            nextLevel() {
+                if (this.level < this.levels.length - 1) {
+                    this.level++;
+                    this.init();
+                }
             }
 
             draw() {
@@ -3193,90 +3654,41 @@
                         const py = y * this.tileSize;
 
                         if (cell === '#') {
-                            this.ctx.fillStyle = '#34495e'; // Wall
+                            this.ctx.fillStyle = '#34495e';
                             this.ctx.fillRect(px, py, this.tileSize, this.tileSize);
-                            // Highlight
                             this.ctx.fillStyle = '#2c3e50';
-                            this.ctx.fillRect(px + 5, py + 5, this.tileSize - 10, this.tileSize - 10);
+                            this.ctx.fillRect(px + 4, py + 4, this.tileSize - 8, this.tileSize - 8);
                         } else if (cell === 'E') {
-                            this.ctx.font = `${this.tileSize * 0.8}px Arial`;
+                            this.ctx.font = `${this.tileSize * 0.7}px Arial`;
                             this.ctx.textAlign = 'center';
                             this.ctx.textBaseline = 'middle';
-                            this.ctx.fillText('🥚', px + this.tileSize / 2, py + this.tileSize / 2);
+                            this.ctx.fillText('🥚', px + this.tileSize/2, py + this.tileSize/2);
                         }
                     }
                 }
 
                 // Draw Player
-                const px = this.playerPos.x * this.tileSize;
-                const py = this.playerPos.y * this.tileSize;
-                this.ctx.font = `${this.tileSize * 0.8}px Arial`;
+                this.ctx.font = `${this.tileSize * 0.7}px Arial`;
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
-                this.ctx.fillText('🦖', px + this.tileSize / 2, py + this.tileSize / 2);
+                this.ctx.fillText('🦖', this.p.x, this.p.y);
             }
 
-            move(dx, dy) {
-                const newX = this.playerPos.x + dx;
-                const newY = this.playerPos.y + dy;
+            cleanup() {
+                this.running = false;
+                if(this.ro) this.ro.disconnect();
 
-                if (newX < 0 || newY < 0 || newY >= this.grid.length || newX >= this.grid[0].length) return;
-
-                const cell = this.grid[newY][newX];
-                if (cell === '#') {
-                    app.audio.playError(); // Bonk
-                    return;
+                if (this.handlers) {
+                    window.removeEventListener('mousemove', this.handlers.move);
+                    window.removeEventListener('mouseup', this.handlers.end);
+                    window.removeEventListener('touchmove', this.handlers.move);
+                    window.removeEventListener('touchend', this.handlers.end);
+                    this.handlers = null;
                 }
-
-                this.playerPos = { x: newX, y: newY };
-                this.draw();
-
-                if (cell === 'E') {
-                    app.audio.playPop();
-                    setTimeout(() => {
-                        this.loadLevel(this.level + 1);
-                    }, 500);
-                }
-            }
-
-            createControls() {
-                const panel = document.createElement('div');
-                panel.style.cssText = `
-                    margin-top: 20px; display: grid; grid-template-areas: ". U ." "L D R";
-                    gap: 10px;
-                `;
-
-                const mkBtn = (txt, area, dx, dy) => {
-                    const b = document.createElement('button');
-                    b.textContent = txt;
-                    b.className = 'mode-btn kid';
-                    b.style.gridArea = area;
-                    b.style.width = '60px';
-                    b.style.height = '60px';
-                    b.style.fontSize = '2em';
-                    b.style.margin = '0';
-                    b.style.padding = '0'; // Fix centering
-                    b.onclick = () => this.move(dx, dy);
-                    return b;
-                };
-
-                panel.appendChild(mkBtn('⬆️', 'U', 0, -1));
-                panel.appendChild(mkBtn('⬅️', 'L', -1, 0));
-                panel.appendChild(mkBtn('⬇️', 'D', 0, 1));
-                panel.appendChild(mkBtn('➡️', 'R', 1, 0));
-
-                this.c.appendChild(panel);
-
-                // Exit
-                const exit = document.createElement('button');
-                exit.textContent = '🏠 Salir';
-                exit.className = 'mode-btn kid';
-                exit.style.marginTop = '20px';
-                exit.onclick = () => app.nav.goDashboard();
-                this.c.appendChild(exit);
             }
 
             winGame() {
+                this.cleanup(); // Stop Loop & Remove Listeners
                 this.c.innerHTML = '';
                 const winDiv = document.createElement('div');
                 winDiv.style.textAlign = 'center';
@@ -3294,10 +3706,6 @@
 
                 app.audio.playWin();
                 app.updateParentStats(50, 1, 'maze');
-            }
-
-            cleanup() {
-                document.removeEventListener('keydown', this.keyHandler);
             }
         }
 
@@ -3335,30 +3743,67 @@
                         ]
                     },
                     {
-                        name: "GATO 🐱",
+                        name: "ESTRELLA ⭐",
                         points: [
-                            {x:0.3,y:0.75},{x:0.25,y:0.65},{x:0.2,y:0.55},{x:0.2,y:0.4},{x:0.25,y:0.3},
-                            {x:0.2,y:0.15},{x:0.35,y:0.25},{x:0.5,y:0.25},{x:0.65,y:0.15},{x:0.6,y:0.3},
-                            {x:0.65,y:0.4},{x:0.65,y:0.55},{x:0.6,y:0.65},{x:0.55,y:0.75},{x:0.55,y:0.85},
-                            {x:0.7,y:0.85},{x:0.75,y:0.75},{x:0.8,y:0.5},{x:0.8,y:0.4},{x:0.75,y:0.3}
+                            {x:0.5, y:0.1}, {x:0.6, y:0.4}, {x:0.9, y:0.4}, {x:0.65, y:0.6},
+                            {x:0.75, y:0.9}, {x:0.5, y:0.7}, {x:0.25, y:0.9}, {x:0.35, y:0.6},
+                            {x:0.1, y:0.4}, {x:0.4, y:0.4}, {x:0.5, y:0.1}
                         ]
                     },
                     {
-                        name: "PERRO 🐶",
+                        name: "CORAZÓN ❤️",
                         points: [
-                            {x:0.2,y:0.5},{x:0.25,y:0.4},{x:0.35,y:0.35},{x:0.3,y:0.2},{x:0.4,y:0.15},
-                            {x:0.5,y:0.2},{x:0.6,y:0.25},{x:0.7,y:0.3},{x:0.75,y:0.4},{x:0.8,y:0.5},
-                            {x:0.85,y:0.6},{x:0.8,y:0.7},{x:0.7,y:0.75},{x:0.6,y:0.7},{x:0.5,y:0.75},
-                            {x:0.4,y:0.7},{x:0.3,y:0.65},{x:0.25,y:0.6},{x:0.2,y:0.55},{x:0.15,y:0.5}
+                            {x:0.5, y:0.3}, {x:0.7, y:0.1}, {x:0.9, y:0.3}, {x:0.9, y:0.5},
+                            {x:0.5, y:0.9}, {x:0.1, y:0.5}, {x:0.1, y:0.3}, {x:0.3, y:0.1},
+                            {x:0.5, y:0.3}
                         ]
                     },
                     {
-                        name: "PATO 🦆",
+                        name: "CASA 🏠",
                         points: [
-                            {x:0.2,y:0.4},{x:0.25,y:0.3},{x:0.35,y:0.25},{x:0.45,y:0.25},{x:0.5,y:0.3},
-                            {x:0.5,y:0.4},{x:0.55,y:0.5},{x:0.65,y:0.55},{x:0.75,y:0.5},{x:0.8,y:0.4},
-                            {x:0.85,y:0.35},{x:0.9,y:0.4},{x:0.85,y:0.55},{x:0.75,y:0.65},{x:0.65,y:0.7},
-                            {x:0.55,y:0.7},{x:0.45,y:0.65},{x:0.35,y:0.6},{x:0.25,y:0.5},{x:0.2,y:0.45}
+                            {x:0.2, y:0.4}, {x:0.5, y:0.1}, {x:0.8, y:0.4}, {x:0.8, y:0.9},
+                            {x:0.2, y:0.9}, {x:0.2, y:0.4}
+                        ]
+                    },
+                    {
+                        name: "BARCO ⛵",
+                        points: [
+                            {x:0.2, y:0.7}, {x:0.8, y:0.7}, {x:0.7, y:0.9}, {x:0.3, y:0.9},
+                            {x:0.2, y:0.7}, {x:0.5, y:0.6}, {x:0.5, y:0.1}, {x:0.2, y:0.6},
+                            {x:0.8, y:0.6}, {x:0.5, y:0.1}
+                        ]
+                    },
+                    {
+                        name: "LUNA 🌙",
+                        points: [
+                            {x:0.5, y:0.1}, {x:0.7, y:0.2}, {x:0.8, y:0.5}, {x:0.7, y:0.8},
+                            {x:0.5, y:0.9}, {x:0.6, y:0.7}, {x:0.65, y:0.5}, {x:0.6, y:0.3},
+                            {x:0.5, y:0.1}
+                        ]
+                    },
+                    {
+                        name: "SOL ☀️",
+                        points: [
+                            {x:0.5, y:0.2}, {x:0.65, y:0.25}, {x:0.8, y:0.5}, {x:0.65, y:0.75},
+                            {x:0.5, y:0.8}, {x:0.35, y:0.75}, {x:0.2, y:0.5}, {x:0.35, y:0.25},
+                            {x:0.5, y:0.2}
+                        ]
+                    },
+                    {
+                        name: "ÁRBOL 🌲",
+                        points: [
+                            {x:0.5, y:0.1}, {x:0.7, y:0.4}, {x:0.6, y:0.4}, {x:0.8, y:0.7},
+                            {x:0.6, y:0.7}, {x:0.6, y:0.9}, {x:0.4, y:0.9}, {x:0.4, y:0.7},
+                            {x:0.2, y:0.7}, {x:0.4, y:0.4}, {x:0.3, y:0.4}, {x:0.5, y:0.1}
+                        ]
+                    },
+                    {
+                        name: "COCHE 🚗",
+                        points: [
+                            {x:0.2, y:0.7}, {x:0.1, y:0.5}, {x:0.2, y:0.5}, {x:0.3, y:0.3},
+                            {x:0.6, y:0.3}, {x:0.7, y:0.5}, {x:0.9, y:0.5}, {x:0.9, y:0.7},
+                            {x:0.2, y:0.7}, {x:0.3, y:0.8}, {x:0.4, y:0.7}, {x:0.7, y:0.7},
+                            {x:0.8, y:0.8}, {x:0.9, y:0.7}
                         ]
                     }
                 ];
@@ -3374,11 +3819,39 @@
                 this.c.style.alignItems = "center";
                 this.c.style.justifyContent = "center";
 
+                // Nav Header
+                const header = document.createElement('div');
+                header.style.display = 'flex';
+                header.style.alignItems = 'center';
+                header.style.gap = '20px';
+                header.style.marginBottom = '10px';
+
+                const btnPrev = document.createElement('button');
+                btnPrev.textContent = '⬅️';
+                btnPrev.style.fontSize = '1.5em';
+                btnPrev.style.background = 'none';
+                btnPrev.style.border = 'none';
+                btnPrev.style.cursor = 'pointer';
+                btnPrev.onclick = () => this.prevLevel();
+
                 const title = document.createElement("h2");
                 title.id = "dotsTitle";
                 title.style.color = "#2980b9";
+                title.style.margin = '0';
                 title.textContent = `Nivel ${this.level + 1}`;
-                this.c.appendChild(title);
+
+                const btnNext = document.createElement('button');
+                btnNext.textContent = '➡️';
+                btnNext.style.fontSize = '1.5em';
+                btnNext.style.background = 'none';
+                btnNext.style.border = 'none';
+                btnNext.style.cursor = 'pointer';
+                btnNext.onclick = () => this.nextLevel();
+
+                header.appendChild(btnPrev);
+                header.appendChild(title);
+                header.appendChild(btnNext);
+                this.c.appendChild(header);
 
                 const canvasContainer = document.createElement("div");
                 canvasContainer.style.position = "relative";
@@ -3434,9 +3907,17 @@
                 this.maxDots = this.dots.length;
                 this.currentDot = 1;
                 this.documentTitle = document.getElementById("dotsTitle");
-                this.documentTitle.textContent = `Nivel ${this.level + 1}: ${this.currentDot} ➡️ ${this.currentDot + 1}`;
+                if(this.documentTitle) this.documentTitle.textContent = `Nivel ${this.level + 1}: ${this.currentDot} ➡️ ${this.currentDot + 1}`;
                 this.lines = [];
                 this.draw();
+            }
+
+            prevLevel() {
+                if (this.level > 0) this.loadLevel(this.level - 1);
+            }
+
+            nextLevel() {
+                if (this.level < this.levels.length - 1) this.loadLevel(this.level + 1);
             }
 
             draw() {
@@ -3965,15 +4446,17 @@
          * 🔴 CONNECT FOUR GAME (Classic Strategy)
          */
         class ConnectFourGame {
-            constructor(data, container) {
+            constructor(data, container, savedState) {
                 this.data = data;
                 this.c = container;
+                this.savedState = savedState;
                 this.cols = 7;
                 this.rows = 6;
-                this.board = []; // 0=Empty, 1=Player, 2=Dino
-                this.turn = 1; // 1=Player, 2=Dino
+                this.board = []; // 0=Empty, 1=Player, 2=Dino/P2
+                this.turn = 1; // 1=Player, 2=Dino/P2
                 this.gameOver = false;
                 this.animating = false;
+                this.gameMode = 'pve'; // pve, pvp
                 this.init();
             }
 
@@ -3986,6 +4469,74 @@
                 this.c.style.justifyContent = 'center';
                 this.c.style.position = 'relative';
 
+                // Mode Selector
+                const title = document.createElement('h2');
+                title.textContent = '🔴 4 en Raya 🟡';
+                title.style.color = 'white';
+                title.style.marginBottom = '30px';
+                title.style.fontSize = '3em';
+                this.c.appendChild(title);
+
+                const btnContainer = document.createElement('div');
+                btnContainer.style.display = 'flex';
+                btnContainer.style.gap = '20px';
+
+                const btnPVE = document.createElement('button');
+                btnPVE.className = 'mode-btn kid';
+                btnPVE.style.background = '#e74c3c';
+                btnPVE.innerHTML = '🤖 1 Jugador<br><span style="font-size:0.6em">vs Dino</span>';
+                btnPVE.onclick = () => this.startGame('pve');
+
+                const btnPVP = document.createElement('button');
+                btnPVP.className = 'mode-btn kid';
+                btnPVP.style.background = '#f1c40f';
+                btnPVP.innerHTML = '👥 2 Jugadores<br><span style="font-size:0.6em">Amigos</span>';
+                btnPVP.onclick = () => this.startGame('pvp');
+
+                btnContainer.appendChild(btnPVE);
+                btnContainer.appendChild(btnPVP);
+
+                if (this.savedState) {
+                    const btnResume = document.createElement('button');
+                    btnResume.className = 'mode-btn kid';
+                    btnResume.style.background = '#2ecc71';
+                    btnResume.innerHTML = '📂 Continuar';
+                    btnResume.onclick = () => this.resumeGame();
+                    btnContainer.appendChild(btnResume);
+                }
+
+                this.c.appendChild(btnContainer);
+
+                const exit = document.createElement('button');
+                exit.textContent = '🏠 Salir';
+                exit.className = 'mode-btn kid';
+                exit.style.marginTop = '40px';
+                exit.onclick = () => window.app.nav.goDashboard();
+                this.c.appendChild(exit);
+            }
+
+            resumeGame() {
+                if (this.savedState) {
+                    this.gameMode = this.savedState.gameMode || 'pve';
+                    this.board = this.savedState.board;
+                    this.turn = this.savedState.turn;
+                    this.startGame(this.gameMode, true);
+                }
+            }
+
+            save() {
+                const state = {
+                    gameMode: this.gameMode,
+                    board: this.board,
+                    turn: this.turn
+                };
+                window.app.saveGame('connect_four', state);
+            }
+
+            startGame(mode, isRestore = false) {
+                this.gameMode = mode;
+                this.c.innerHTML = '';
+
                 // Title
                 const title = document.createElement('h2');
                 title.textContent = '🔴 vs 🟡';
@@ -3993,10 +4544,22 @@
                 title.style.marginBottom = '10px';
                 this.c.appendChild(title);
 
+                // Controls
+                const controls = document.createElement('div');
+                controls.style.marginBottom = '10px';
+                const saveBtn = document.createElement('button');
+                saveBtn.innerText = '💾 Guardar';
+                saveBtn.className = 'mode-btn kid';
+                saveBtn.style.padding = '5px 15px';
+                saveBtn.style.fontSize = '1em';
+                saveBtn.style.background = '#3498db';
+                saveBtn.onclick = () => this.save();
+                controls.appendChild(saveBtn);
+                this.c.appendChild(controls);
+
                 // Game Board Container
                 const boardEl = document.createElement('div');
                 boardEl.className = 'c4-board';
-                // Dynamic grid style
                 boardEl.style.cssText = `
                     display: grid;
                     grid-template-columns: repeat(7, 1fr);
@@ -4013,7 +4576,9 @@
 
                 this.slots = [];
                 // Init Logic Board
-                this.board = Array(this.rows).fill(null).map(() => Array(this.cols).fill(0));
+                if (!isRestore) {
+                    this.board = Array(this.rows).fill(null).map(() => Array(this.cols).fill(0));
+                }
 
                 // Create Slots
                 for (let r = 0; r < this.rows; r++) {
@@ -4029,7 +4594,7 @@
                         `;
                         slot.dataset.col = c;
                         slot.dataset.row = r;
-                        slot.onclick = () => this.playerMove(c);
+                        slot.onclick = () => this.handleSlotClick(c);
 
                         // Inner circle for piece
                         const piece = document.createElement('div');
@@ -4038,6 +4603,13 @@
                             width: 100%; height: 100%; border-radius: 50%;
                             transform: scale(0); transition: transform 0.3s cubic-bezier(1.000, 0.005, 0.295, 1.225);
                         `;
+
+                        // Restore Visuals
+                        if (isRestore && this.board[r][c] !== 0) {
+                            piece.style.transform = 'scale(1)';
+                            piece.style.background = (this.board[r][c] === 1) ? '#e74c3c' : '#f1c40f';
+                        }
+
                         slot.appendChild(piece);
                         this.slots.push({ el: slot, piece: piece, row: r, col: c });
                         boardEl.appendChild(slot);
@@ -4049,31 +4621,59 @@
                 exit.textContent = '🏠 Salir';
                 exit.className = 'mode-btn kid';
                 exit.style.marginTop = '20px';
-                exit.onclick = () => app.nav.goDashboard();
+                exit.onclick = () => window.app.nav.goDashboard();
                 this.c.appendChild(exit);
 
                 // Status Message
                 this.statusEl = document.createElement('div');
                 this.statusEl.style.cssText = 'color: white; font-size: 1.5em; margin-top: 10px; height: 30px;';
-                this.statusEl.textContent = 'Tu turno 🔴';
+                this.statusEl.textContent = (this.turn === 1) ? 'Tu turno 🔴' : 'Turno Amarillo 🟡';
                 this.c.appendChild(this.statusEl);
             }
 
-            playerMove(col) {
-                if (this.gameOver || this.turn !== 1 || this.animating) return;
+            handleSlotClick(col) {
+                if (this.gameOver || this.animating) return;
 
-                if (this.dropPiece(col, 1)) {
-                    app.audio.playPop(); // Sound
-                    this.turn = 2;
-                    this.statusEl.textContent = 'Dino piensa... 🤔';
+                // PvE: Turn 1 is Player, Turn 2 is AI
+                if (this.gameMode === 'pve' && this.turn === 2) return;
 
-                    if (!this.checkWin(1) && !this.checkDraw()) {
-                        this.animating = true;
-                        setTimeout(() => this.dinoMove(), 800); // Small delay for "thinking"
+                this.makeMove(col);
+            }
+
+            makeMove(col) {
+                const currentPlayer = this.turn;
+
+                if (this.dropPiece(col, currentPlayer)) {
+                    app.audio.playPop();
+
+                    // Check Win/Draw
+                    if (this.checkWin(currentPlayer)) return;
+                    if (this.checkDraw()) return;
+
+                    // Switch Turn
+                    this.turn = (this.turn === 1) ? 2 : 1;
+
+                    if (this.gameMode === 'pve') {
+                        if (this.turn === 2) {
+                            this.statusEl.textContent = 'Dino piensa... 🤔';
+                            this.animating = true;
+                            setTimeout(() => this.dinoMove(), 800);
+                        } else {
+                            this.statusEl.textContent = 'Tu turno 🔴';
+                        }
+                    } else {
+                        // PvP
+                        this.statusEl.textContent = (this.turn === 1) ? 'Turno Rojo 🔴' : 'Turno Amarillo 🟡';
                     }
+
                 } else {
-                    app.audio.playError(); // Column full
+                    app.audio.playError();
                 }
+            }
+
+            // Kept for backward compatibility if called directly, but now routed via handleSlotClick
+            playerMove(col) {
+                this.handleSlotClick(col);
             }
 
             dinoMove() {
@@ -4165,39 +4765,41 @@
             checkWin(player) {
                 if (this.checkWinLogic(player, true)) {
                     this.gameOver = true;
-                    this.statusEl.textContent = player === 1 ? '¡GANASTE! 🎉' : '¡Dino Gana! 🦖';
-                    if (player === 1) {
+
+                    let msg = '';
+                    if (this.gameMode === 'pve') {
+                        msg = (player === 1) ? '¡GANASTE! 🎉' : '¡Dino Gana! 🦖';
+                    } else {
+                        msg = (player === 1) ? '¡Rojo Gana! 🔴' : '¡Amarillo Gana! 🟡';
+                    }
+                    this.statusEl.textContent = msg;
+
+                    if (player === 1 || (this.gameMode === 'pvp' && player === 2)) {
                         app.audio.playWin();
-                        app.addScore(20);
-                        setTimeout(() => {
-                            const ov = document.createElement('div');
-                            ov.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:100; border-radius:10px;';
-                            ov.innerHTML = `
-                                <div style="font-size:5em;">${this.statusEl.textContent.includes('Dino') ? '🦕' : '🏆'}</div>
-                                <h2 style="color:white; margin:20px;">${this.statusEl.textContent}</h2>
-                                <div style="display:flex; gap:20px; flex-direction:column;">
-                                    <button class="mode-btn kid" style="background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
-                                    <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
-                                </div>
-                            `;
-                            this.c.appendChild(ov);
-                        }, 1500);
+                        if (player === 1 && this.gameMode === 'pve') app.addScore(20);
                     } else {
                         app.audio.playError();
-                        setTimeout(() => {
-                            const ov = document.createElement('div');
-                            ov.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:100; border-radius:10px;';
-                            ov.innerHTML = `
-                                <div style="font-size:5em;">${this.statusEl.textContent.includes('Dino') ? '🦕' : '🏆'}</div>
-                                <h2 style="color:white; margin:20px;">${this.statusEl.textContent}</h2>
-                                <div style="display:flex; gap:20px; flex-direction:column;">
-                                    <button class="mode-btn kid" style="background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
-                                    <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
-                                </div>
-                            `;
-                            this.c.appendChild(ov);
-                        }, 1500);
                     }
+
+                    setTimeout(() => {
+                        const ov = document.createElement('div');
+                        ov.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:100; border-radius:10px;';
+
+                        let icon = '🏆';
+                        if (msg.includes('Dino')) icon = '🦕';
+                        if (msg.includes('Amarillo')) icon = '🟡';
+                        if (msg.includes('Rojo')) icon = '🔴';
+
+                        ov.innerHTML = `
+                            <div style="font-size:5em;">${icon}</div>
+                            <h2 style="color:white; margin:20px;">${msg}</h2>
+                            <div style="display:flex; gap:20px; flex-direction:column;">
+                                <button class="mode-btn kid" style="background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
+                                <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
+                            </div>
+                        `;
+                        this.c.appendChild(ov);
+                    }, 1500);
                     return true;
                 }
                 return false;
@@ -4253,9 +4855,10 @@
          * 🏁 CHECKERS GAME (Damas)
          */
         class CheckersGame {
-            constructor(data, container) {
+            constructor(data, container, savedState) {
                 this.data = data;
                 this.c = container;
+                this.savedState = savedState;
                 this.board = []; // 8x8: 0=Empty, 1=Red(Player), 2=Black(Dino), 3=RedKing, 4=BlackKing
                 this.turn = 1; // 1=Player, 2=Dino
                 this.selectedPiece = null; // {r, c}
@@ -4267,7 +4870,7 @@
 
             init() {
                 this.c.innerHTML = '';
-                this.c.style.background = '#eecbad'; // Wood-like background
+                this.c.style.background = '#eecbad';
                 this.c.style.display = 'flex';
                 this.c.style.flexDirection = 'column';
                 this.c.style.alignItems = 'center';
@@ -4276,8 +4879,69 @@
                 const title = document.createElement('h2');
                 title.textContent = '🏁 Damas 🦖';
                 title.style.color = '#5d4037';
-                title.style.marginBottom = '10px';
+                title.style.marginBottom = '20px';
                 this.c.appendChild(title);
+
+                const btnPlay = document.createElement('button');
+                btnPlay.className = 'mode-btn kid';
+                btnPlay.style.background = '#e74c3c';
+                btnPlay.textContent = '🎮 Jugar';
+                btnPlay.onclick = () => this.startGame(false);
+                this.c.appendChild(btnPlay);
+
+                if (this.savedState) {
+                    const btnResume = document.createElement('button');
+                    btnResume.className = 'mode-btn kid';
+                    btnResume.style.background = '#2ecc71';
+                    btnResume.style.marginTop = '10px';
+                    btnResume.textContent = '📂 Continuar';
+                    btnResume.onclick = () => this.resumeGame();
+                    this.c.appendChild(btnResume);
+                }
+
+                const exit = document.createElement('button');
+                exit.textContent = '🏠 Salir';
+                exit.className = 'mode-btn kid';
+                exit.style.marginTop = '20px';
+                exit.onclick = () => window.app.nav.goDashboard();
+                this.c.appendChild(exit);
+            }
+
+            resumeGame() {
+                this.board = this.savedState.board;
+                this.turn = this.savedState.turn;
+                this.startGame(true);
+            }
+
+            save() {
+                const state = {
+                    board: this.board,
+                    turn: this.turn
+                };
+                window.app.saveGame('checkers', state);
+            }
+
+            startGame(isRestore) {
+                this.c.innerHTML = '';
+
+                // Controls Header
+                const controls = document.createElement('div');
+                controls.style.cssText = 'display:flex; justify-content:space-between; width:95%; max-width:600px; margin-bottom:5px;';
+
+                const btnBack = document.createElement('button');
+                btnBack.textContent = '🔙';
+                btnBack.style.cssText = 'background:none; border:none; font-size:1.5em; cursor:pointer;';
+                btnBack.onclick = () => this.init(); // Back to Menu
+
+                const btnSave = document.createElement('button');
+                btnSave.textContent = '💾 Guardar';
+                btnSave.className = 'mode-btn kid';
+                btnSave.style.cssText = 'padding: 5px 15px; font-size: 1em; background: #3498db;';
+                btnSave.onclick = () => this.save();
+
+                controls.appendChild(btnBack);
+                controls.appendChild(btnSave);
+                this.c.appendChild(controls);
 
                 const boardEl = document.createElement('div');
                 boardEl.className = 'checkers-board';
@@ -4291,7 +4955,7 @@
                 this.c.appendChild(boardEl);
 
                 this.cells = [];
-                this.board = this.createBoard();
+                if (!isRestore) this.board = this.createBoard();
 
                 // Render Grid
                 for (let r = 0; r < 8; r++) {
@@ -4324,20 +4988,19 @@
                     }
                 }
 
-                // Exit
-                const exit = document.createElement('button');
-                exit.textContent = '🏠 Salir';
-                exit.className = 'mode-btn kid';
-                exit.style.marginTop = '10px';
-                exit.onclick = () => app.nav.goDashboard();
-                this.c.appendChild(exit);
-
                 this.statusEl = document.createElement('div');
                 this.statusEl.style.cssText = 'color: #5d4037; font-weight: bold; font-size: 1.5em; margin-top: 5px;';
-                this.statusEl.textContent = 'Tu turno (Rojos) 🔴';
+
+                if (this.turn === 1) this.statusEl.textContent = 'Tu turno (Rojos) 🔴';
+                else this.statusEl.textContent = 'Dino piensa... 🤔';
+
                 this.c.appendChild(this.statusEl);
 
                 this.updateView();
+
+                if (isRestore && this.turn === 2) {
+                    setTimeout(() => this.dinoTurn(), 1000);
+                }
             }
 
             createBoard() {
@@ -4601,27 +5264,24 @@
             }
         }
 
-        /**
+                /**
          * 🎲 PARCHIS GAME (Ludo Simplified)
-         * 2 Players: Red (Human) vs Yellow (Dino).
+         * 2-4 Players.
          */
         class ParchisGame {
-            constructor(data, container) {
+            constructor(data, container, savedState) {
                 this.data = data;
                 this.c = container;
+                this.savedState = savedState;
                 // Game State
-                this.turn = 1; // 1=Red, 2=Yellow
+                this.turn = 1; // 1=Red, 2=Yellow, 3=Green, 4=Blue
                 this.diceVal = null;
                 this.waitingRoll = true;
-                // Pieces: 0-3 Red, 4-7 Yellow. Value = position index (0=Home, 1..68=Path, >100=Goal)
-                // Let's us a simple path model:
-                // Shared Path: 1 to 68.
-                // Red Start: 5. Red Goal Entry: 68 -> 101..107 (Winner).
-                // Yellow Start: 22. Yellow Goal Entry: 17 -> 201..207 (Winner).
-                this.pieces = [0, 0, 0, 0, 0, 0, 0, 0]; // 0=Home
+                // Pieces: 0-3 Red, 4-7 Yellow, 8-11 Green, 12-15 Blue.
+                this.pieces = Array(16).fill(0);
                 this.msg = 'Selecciona Modo 🎮';
                 this.gameOver = false;
-                this.gameMode = 'pve'; // pve | pvp
+                this.gameMode = 'pve'; // pve | pvp | pvp4
 
                 this.init();
             }
@@ -4661,22 +5321,84 @@
                 btn2.innerHTML = '👥 2 Jugadores<br><span style="font-size:0.6em">Amigos</span>';
                 btn2.onclick = () => this.startGame('pvp');
 
+                const btn4 = document.createElement('button');
+                btn4.className = 'mode-btn kid';
+                btn4.style.background = '#2ecc71';
+                btn4.innerHTML = '👥 4 Jugadores<br><span style="font-size:0.6em">Fiesta</span>';
+                btn4.onclick = () => this.startGame('pvp4');
+
                 const btn3 = document.createElement('button');
                 btn3.className = 'mode-btn kid';
                 btn3.style.background = '#9b59b6';
-                btn3.innerHTML = '🎲 2 Jugadores<br><span style="font-size:0.6em">Dado Real</span>';
+                btn3.innerHTML = '🎲 Híbrido<br><span style="font-size:0.6em">2P Real</span>';
                 btn3.onclick = () => this.startGame('hybrid');
+
+                const btn5 = document.createElement('button');
+                btn5.className = 'mode-btn kid';
+                btn5.style.background = '#8e44ad';
+                btn5.innerHTML = '🎲 Híbrido 4<br><span style="font-size:0.6em">4P Real</span>';
+                btn5.onclick = () => this.startGame('hybrid4');
 
                 btnContainer.appendChild(btn1);
                 btnContainer.appendChild(btn2);
+                btnContainer.appendChild(btn4);
                 btnContainer.appendChild(btn3);
+                btnContainer.appendChild(btn5);
+
+                // Restore Button
+                if (this.savedState) {
+                    const btnResume = document.createElement('button');
+                    btnResume.className = 'mode-btn kid';
+                    btnResume.style.background = '#2ecc71';
+                    btnResume.innerHTML = '📂 Continuar<br><span style="font-size:0.6em">Partida Guardada</span>';
+                    btnResume.onclick = () => this.resumeGame();
+                    btnContainer.appendChild(btnResume);
+                }
+
                 this.c.appendChild(btnContainer);
+
+                // Exit Button
+                const exit = document.createElement('button');
+                exit.textContent = '🏠 Salir';
+                exit.className = 'mode-btn kid';
+                exit.style.marginTop = '40px';
+                exit.onclick = () => window.app.nav.goDashboard();
+                this.c.appendChild(exit);
+            }
+
+            resumeGame() {
+                if (this.savedState) {
+                    this.gameMode = this.savedState.gameMode || 'pve';
+                    this.pieces = this.savedState.pieces || Array(16).fill(0);
+                    this.turn = this.savedState.turn || 1;
+                    this.msg = (this.gameMode === 'hybrid' || this.gameMode === 'hybrid4') ? 'Tira tu dado y anota 📝' : 'Tira el dado 🎲';
+                    this.setupBoard();
+                    this.updateTurnUI();
+
+                    if (this.gameMode === 'pve' && this.turn === 2) {
+                        this.dinoAI();
+                    } else {
+                        this.waitingRoll = true;
+                    }
+                }
+            }
+
+            save() {
+                const state = {
+                    gameMode: this.gameMode,
+                    pieces: this.pieces,
+                    turn: this.turn
+                };
+                window.app.saveGame('parchis', state);
             }
 
             startGame(mode) {
                 this.gameMode = mode;
-                this.msg = (mode === 'hybrid') ? 'Tira tu dado y anota 📝' : 'Tira el dado 🎲';
+                this.pieces = Array(16).fill(0);
+                this.turn = 1;
+                this.msg = (mode === 'hybrid' || mode === 'hybrid4') ? 'Tira tu dado y anota 📝' : 'Tira el dado 🎲';
                 this.setupBoard();
+                this.updateTurnUI();
             }
 
             setupBoard() {
@@ -4744,22 +5466,22 @@
                 `;
                 this.c.appendChild(board);
 
-
-
-                // We map visuals dynamically or static?
-                // Let's create cells. 11x11 is simpler and standard for Ludo/Parchis is usually 15x15 but 11x11 works for "Fast Ludo".
-                // Let's use 11x11 for better visible size on mobile.
-                // Path: Outer ring + Cross.
                 this.renderBoard(board);
 
                 // Pieces Render
                 this.pieceEls = [];
-                for (let i = 0; i < 8; i++) {
+                const colors = ['#e74c3c', '#f1c40f', '#2ecc71', '#3498db']; // Red, Yellow, Green, Blue
+
+                // Show pieces based on mode
+                const totalPieces = (this.gameMode === 'pvp4' || this.gameMode === 'hybrid4') ? 16 : 8; // 8 for 2P modes
+
+                for (let i = 0; i < totalPieces; i++) {
+                    const pIdx = Math.floor(i / 4); // 0, 1, 2, 3
                     const p = document.createElement('div');
                     p.className = 'parchis-piece';
                     p.style.cssText = `
                         width: 5.5%; height: 5.5%; border-radius: 50%;
-                        background: ${i < 4 ? '#e74c3c' : '#f1c40f'};
+                        background: ${colors[pIdx]};
                         border: 2px solid white; box-shadow: 0 3px 5px rgba(0,0,0,0.3);
                         position: absolute; transition: all 0.5s;
                         z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 0.8em; color:white; font-weight:bold;
@@ -4771,20 +5493,36 @@
                 }
                 this.updatePieces();
 
+                // Controls Row
+                const controls = document.createElement('div');
+                controls.style.display = 'flex';
+                controls.style.gap = '10px';
+                controls.style.marginTop = '10px';
+
+                // Save
+                const saveBtn = document.createElement('button');
+                saveBtn.textContent = '💾 Guardar';
+                saveBtn.className = 'mode-btn kid';
+                saveBtn.style.background = '#3498db'; // Blue
+                saveBtn.style.padding = '10px 20px';
+                saveBtn.style.fontSize = '1em';
+                saveBtn.onclick = () => this.save();
+                controls.appendChild(saveBtn);
+
                 // Exit
                 const exit = document.createElement('button');
                 exit.textContent = '🏠 Salir';
                 exit.className = 'mode-btn kid';
-                exit.style.marginTop = '10px';
-                exit.onclick = () => app.nav.goDashboard();
-                this.c.appendChild(exit);
+                exit.style.padding = '10px 20px';
+                exit.style.fontSize = '1em';
+                exit.onclick = () => window.app.nav.goDashboard();
+                controls.appendChild(exit);
+
+                this.c.appendChild(controls);
             }
 
             renderBoard(container) {
                 // 11x11 Grid.
-                // Corners are Homes (4x4 areas).
-                // Cross is Path.
-
                 for (let r = 0; r < 11; r++) {
                     for (let c = 0; c < 11; c++) {
                         const div = document.createElement('div');
@@ -4794,8 +5532,8 @@
                         // Corners (Homes)
                         if (r < 4 && c < 4) div.style.background = '#e74c3c'; // Red Home
                         else if (r < 4 && c > 6) div.style.background = '#f1c40f'; // Yellow Home
-                        else if (r > 6 && c < 4) div.style.background = '#3498db'; // Blue (Unused)
-                        else if (r > 6 && c > 6) div.style.background = '#2ecc71'; // Green (Unused)
+                        else if (r > 6 && c < 4) div.style.background = '#3498db'; // Blue (Unused in 2P but shown)
+                        else if (r > 6 && c > 6) div.style.background = '#2ecc71'; // Green (Unused in 2P but shown)
 
                         // Center
                         else if (r === 5 && c === 5) div.style.background = 'conic-gradient(#e74c3c, #f1c40f, #2ecc71, #3498db)';
@@ -4822,140 +5560,99 @@
                 }
             }
 
-            // Coordinate Mapper (Simple 11x11 Ludo)
             getCoord(pos, playerIdx) {
-                // Returns {left: %, top: %} based on pos logic.
-                // 0 = Home.
-                // 1..40 = Outer Loop.
-                // >100 = Final Path.
+                // Returns {x, y} grid indices (0-10)
+                // pos: 0=Home, 1..40=Loop, 100+=Goal
 
-                // Normalize visual pos for simplicty.
-                // Let's implement static mapping for key milestones to avoid complex math.
-                // Or simplified cycle.
-
-                /*
-                   Grid 11x11.
-                   Outer Path clockwise:
-                   (4,0)->(4,4)->(0,4)->(0,6)->(4,6)->(4,10)->(6,10)->(6,6)->(10,6)->(10,4)->(6,4)->(6,0)->Loop
-                */
-
+                // HOMES
                 if (pos === 0) {
-                    // Home Positions
-                    const isRed = playerIdx < 4;
-                    const offset = playerIdx % 4;
-                    // Red Top-Left (actually standard Ludo Red is top-left? Let's say yes).
-                    // Wait, standard has Red Top-Left.
-                    // 2x2 grid inside 4x4 area.
-                    const r = isRed ? (Math.floor(offset / 2) + 1) : (Math.floor(offset / 2) + 1);
-                    const c = isRed ? (offset % 2 + 1) : (offset % 2 + 7);
+                    const p = Math.floor(playerIdx / 4); // 0..3 (Red, Yel, Grn, Blu)
+                    const sub = playerIdx % 4;
+                    // Grid 11x11. Corners 4x4.
+                    let bx = 0, by = 0;
+                    if (p === 0) { bx=1; by=1; } // Red: TL
+                    if (p === 1) { bx=7; by=1; } // Yel: TR
+                    if (p === 2) { bx=7; by=7; } // Grn: BR
+                    if (p === 3) { bx=1; by=7; } // Blu: BL
+
+                    const r = by + Math.floor(sub / 2);
+                    const c = bx + (sub % 2);
                     return { x: c, y: r };
                 }
 
-                // Map linear path index to (x,y)
-                // This is the tricky part. For a pure Agent approach, let's look-up table or logic?
-                // Logic:
-                // Segments:
-                // 1. Red Start (4,0) -> Right to (4,4) -> Up to (0,4) -> Right (0,6) -> Down (4,6) -> Right (4,10) ...
-
-                // Let's define key waypoints and interpolate.
-                // Actually, for robust movement, let's hardcode the ~40 cells coords is safest.
-                // Or use a "Walk" function.
-
-                // SIMPLIFIED MAP (11x11):
-                // 04,00 (Start Red) -> 04,01 -> 04,02 -> 04,03 -> 04,04
-                // 03,04 -> 02,04 -> 01,04 -> 00,04
-                // 00,05 (Top Mid) -> 00,06 ...
-
-                // To save tokens, I will implement a visual approximator function.
-                let x = 0, y = 0;
-
-                // Goal Paths
+                // GOALS (100+)
                 if (pos > 100) {
-                    const step = pos - 100; // 1 to 5
-                    if (playerIdx < 4) { // Red (Left -> Center)
-                        y = 5; x = step;
-                    } else { // Yellow (Top -> Center)
-                        x = 5; y = step;
-                    }
-                } else {
-                    // Outer Loop (1-40)
-                    // Hardcoded segments for robustness
-                    if (pos <= 5) { y = 4; x = pos - 1; } // 0..4
-                    else if (pos <= 9) { y = 4 - (pos - 5); x = 4; }
-                    else if (pos <= 11) { y = 0; x = 4 + (pos - 9); }
-                    else if (pos <= 15) { y = (pos - 11); x = 6; }
-                    else if (pos <= 20) { y = 4; x = 6 + (pos - 15); }
-                    else if (pos <= 22) { y = 4 + (pos - 20); x = 10; }
-                    else if (pos <= 25) { y = 6; x = 10 - (pos - 22); }
-                    else if (pos <= 29) { y = 6 + (pos - 25); x = 6; }
-                    else if (pos <= 31) { y = 10; x = 6 - (pos - 29); }
-                    else if (pos <= 35) { y = 10 - (pos - 31); x = 4; }
-                    else if (pos <= 40) { y = 6; x = 4 - (pos - 35); } // Back to near start
+                    const step = pos - 100; // 1..5
+                    const p = Math.floor(playerIdx / 4);
+                    if (p === 0) return { x: step, y: 5 }; // Red -> Right
+                    if (p === 1) return { x: 5, y: step }; // Yel -> Down
+                    if (p === 2) return { x: 10 - step, y: 5 }; // Grn -> Left
+                    if (p === 3) return { x: 5, y: 10 - step }; // Blu -> Up
                 }
+
+                // PATH (1..40)
+                // Normalize 1..40 to Grid Coords
+                let x = 0, y = 0;
+                if (pos <= 5) { y = 4; x = pos - 1; }
+                else if (pos <= 9) { y = 4 - (pos - 5); x = 4; }
+                else if (pos <= 11) { y = 0; x = 4 + (pos - 9); }
+                else if (pos <= 15) { y = (pos - 11); x = 6; }
+                else if (pos <= 19) { y = 4; x = 6 + (pos - 15); }
+                else if (pos <= 21) { y = 4 + (pos - 19); x = 10; }
+                else if (pos <= 25) { y = 6; x = 10 - (pos - 21); }
+                else if (pos <= 29) { y = 6 + (pos - 25); x = 6; }
+                else if (pos <= 31) { y = 10; x = 6 - (pos - 29); }
+                else if (pos <= 35) { y = 10 - (pos - 31); x = 4; }
+                else if (pos <= 39) { y = 6; x = 4 - (pos - 35); }
+                else if (pos === 40) { y = 5; x = 0; }
 
                 return { x, y };
             }
 
             updatePieces() {
-                this.pieces.forEach((pos, i) => {
-                    // Logic to Visual
-                    let coords;
-                    if (pos === 0) {
-                        // Home
-                        coords = this.getCoord(0, i);
-                    } else {
-                        // Path Mapping
-                        // Red Start is 1.
-                        // Yellow Start is 11 (Top).
-                        // Loop length 40.
-                        let visualPos = pos;
-                        if (i >= 4) { // Yellow
-                            // If raw pos is relative to own start?
-                            // Let's use absolute path 1..40.
-                            // 1 = Red Start (4,0).
-                            // 11 = Yellow Start (0,6).
-                            // 21 = Button Right.
-                            // 31 = Bottom Left.
+                if(!this.pieceEls) return;
 
-                            // Visual Pos specific mapping? No, simplify:
-                            // pieces array holds ABSOLUTE board position (1-40).
-                            // 0 = Home.
-                            // > 100 = Inside Goal.
-                        }
-                        coords = this.getCoord(visualPos, i);
-                    }
+                this.pieceEls.forEach((el, i) => {
+                    const pos = this.pieces[i];
+                    const coords = this.getCoord(pos, i);
 
-                    if (!coords) coords = { x: 5, y: 5 }; // Center fallback
-
-                    const el = this.pieceEls[i];
-                    // Grid coords are 1-based? No, CSS Grid starts at 1. My updates are 0-based.
                     el.style.left = `calc(${coords.x * 9.09}% + 1%)`;
                     el.style.top = `calc(${coords.y * 9.09}% + 1%)`;
 
-                    // Highlight Active
-                    if (this.turn === 1 && i < 4 && this.diceVal && !this.waitingRoll) {
+                    // Highlight Active Player's Pieces
+                    const pIdx = Math.floor(i / 4) + 1; // 1,2,3,4
+                    const isMyTurn = (this.turn === pIdx);
+
+                    let canInteract = false;
+                    if (isMyTurn && this.diceVal && !this.waitingRoll) {
+                        if (this.gameMode === 'pve') {
+                            canInteract = (pIdx === 1); // Only Human Red
+                        } else {
+                            canInteract = true; // Any human turn
+                        }
+                    }
+
+                    if (canInteract) {
                         el.style.border = '2px solid white';
-                        el.style.transform = 'scale(1.1)';
+                        el.style.transform = 'scale(1.2)';
                         el.style.cursor = 'pointer';
+                        el.style.zIndex = '20';
                     } else {
                         el.style.border = '2px solid white';
                         el.style.transform = 'scale(1)';
                         el.style.cursor = 'default';
-                        if (i < 4) el.style.opacity = '1';
-                        else el.style.opacity = '0.9'; // Dino
+                        el.style.zIndex = '10';
                     }
                 });
             }
 
             rollDice() {
                 if (this.waitingRoll) {
-                    // Check turn validity (PVP allows P2 to roll)
-                    if (this.gameMode === 'pve' && this.turn !== 1) return; // Prevent rolling for Dino
+                    if (this.gameMode === 'pve' && this.turn !== 1) return;
 
-                    if (this.gameMode === 'hybrid') {
-                        // Show Manual Input
+                    if (this.gameMode === 'hybrid' || this.gameMode === 'hybrid4') {
                         this.diceInput.style.display = 'flex';
-                        return; // Wait for submitDice
+                        return;
                     }
 
                     this.diceVal = Math.floor(Math.random() * 6) + 1;
@@ -4974,7 +5671,6 @@
                 this.waitingRoll = false;
                 this.statusEl.textContent = `Has sacado un ${val}`;
 
-                // Check if moves possible
                 const playerToCheck = this.turn;
                 if (!this.canMoveAny(playerToCheck)) {
                     setTimeout(() => {
@@ -4982,32 +5678,37 @@
                         this.nextTurn();
                     }, 1000);
                 } else {
-                    // Wait for click
                     this.statusEl.textContent = 'Mueve tu ficha...';
+                    this.updatePieces(); // Refresh highlights
                 }
             }
 
+            canMoveAny(player) {
+                const start = (player - 1) * 4;
+                for (let i = start; i < start + 4; i++) {
+                    if (this.validateMove(i, this.diceVal) !== false) return true;
+                }
+                return false;
+            }
+
             clickPiece(idx) {
-                if (this.waitingRoll || this.turn !== 1 && this.gameMode === 'pve') return;
-                // Strict Turn Check for PVP
-                if (this.gameMode !== 'pve' && this.turn === 1 && idx >= 4) return;
-                if (this.gameMode !== 'pve' && this.turn === 2 && idx < 4) return;
+                const pieceOwner = Math.floor(idx / 4) + 1;
+
+                if (this.turn !== pieceOwner) return;
+                if (this.waitingRoll) return;
+                if (this.gameMode === 'pve' && pieceOwner !== 1) return;
 
                 if (this.tryMove(idx, this.diceVal)) {
-                    // Store val for check before clearing
                     const rolled = this.diceVal;
                     this.diceVal = null;
                     this.waitingRoll = true;
 
                     this.checkWin();
                     if (!this.gameOver) {
-                        if (rolled === 6) { // Check stored value
+                        if (rolled === 6) {
                             this.waitingRoll = true;
-                            this.statusEl.textContent = '¡Sacas un 6! Tira otra vez.';
-                            // For Hybrid/PVP, we need to ensure dice is clickable again
-                            if (this.gameMode === 'hybrid') {
-                                // Keep roll enabled
-                            }
+                            this.statusEl.textContent = '¡6! Repite turno 🎲';
+                            this.updatePieces();
                         } else {
                             this.nextTurn();
                         }
@@ -5021,7 +5722,6 @@
                 const newPos = this.validateMove(pIdx, steps);
                 if (newPos === false) return false;
 
-                // Execute
                 this.pieces[pIdx] = newPos;
                 this.updatePieces();
                 app.audio.playPop();
@@ -5029,115 +5729,85 @@
             }
 
             validateMove(pIdx, steps) {
-                let pos = this.pieces[pIdx];
-                let newPos = pos;
-                const isRed = pIdx < 4;
+                const pos = this.pieces[pIdx];
+                const playerNum = Math.floor(pIdx / 4); // 0,1,2,3
 
                 // 1. Leave Home
                 if (pos === 0) {
                     if (steps === 5) {
-                        // Move to Start. Red Start = 1. Yellow Start = 11.
-                        return isRed ? 1 : 11;
+                        const starts = [1, 11, 21, 31];
+                        return starts[playerNum];
                     } else {
                         return false;
                     }
                 }
 
-                // 2. In Goal Already
+                // 2. In Goal Already (>100)
                 if (pos > 100) {
-                    // Red Goal: 100+, Yellow Goal: 200+
-                    const goalMax = isRed ? 107 : 207; // 100 + 7 steps logic?
-                    // Let's assume path logic led to 100+ being safely inside.
-                    // If we just add steps, we need to check limit.
-                    // Original code: if (pos + steps <= 105) ...
-                    // Let's standardise: 100-104 are steps. 105 is center?
-                    // Code said: if (pos + steps <= 105)
-                    if (pos + steps <= (isRed ? 106 : 206)) return pos + steps;
-                    else return false;
+                    const stepInGoal = pos - 100;
+                    if (stepInGoal + steps <= 6) return pos + steps;
+                    return false;
                 }
 
                 // 3. Normal Path
-                // Logic for Red (Start 1, Goal Entry @ 40)
-                if (isRed) {
-                    if (pos + steps > 40) {
-                        // Enter Goal?
-                        let diff = (pos + steps) - 40;
-                        if (diff <= 5) return 100 + diff;
-                        else return false; // Overshoot
-                    } else {
-                        return pos + steps;
-                    }
-                } else {
-                    // Yellow (Start 11, Goal Entry @ 10)
-                    // Wrap 40->1.
-                    let raw = pos + steps;
-                    // Check wrap
-                    if (pos <= 40 && raw > 40) raw -= 40;
+                // Robust Generic Logic:
+                const absStart = [1, 11, 21, 31][playerNum];
 
-                    // Goal Logic for Yellow: Enters at 10.
-                    // If we were <= 10 and now > 10? No, we start at 11.
-                    // We approach 10 from 9, 8... No, 1..10.
-                    // If pos is in range 1..10 (after wrap) and we pass 10.
+                // Current Distance from Start (0..39)
+                // Need to handle wrap logic correctly for modulo arithmetic on negative numbers if necessary,
+                // but here numbers are positive.
+                // pos 1..40. Start 1..40.
+                // Distance = (pos - absStart + 40) % 40
 
-                    // Case: pos=8, steps=5 -> 13. >10.
-                    // But wait, Yellow starts at 11. Moves 11..40, then 1..10.
-                    // So if pos <= 10 (meaning we wrapped) and pos+steps > 10
-                    if (pos <= 10 && pos + steps > 10) {
-                        let diff = (pos + steps) - 10;
-                        if (diff <= 5) return 200 + diff;
-                        else return false;
-                    }
+                // Example: Red Start 1. Pos 1. Dist = 0.
+                // Example: Yel Start 11. Pos 11. Dist = 0.
+                // Example: Yel Pos 10. Dist = (10 - 11 + 40)%40 = 39. Correct (just before entry).
 
-                    // Otherwise regular move
-                    return raw;
+                let dist = (pos - absStart + 40) % 40;
+                let nextDist = dist + steps;
+
+                if (nextDist >= 40) {
+                    // Entering Goal
+                    const excess = nextDist - 40; // 0..5 (Steps into goal)
+                    if (excess < 6) return 100 + (excess + 1);
+                    return false; // Overshoot
                 }
+
+                // Just moving on path (Wrap 40 -> 1)
+                let nextPos = pos + steps;
+                if (nextPos > 40) nextPos -= 40;
+                return nextPos;
             }
 
-            canMoveAny(player) {
-                // Check if any piece can move with current dice
-                const start = player === 1 ? 0 : 4;
-                for (let i = start; i < start + 4; i++) {
-                    if (this.validateMove(i, this.diceVal) !== false) return true;
-                }
-                return false;
+            updateTurnUI() {
+                const colors = ['#fad390', '#fff9c4', '#a5d6a7', '#81d4fa'];
+                const names = ['Rojo 🔴', 'Amarillo 🟡', 'Verde 🟢', 'Azul 🔵'];
+
+                this.statusEl.textContent = `Turno ${names[this.turn - 1]}`;
+                this.c.style.background = colors[this.turn - 1];
             }
 
             nextTurn() {
-                this.turn = (this.turn === 1) ? 2 : 1;
-                this.diceEl.textContent = '🎲';
+                const maxP = (this.gameMode === 'pvp4' || this.gameMode === 'hybrid4') ? 4 : 2;
+                this.turn = (this.turn % maxP) + 1;
 
-                if (this.turn === 2) {
-                    if (this.gameMode === 'pve') {
-                        this.statusEl.textContent = 'Dino tira...';
-                        setTimeout(() => this.dinoAI(), 1000);
-                    } else {
-                        // PVP or Hybrid
-                        this.waitingRoll = true;
-                        this.statusEl.textContent = 'Turno Amarillo 🟡';
-                        this.c.style.background = '#fff9c4'; // Subtle Hint
-                    }
+                this.diceEl.textContent = '🎲';
+                this.updateTurnUI();
+
+                if (this.gameMode === 'pve' && this.turn === 2) {
+                    this.statusEl.textContent = 'Dino tira...';
+                    setTimeout(() => this.dinoAI(), 1000);
                 } else {
                     this.waitingRoll = true;
-                    this.statusEl.textContent = 'Turno Rojo 🔴';
-                    this.c.style.background = '#fad390'; // Subtle Hint
                 }
             }
 
             dinoAI() {
-                // Roll
                 this.diceVal = Math.floor(Math.random() * 6) + 1;
                 this.diceEl.textContent = '🎲 ' + this.diceVal;
 
-                // Move Priority:
-                // 1. Leave Home (if 5)
-                // 2. Capture (not impl yet)
-                // 3. Enter Goal
-                // 4. Advance Furthest
-
                 setTimeout(() => {
                     let moved = false;
-                    // Try pieces 4,5,6,7
-                    // Shuffle order to vary
                     const pIds = [4, 5, 6, 7].sort(() => Math.random() - 0.5);
 
                     for (let id of pIds) {
@@ -5161,32 +5831,34 @@
             }
 
             checkWin() {
-                const redWins = this.pieces.slice(0, 4).every(p => p > 100);
-                const yellowWins = this.pieces.slice(4, 8).every(p => p > 200);
+                for(let p=0; p<4; p++) {
+                    const start = p*4;
+                    // Check if all 4 pieces are in goal (>100)
+                    const wins = this.pieces.slice(start, start+4).every(pos => pos > 100);
 
-                if (redWins || yellowWins) {
-                    this.gameOver = true;
-                    this.statusEl.textContent = redWins ? '¡GANASTE! 🔴🏆' : '¡Dino Gana! 🦖';
-                    if (redWins) {
+                    if (wins) {
+                        this.gameOver = true;
+                        const names = ['Rojo 🔴', 'Amarillo 🟡', 'Verde 🟢', 'Azul 🔵'];
+                        this.statusEl.textContent = `¡${names[p]} GANA! 🏆`;
+
                         app.audio.playWin();
-                        app.addScore(40);
-                    } else {
-                        app.audio.playError();
-                    }
+                        if (p === 0 && this.gameMode === 'pve') app.addScore(40);
 
-                    setTimeout(() => {
-                        const ov = document.createElement('div');
-                        ov.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:100; border-radius:10px;';
-                        ov.innerHTML = `
-                            <div style="font-size:5em;">${redWins ? '🏆' : '🦖'}</div>
-                            <h2 style="color:white; margin:20px;">${this.statusEl.textContent}</h2>
-                            <div style="display:flex; gap:20px; flex-direction:column;">
-                                <button class="mode-btn kid" style="background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
-                                <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
-                            </div>
-                        `;
-                        this.c.appendChild(ov);
-                    }, 1500);
+                        setTimeout(() => {
+                            const ov = document.createElement('div');
+                            ov.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:100; border-radius:10px;';
+                            ov.innerHTML = `
+                                <div style="font-size:5em;">🏆</div>
+                                <h2 style="color:white; margin:20px;">${names[p]} GANA</h2>
+                                <div style="display:flex; gap:20px; flex-direction:column;">
+                                    <button class="mode-btn kid" style="background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
+                                    <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
+                                </div>
+                            `;
+                            this.c.appendChild(ov);
+                        }, 1500);
+                        return;
+                    }
                 }
             }
 
@@ -5199,9 +5871,10 @@
          * - Rules: Oca, Puente, Posada, Pozo, Laberinto, Cárcel, Muerte.
          */
         class GooseGame {
-            constructor(data, container) {
+            constructor(data, container, savedState) {
                 this.data = data;
                 this.c = container;
+                this.savedState = savedState;
                 this.app = window.app;
                 this.pieces = [1, 1]; // P1 (User/Dino), P2 (AI/Human)
                 this.turn = 0; // 0 = P1, 1 = P2
@@ -5231,9 +5904,133 @@
                 this.timeouts.push(id);
             }
 
+            injectStyles() {
+                if (document.getElementById('goose-game-style')) return;
+                const s = document.createElement('style');
+                s.id = 'goose-game-style';
+                s.innerHTML = `
+                    /* --- GOOSE GAME STYLES --- */
+                    .goose-container {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        background: #ecf0f1;
+                        width: 100%;
+                        height: 100%; /* Fill container */
+                        justify-content: flex-start;
+                        font-family: "Fredoka", sans-serif;
+                        padding: 5px;
+                        box-sizing: border-box;
+                        overflow-y: auto; /* Allow internal scroll if needed */
+                        -webkit-overflow-scrolling: touch;
+                    }
+
+                    .goose-header {
+                        width: 95%;
+                        max-width: 500px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 5px;
+                        background: white;
+                        padding: 8px;
+                        border-radius: 15px;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                        flex-shrink: 0;
+                    }
+
+                    .goose-board {
+                        display: grid;
+                        grid-template-columns: repeat(8, minmax(0, 1fr));
+                        grid-template-rows: repeat(8, minmax(0, 1fr));
+                        gap: 2px;
+                        box-sizing: border-box;
+                        background: #2c3e50;
+                        border: 4px solid #34495e;
+                        border-radius: 10px;
+                        position: relative;
+                        padding: 2px;
+
+                        /* Responsive Sizing v17.31 */
+                        width: 95%;
+                        max-width: 55vh; /* Limit width based on viewport height (safe proxy for container) */
+                        min-width: 280px; /* Minimum playable size */
+
+                        max-height: calc(100% - 90px); /* Leave room for header */
+                        aspect-ratio: 1/1;
+
+                        /* Flex centering */
+                        margin: 0 auto 10px auto;
+
+                        /* Ensure it shrinks */
+                        min-height: 0;
+                    }
+
+                    .goose-board > div {
+                        overflow: hidden;
+                        font-size: clamp(0.6em, 2.5vmin, 1.2em);
+                    }
+                    .goose-board > div > div {
+                        max-width: 100%;
+                        overflow: hidden;
+                    }
+
+                    /* --- MOBILE LANDSCAPE OPTIMIZATIONS --- */
+                    @media (orientation: landscape) and (max-height: 600px) {
+                        .container {
+                            margin-top: 0px !important;
+                        }
+
+                        .goose-container {
+                            flex-direction: row;
+                            justify-content: center;
+                            align-items: center;
+                            gap: 10px;
+                            padding: 2px;
+                        }
+
+                        .goose-header {
+                            width: 120px;
+                            flex-direction: column;
+                            height: auto;
+                            max-height: 98%;
+                            overflow-y: auto;
+                            padding: 5px;
+                            gap: 10px;
+                            margin-bottom: 0;
+                            margin-right: 5px;
+                        }
+
+                        .goose-header > div {
+                            flex-direction: column;
+                            align-items: center;
+                            text-align: center;
+                        }
+
+                        .goose-board {
+                            width: auto;
+                            height: auto;
+                            max-height: 90vh;
+                            max-width: calc(100% - 130px);
+                            min-width: 200px;
+                            aspect-ratio: 1/1;
+                        }
+
+                        #gameArea {
+                            height: auto !important;
+                            min-height: 0 !important;
+                            flex-grow: 1; /* Allow taking space */
+                        }
+                    }
+                `;
+                document.head.appendChild(s);
+            }
+
             init() {
+                this.injectStyles();
                 this.c.innerHTML = '';
-                this.c.style.cssText = 'display:flex; flex-direction:column; align-items:center; background:#ecf0f1; height:100%; justify-content:center; overflow:hidden; font-family: "Fredoka", sans-serif;';
+                this.c.classList.add('goose-container'); // Add class
+                this.c.style.cssText = ''; // Clear inline
 
                 // Title
                 const title = document.createElement('h2');
@@ -5265,22 +6062,69 @@
                 btnContainer.appendChild(btn1);
                 btnContainer.appendChild(btn2);
                 btnContainer.appendChild(btn3);
+
+                if (this.savedState) {
+                    const btnResume = document.createElement('button');
+                    btnResume.className = 'mode-btn kid';
+                    btnResume.style.background = '#2ecc71';
+                    btnResume.innerHTML = '📂 Continuar<br><span style="font-size:0.6em">Partida Guardada</span>';
+                    btnResume.onclick = () => this.resumeGame();
+                    btnContainer.appendChild(btnResume);
+                }
+
                 this.c.appendChild(btnContainer);
+
+                // Exit Button
+                const exit = document.createElement('button');
+                exit.textContent = '🏠 Salir';
+                exit.className = 'mode-btn kid';
+                exit.style.marginTop = '40px';
+                exit.onclick = () => this.app.nav.goDashboard();
+                this.c.appendChild(exit);
             }
 
-            startGame(mode) {
+            resumeGame() {
+                if (this.savedState) {
+                    this.gameMode = this.savedState.gameMode || 'pve';
+                    this.pieces = this.savedState.pieces || [1, 1];
+                    this.turn = this.savedState.turn || 0;
+                    this.skip = this.savedState.skip || [0, 0];
+                    this.startGame(this.gameMode, true);
+                }
+            }
+
+            save() {
+                const state = {
+                    gameMode: this.gameMode,
+                    pieces: this.pieces,
+                    turn: this.turn,
+                    skip: this.skip
+                };
+                window.app.saveGame('goose', state);
+            }
+
+            startGame(mode, isRestore = false) {
                 this.gameMode = mode;
                 this.c.innerHTML = '';
                 this.waitingRoll = true;
 
                 // 1. Cabecera
                 const h = document.createElement('div');
-                h.style.cssText = 'width:95%; max-width:500px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; background:white; padding:10px; border-radius:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); flex-shrink:0;';
+                h.className = 'goose-header';
+                // h.style.cssText = ''; // Removed inline styles in favor of class
 
                 this.statusEl = document.createElement('h3');
                 this.statusEl.innerText = (mode === 'hybrid') ? 'Tira tu dado' : '¡Tira el dado!';
                 this.statusEl.style.fontSize = '1.1em';
                 this.statusEl.style.margin = '0';
+
+                if (isRestore && this.turn !== 0 && this.gameMode === 'pve') {
+                    // If resuming and it was AI turn?
+                    // Let's just reset to waiting for roll to avoid instant AI move confusion or just set text
+                    this.statusEl.innerText = `Turno ${this.turn===0 ? 'Dino 🦕' : 'Oca 🦆'}`;
+                } else if (isRestore) {
+                     this.statusEl.innerText = `Turno ${this.turn===0 ? 'Dino 🦕' : ((this.gameMode === 'pve') ? 'Oca 🦆' : 'J2 🦖')}`;
+                }
 
                 this.diceEl = document.createElement('div');
                 this.diceEl.innerText = '🎲';
@@ -5288,7 +6132,39 @@
                 this.diceEl.style.cursor = 'pointer';
                 this.diceEl.onclick = () => this.rollDice();
 
-                h.append(this.statusEl, this.diceEl);
+                // Left Control Group
+                const leftDiv = document.createElement('div');
+                leftDiv.style.display = 'flex';
+                leftDiv.style.alignItems = 'center';
+                leftDiv.style.gap = '5px';
+
+                // Back Button (New)
+                const backBtn = document.createElement('button');
+                backBtn.innerText = '🔙';
+                backBtn.style.cssText = 'background:none; border:none; font-size:2em; cursor:pointer;';
+                backBtn.onclick = () => {
+                    if(confirm('¿Salir al menú de la Oca?')) {
+                        this.cleanup();
+                        this.init();
+                    }
+                };
+
+                // Save Button
+                const saveBtn = document.createElement('button');
+                saveBtn.innerText = '💾';
+                saveBtn.style.cssText = 'background:none; border:none; font-size:2em; cursor:pointer;';
+                saveBtn.onclick = () => this.save();
+
+                leftDiv.append(backBtn, saveBtn);
+
+                // Wrap status and dice
+                const rightDiv = document.createElement('div');
+                rightDiv.style.display = 'flex';
+                rightDiv.style.alignItems = 'center';
+                rightDiv.style.gap = '10px';
+                rightDiv.append(this.statusEl, this.diceEl);
+
+                h.append(leftDiv, rightDiv);
                 this.c.append(h);
 
                 // Manual Input (Hidden)
@@ -5315,17 +6191,7 @@
 
                 // 2. Tablero
                 this.boardEl = document.createElement('div');
-                this.boardEl.style.cssText = `
-                    display: grid;
-                    grid-template-columns: repeat(8, 1fr);
-                    grid-template-rows: repeat(8, 1fr);
-                    gap: 2px;
-                    width: 95vmin; height: 95vmin;
-                    max-width: 500px; max-height: 500px;
-                    background: #2c3e50; border: 4px solid #34495e;
-                    border-radius: 10px; position: relative;
-                    padding: 2px;
-                `;
+                this.boardEl.className = 'goose-board';
                 this.c.append(this.boardEl);
 
                 // 3. Render
@@ -5335,7 +6201,15 @@
 
                 // 4. Robustez
                 if (window.ResizeObserver) {
-                    this.ro = new ResizeObserver(() => this.updatePositions());
+                    this.ro = new ResizeObserver(() => {
+                        if (!this.ticking) {
+                            window.requestAnimationFrame(() => {
+                                this.updatePositions();
+                                this.ticking = false;
+                            });
+                            this.ticking = true;
+                        }
+                    });
                     this.ro.observe(this.boardEl);
                 } else {
                     this.wait(() => this.updatePositions(), 500);
@@ -5496,9 +6370,19 @@
 
                     this.pieces[this.turn] = next;
                     this.updatePositions();
-                    this.waitingRoll = true; // Auto roll? usually Rules say roll again.
-                    // Simplified: Just move, keep turn? Or just move.
-                    // Code before said: waitingRoll = true; return; -> User rolls again.
+
+                    // If AI (PVE Turn 1), Auto Roll again
+                    if (this.gameMode === 'pve' && this.turn === 1) {
+                        this.wait(() => {
+                            let val = Math.floor(Math.random()*6)+1;
+                            this.diceEl.innerText = '🎲 ' + val;
+                            this.app.audio.speak('Oca saca ' + val);
+                            this.processRoll(val);
+                        }, 1000);
+                    } else {
+                        // Human or PVP: Wait for click
+                        this.waitingRoll = true;
+                    }
                     return;
                 }
 
@@ -5543,6 +6427,7 @@
                 if (this.ro) this.ro.disconnect();
                 this.timeouts.forEach(clearTimeout);
                 this.timeouts = [];
+                this.c.classList.remove('goose-container');
             }
         }
 
@@ -5550,28 +6435,14 @@
          * ♟️ CHESS GAME (Ajedrez Simplified)
          */
         class ChessGame {
-            constructor(data, container) {
+            constructor(data, container, savedState) {
                 this.data = data;
                 this.c = container;
+                this.savedState = savedState;
                 this.turn = 'white'; // white | black
                 this.selected = null; // {r, c}
                 this.moves = []; // Valid moves for selected
                 this.gameOver = false;
-
-                // Representation:
-                // lower = black (dino), UPPER = WHITE (Player)
-                // r,n,b,q,k,p
-                // Board 8x8
-                this.board = [
-                    ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-                    ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-                    ['', '', '', '', '', '', '', ''],
-                    ['', '', '', '', '', '', '', ''],
-                    ['', '', '', '', '', '', '', ''],
-                    ['', '', '', '', '', '', '', ''],
-                    ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-                    ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
-                ];
 
                 this.piecesMap = {
                     'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟',
@@ -5592,7 +6463,69 @@
                 const title = document.createElement('h2');
                 title.textContent = '♟️ Ajedrez 🦖';
                 title.style.color = '#ecf0f1';
+                title.style.marginBottom = '20px';
                 this.c.appendChild(title);
+
+                const btnPlay = document.createElement('button');
+                btnPlay.className = 'mode-btn kid';
+                btnPlay.style.background = '#e74c3c';
+                btnPlay.textContent = '🎮 Jugar';
+                btnPlay.onclick = () => this.startGame(false);
+                this.c.appendChild(btnPlay);
+
+                if (this.savedState) {
+                    const btnResume = document.createElement('button');
+                    btnResume.className = 'mode-btn kid';
+                    btnResume.style.background = '#2ecc71';
+                    btnResume.style.marginTop = '10px';
+                    btnResume.textContent = '📂 Continuar';
+                    btnResume.onclick = () => this.resumeGame();
+                    this.c.appendChild(btnResume);
+                }
+
+                const exit = document.createElement('button');
+                exit.textContent = '🏠 Salir';
+                exit.className = 'mode-btn kid';
+                exit.style.marginTop = '20px';
+                exit.onclick = () => window.app.nav.goDashboard();
+                this.c.appendChild(exit);
+            }
+
+            resumeGame() {
+                this.board = this.savedState.board;
+                this.turn = this.savedState.turn;
+                this.startGame(true);
+            }
+
+            save() {
+                const state = {
+                    board: this.board,
+                    turn: this.turn
+                };
+                window.app.saveGame('chess', state);
+            }
+
+            startGame(isRestore) {
+                this.c.innerHTML = '';
+
+                // Controls
+                const controls = document.createElement('div');
+                controls.style.cssText = 'display:flex; justify-content:space-between; width:95%; max-width:600px; margin-bottom:5px;';
+
+                const btnBack = document.createElement('button');
+                btnBack.textContent = '🔙';
+                btnBack.style.cssText = 'background:none; border:none; font-size:1.5em; cursor:pointer; margin-right: 10px;';
+                btnBack.onclick = () => this.init();
+
+                const btnSave = document.createElement('button');
+                btnSave.textContent = '💾 Guardar';
+                btnSave.className = 'mode-btn kid';
+                btnSave.style.cssText = 'padding: 5px 15px; font-size: 1em; background: #3498db;';
+                btnSave.onclick = () => this.save();
+
+                controls.appendChild(btnBack);
+                controls.appendChild(btnSave);
+                this.c.appendChild(controls);
 
                 const boardEl = document.createElement('div');
                 boardEl.style.cssText = `
@@ -5602,6 +6535,21 @@
                     border: 5px solid #2c3e50;
                 `;
                 this.c.appendChild(boardEl);
+
+                // Init Board State if not restoring
+                if (!isRestore) {
+                    this.board = [
+                        ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+                        ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+                        ['', '', '', '', '', '', '', ''],
+                        ['', '', '', '', '', '', '', ''],
+                        ['', '', '', '', '', '', '', ''],
+                        ['', '', '', '', '', '', '', ''],
+                        ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+                        ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+                    ];
+                    this.turn = 'white';
+                }
 
                 this.cells = [];
                 for (let r = 0; r < 8; r++) {
@@ -5625,18 +6573,14 @@
 
                 this.statusEl = document.createElement('div');
                 this.statusEl.style.cssText = 'color:white; margin-top:10px; font-size:1.5em;';
-                this.statusEl.textContent = 'Tu turno (Blancas)';
+                this.statusEl.textContent = this.turn === 'white' ? 'Tu turno (Blancas)' : 'Dino piensa...';
                 this.c.appendChild(this.statusEl);
 
-                // Exit
-                const exit = document.createElement('button');
-                exit.textContent = '🏠 Salir';
-                exit.className = 'mode-btn kid';
-                exit.style.marginTop = '10px';
-                exit.onclick = () => app.nav.goDashboard();
-                this.c.appendChild(exit);
-
                 this.render();
+
+                if (isRestore && this.turn === 'black') {
+                    setTimeout(() => this.dinoAI(), 500);
+                }
             }
 
             render() {
@@ -5857,6 +6801,329 @@
             cleanup() { }
         }
 
+        /**
+         * 🤖 ROBOTICS GAME (Coding Logic)
+         */
+        class RoboticsGame {
+            constructor(data, container) {
+                this.data = data;
+                this.c = container;
+                this.level = 0;
+                this.program = [];
+                this.running = false;
+                this.speed = 500; // ms per step
+
+                // 0=Empty, 1=Path, 2=Start, 3=Goal, 4=Obstacle
+                this.levels = [
+                    {
+                        grid: [
+                            [0,0,0,0,0],
+                            [0,2,1,3,0],
+                            [0,0,0,0,0],
+                            [0,0,0,0,0],
+                            [0,0,0,0,0]
+                        ],
+                        startDir: 1 // 0=N, 1=E, 2=S, 3=W
+                    },
+                    {
+                        grid: [
+                            [0,0,0,0,0],
+                            [0,2,1,0,0],
+                            [0,0,1,0,0],
+                            [0,0,3,0,0],
+                            [0,0,0,0,0]
+                        ],
+                        startDir: 1
+                    },
+                    {
+                        grid: [
+                            [0,0,3,0,0],
+                            [0,0,1,0,0],
+                            [0,1,1,0,0],
+                            [0,2,0,0,0],
+                            [0,0,0,0,0]
+                        ],
+                        startDir: 1
+                    },
+                    {
+                        // Level 4: ZigZag
+                        grid: [
+                            [2,1,1,0,0],
+                            [0,0,1,0,0],
+                            [0,0,1,1,1],
+                            [0,0,0,0,1],
+                            [0,0,0,0,3]
+                        ],
+                        startDir: 1
+                    },
+                    {
+                        // Level 5: La Vuelta (U-Turn)
+                        grid: [
+                            [1,1,1,1,3],
+                            [1,0,0,0,0],
+                            [1,0,0,0,0],
+                            [1,0,0,0,0],
+                            [2,0,0,0,0]
+                        ],
+                        startDir: 0 // Up
+                    },
+                    {
+                        // Level 6: Espiral
+                        grid: [
+                            [2,1,1,1,1],
+                            [0,0,0,0,1],
+                            [1,3,0,0,1],
+                            [1,0,0,0,1],
+                            [1,1,1,1,1]
+                        ],
+                        startDir: 1 // Right
+                    }
+                ];
+
+                this.robot = { x: 0, y: 0, dir: 1 };
+                this.init();
+            }
+
+            init() {
+                this.currentLevelData = this.levels[this.level];
+                this.resetRobot();
+                this.program = [];
+                this.render();
+            }
+
+            resetRobot() {
+                const grid = this.currentLevelData.grid;
+                for(let r=0; r<grid.length; r++) {
+                    for(let c=0; c<grid[0].length; c++) {
+                        if(grid[r][c] === 2) {
+                            this.robot.x = c;
+                            this.robot.y = r;
+                        }
+                    }
+                }
+                this.robot.dir = this.currentLevelData.startDir;
+            }
+
+            render() {
+                this.c.innerHTML = '';
+                this.c.style.background = '#2c3e50';
+                this.c.style.display = 'flex';
+                this.c.style.flexDirection = 'column';
+                this.c.style.alignItems = 'center';
+                this.c.style.justifyContent = 'flex-start';
+                this.c.style.padding = '10px';
+
+                // Header & Level Nav
+                const header = document.createElement('div');
+                header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; width:100%; max-width:400px; margin-bottom:10px;';
+
+                const btnPrev = document.createElement('button');
+                btnPrev.innerHTML = '⬅️';
+                btnPrev.style.cssText = `background:none; border:none; font-size:2em; cursor:pointer; opacity: ${this.level > 0 ? 1 : 0.3};`;
+                btnPrev.onclick = () => { if(this.level > 0) { this.level--; this.init(); } };
+
+                const h = document.createElement('h2');
+                h.innerHTML = `🤖 Nivel ${this.level + 1}`;
+                h.style.color = '#00d2d3';
+                h.style.margin = '0';
+
+                const btnNext = document.createElement('button');
+                btnNext.innerHTML = '➡️';
+                btnNext.style.cssText = `background:none; border:none; font-size:2em; cursor:pointer; opacity: ${this.level < this.levels.length - 1 ? 1 : 0.3};`;
+                btnNext.onclick = () => { if(this.level < this.levels.length - 1) { this.level++; this.init(); } };
+
+                header.appendChild(btnPrev);
+                header.appendChild(h);
+                header.appendChild(btnNext);
+                this.c.appendChild(header);
+
+                // Grid Container
+                const gridEl = document.createElement('div');
+                gridEl.style.cssText = `
+                    display: grid;
+                    grid-template-columns: repeat(5, 1fr);
+                    gap: 2px;
+                    width: 90vmin; max-width: 400px;
+                    aspect-ratio: 1/1;
+                    background: #34495e;
+                    border: 4px solid #00d2d3;
+                    border-radius: 10px;
+                    margin-bottom: 20px;
+                `;
+
+                const grid = this.currentLevelData.grid;
+                for(let r=0; r<grid.length; r++) {
+                    for(let c=0; c<grid[0].length; c++) {
+                        const cell = document.createElement('div');
+                        cell.style.cssText = `
+                            background: ${grid[r][c] === 0 ? '#34495e' : '#576574'};
+                            display: flex; align-items: center; justify-content: center;
+                            font-size: 2em; border-radius: 4px;
+                        `;
+
+                        if(grid[r][c] === 3) cell.innerHTML = '🔋'; // Goal
+
+                        // Robot
+                        if(this.robot.x === c && this.robot.y === r) {
+                            cell.innerHTML = '<span>🤖</span>';
+                            const rot = this.robot.dir * 90;
+                            cell.firstChild.style.transform = `rotate(${rot}deg)`;
+                            cell.firstChild.style.display = 'block';
+                        }
+
+                        gridEl.appendChild(cell);
+                    }
+                }
+                this.c.appendChild(gridEl);
+
+                // Queue Display
+                const queueEl = document.createElement('div');
+                queueEl.style.cssText = `
+                    width: 95%; min-height: 50px; background: #222;
+                    border-radius: 5px; padding: 5px; display: flex; gap: 5px;
+                    overflow-x: auto; margin-bottom: 10px; color: white; align-items: center;
+                `;
+                if(this.program.length === 0) queueEl.innerHTML = '<span style="color:#666">...</span>';
+                this.program.forEach((cmd, i) => {
+                    const icon = this.getIcon(cmd);
+                    const sp = document.createElement('span');
+                    sp.textContent = icon;
+                    sp.style.cssText = 'background:#555; padding:5px; border-radius:3px;';
+                    queueEl.appendChild(sp);
+                });
+                this.c.appendChild(queueEl);
+
+                // Controls
+                const controls = document.createElement('div');
+                controls.style.cssText = `display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; width: 95%; max-width: 400px;`;
+
+                this.createBtn(controls, '⬆️', '#2ecc71', () => this.addCmd('F'));
+                this.createBtn(controls, '↺', '#f1c40f', () => this.addCmd('L'));
+                this.createBtn(controls, '↻', '#f1c40f', () => this.addCmd('R'));
+                this.createBtn(controls, '⌫', '#e67e22', () => { this.program.pop(); this.render(); }); // Backspace
+                this.createBtn(controls, '🗑️', '#e74c3c', () => { this.program = []; this.render(); }); // Clear All
+
+                this.c.appendChild(controls);
+
+                // Run Button
+                const runBtn = document.createElement('button');
+                runBtn.textContent = this.running ? '🏃 Ejecutando...' : '▶️ EJECUTAR';
+                runBtn.className = 'mode-btn kid';
+                runBtn.style.cssText = `margin-top: 15px; background: ${this.running ? '#7f8c8d' : '#00d2d3'}; width: 95%; max-width: 400px;`;
+                runBtn.onclick = () => this.runProgram();
+                this.c.appendChild(runBtn);
+
+                // Exit
+                const exit = document.createElement('button');
+                exit.textContent = '🏠 Salir';
+                exit.style.cssText = 'background:none; border:none; color:white; margin-top:10px; font-size:1.2em;';
+                exit.onclick = () => window.app.nav.goDashboard();
+                this.c.appendChild(exit);
+            }
+
+            createBtn(parent, text, color, fn) {
+                const b = document.createElement('button');
+                b.textContent = text;
+                b.style.cssText = `
+                    background: ${color}; border: none; border-radius: 10px;
+                    font-size: 2em; padding: 10px; cursor: pointer; color: white;
+                    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+                `;
+                b.onclick = () => { if(!this.running) fn(); };
+                parent.appendChild(b);
+            }
+
+            getIcon(cmd) {
+                if(cmd === 'F') return '⬆️';
+                if(cmd === 'L') return '↺';
+                if(cmd === 'R') return '↻';
+                return '?';
+            }
+
+            addCmd(cmd) {
+                if(this.program.length < 10) {
+                    this.program.push(cmd);
+                    this.render();
+                }
+            }
+
+            async runProgram() {
+                if(this.running || this.program.length === 0) return;
+                this.running = true;
+                this.resetRobot();
+                this.render();
+
+                for(let i=0; i<this.program.length; i++) {
+                    await new Promise(r => setTimeout(r, this.speed));
+                    const cmd = this.program[i];
+
+                    if(cmd === 'F') {
+                        let nx = this.robot.x;
+                        let ny = this.robot.y;
+                        if(this.robot.dir === 0) ny--;
+                        if(this.robot.dir === 1) nx++;
+                        if(this.robot.dir === 2) ny++;
+                        if(this.robot.dir === 3) nx--;
+
+                        if(this.isValid(nx, ny)) {
+                            this.robot.x = nx;
+                            this.robot.y = ny;
+                        } else {
+                            window.app.audio.playError();
+                        }
+                    }
+                    else if(cmd === 'L') {
+                        this.robot.dir = (this.robot.dir - 1 + 4) % 4;
+                    }
+                    else if(cmd === 'R') {
+                        this.robot.dir = (this.robot.dir + 1) % 4;
+                    }
+
+                    this.render();
+                    window.app.audio.playPop();
+                }
+
+                const grid = this.currentLevelData.grid;
+                if(grid[this.robot.y][this.robot.x] === 3) {
+                    window.app.audio.playWin();
+                    setTimeout(() => {
+                        this.level++;
+                        if(this.level >= this.levels.length) {
+                            this.winGame();
+                        } else {
+                            this.init();
+                        }
+                    }, 1000);
+                } else {
+                    window.app.audio.playError();
+                }
+
+                this.running = false;
+                this.render();
+            }
+
+            isValid(x, y) {
+                const grid = this.currentLevelData.grid;
+                if(y < 0 || y >= grid.length || x < 0 || x >= grid[0].length) return false;
+                if(grid[y][x] === 0) return false;
+                return true;
+            }
+
+            winGame() {
+                this.c.innerHTML = `
+                    <div style="text-align: center; color: white;">
+                        <div style="font-size: 6em;">🤖🏆</div>
+                        <h1>¡Programación Completada!</h1>
+                        <button class="mode-btn kid" style="margin-top:20px; background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
+                        <br>
+                        <button class="mode-btn kid" style="margin-top:10px;" onclick="app.nav.goDashboard()">🏠 Salir</button>
+                    </div>
+                `;
+                window.app.updateParentStats(30, 1, 'robotics');
+            }
+
+            cleanup() { this.running = false; }
+        }
         class App {
             constructor() {
                 this.nav = new Navigation();
@@ -5875,7 +7142,7 @@
                     movementStars: 0,
                     cinemaLocked: false,
                     magicWord: null,
-                    cinemaUrls: VIDEOS_DATA.map(v => v.url),
+                    cinemaUrls: VIDEOS_DATA.map(v => v.url), // Default age
                     ...(savedState || {})
                 };
 
@@ -5933,11 +7200,13 @@
                 document.addEventListener('keydown', unlockAudio);
             }
 
+
+
             renderActivities(mode = 'root') {
                 const grid = document.getElementById('activitiesGrid');
                 grid.innerHTML = '';
 
-                const ARCADE_KEYS = ['aventura', 'surf', 'soccer', 'kart', 'fighter', 'laberinto', 'unir_puntos', 'connect_four', 'checkers', 'parchis', 'oca', 'chess'];
+                const ARCADE_KEYS = ['aventura', 'surf', 'soccer', 'kart', 'fighter', 'laberinto', 'unir_puntos', 'connect_four', 'checkers', 'parchis', 'oca', 'chess', 'robotica'];
 
                 // 1. Render Specific Folder Header/Back Button?
                 if (mode === 'arcade') {
@@ -5996,6 +7265,25 @@
                 });
             }
 
+            saveGame(gameKey, state) {
+                try {
+                    localStorage.setItem(`savedGame_${gameKey}`, JSON.stringify(state));
+                    this.showToast('💾 Partida Guardada');
+                } catch (e) {
+                    console.error('Save failed', e);
+                    this.showToast('❌ Error al guardar');
+                }
+            }
+
+            getSavedGame(gameKey) {
+                try {
+                    const raw = localStorage.getItem(`savedGame_${gameKey}`);
+                    return raw ? JSON.parse(raw) : null;
+                } catch (e) {
+                    return null;
+                }
+            }
+
             startGame(key) {
                 this.currentGameKey = key; // Save for Replay
                 this.nav.show('game');
@@ -6006,6 +7294,9 @@
                 if (this.gameInstance && typeof this.gameInstance.cleanup === 'function') {
                     this.gameInstance.cleanup();
                 }
+
+                // Check for save
+                const savedState = this.getSavedGame(key);
 
                 if (data.type === 'movement') {
                     this.gameInstance = new MovementGame(data, canvas);
@@ -6028,15 +7319,17 @@
                 } else if (data.type === 'clock') {
                     this.gameInstance = new ClockGame(data, canvas);
                 } else if (data.type === 'connect_four') {
-                    this.gameInstance = new ConnectFourGame(data, canvas);
+                    this.gameInstance = new ConnectFourGame(data, canvas, savedState);
                 } else if (data.type === 'checkers') {
-                    this.gameInstance = new CheckersGame(data, canvas);
+                    this.gameInstance = new CheckersGame(data, canvas, savedState);
                 } else if (data.type === 'parchis') {
-                    this.gameInstance = new ParchisGame(data, canvas);
+                    this.gameInstance = new ParchisGame(data, canvas, savedState);
                 } else if (data.type === 'chess') {
-                    this.gameInstance = new ChessGame(data, canvas);
+                    this.gameInstance = new ChessGame(data, canvas, savedState);
                 } else if (data.type === 'goose') {
-                    this.gameInstance = new GooseGame(data, canvas);
+                    this.gameInstance = new GooseGame(data, canvas, savedState);
+                } else if (data.type === 'robotics') {
+                    this.gameInstance = new RoboticsGame(data, canvas);
                 } else {
                     this.gameInstance = new QuizGame(data, this);
                 }
@@ -6179,7 +7472,7 @@
             checkKidAccess() {
                 if (!this.state.magicWord) {
                     // No PIN set, enter directly
-                    this.renderActivities('root'); // Default to root
+                    this.renderActivities('root');
                     this.nav.show('kid-dash');
                     return;
                 }
