@@ -6069,9 +6069,16 @@
                 btn3.innerHTML = '🎲 Híbrido<br><span style="font-size:0.6em">Dado Real</span>';
                 btn3.onclick = () => this.startGame('hybrid');
 
+                const btn4 = document.createElement('button');
+                btn4.className = 'mode-btn kid';
+                btn4.style.background = '#8e44ad';
+                btn4.innerHTML = '🎲 Híbrido 4<br><span style="font-size:0.6em">4P Real</span>';
+                btn4.onclick = () => this.startGame('hybrid4');
+
                 btnContainer.appendChild(btn1);
                 btnContainer.appendChild(btn2);
                 btnContainer.appendChild(btn3);
+                btnContainer.appendChild(btn4);
 
                 if (this.savedState) {
                     const btnResume = document.createElement('button');
@@ -6098,7 +6105,7 @@
                     this.gameMode = this.savedState.gameMode || 'pve';
                     this.pieces = this.savedState.pieces || [1, 1];
                     this.turn = this.savedState.turn || 0;
-                    this.skip = this.savedState.skip || [0, 0];
+                    this.skip = this.savedState.skip || [0, 0, 0, 0]; // Accommodate 4
                     this.startGame(this.gameMode, true);
                 }
             }
@@ -6115,6 +6122,18 @@
 
             startGame(mode, isRestore = false) {
                 this.gameMode = mode;
+
+                // Initialize Pieces
+                if (!isRestore) {
+                    if (this.gameMode === 'hybrid4') {
+                        this.pieces = [1, 1, 1, 1];
+                        this.skip = [0, 0, 0, 0];
+                    } else {
+                        this.pieces = [1, 1];
+                        this.skip = [0, 0];
+                    }
+                }
+
                 this.c.innerHTML = '';
                 this.waitingRoll = true;
 
@@ -6124,7 +6143,7 @@
                 // h.style.cssText = ''; // Removed inline styles in favor of class
 
                 this.statusEl = document.createElement('h3');
-                this.statusEl.innerText = (mode === 'hybrid') ? 'Tira tu dado' : '¡Tira el dado!';
+                this.statusEl.innerText = (mode === 'hybrid' || mode === 'hybrid4') ? 'Tira tu dado' : '¡Tira el dado!';
                 this.statusEl.style.fontSize = '1.1em';
                 this.statusEl.style.margin = '0';
 
@@ -6267,19 +6286,15 @@
 
             createTokens() {
                 this.tokens = [];
-                // P1: Dino (🦕)
-                let t1 = document.createElement('div');
-                t1.innerText = '🦕';
-                t1.style.cssText = 'position:absolute; font-size:2.2em; transition:all 0.5s; z-index:20; pointer-events:none; filter: drop-shadow(0 0 2px white);';
-                this.boardEl.append(t1);
-                this.tokens.push(t1);
+                const icons = ['🦕', (this.gameMode === 'pve' ? '🦆' : '🦖'), '🐔', '🦄'];
 
-                // P2: Oca/Friend (🦆 or 🦖)
-                let t2 = document.createElement('div');
-                t2.innerText = (this.gameMode === 'pve') ? '🦆' : '🦖';
-                t2.style.cssText = 'position:absolute; font-size:2.2em; transition:all 0.5s; z-index:20; pointer-events:none; filter: drop-shadow(0 0 2px white);';
-                this.boardEl.append(t2);
-                this.tokens.push(t2);
+                this.pieces.forEach((_, i) => {
+                    let t = document.createElement('div');
+                    t.innerText = icons[i] || '👤';
+                    t.style.cssText = 'position:absolute; font-size:2.2em; transition:all 0.5s; z-index:20; pointer-events:none; filter: drop-shadow(0 0 2px white);';
+                    this.boardEl.append(t);
+                    this.tokens.push(t);
+                });
             }
 
             updatePositions() {
@@ -6320,7 +6335,7 @@
                 }
 
                 // Hybrid Mode
-                if (this.gameMode === 'hybrid') {
+                if (this.gameMode === 'hybrid' || this.gameMode === 'hybrid4') {
                     this.diceInput.style.display = 'flex';
                     return;
                 }
@@ -6412,11 +6427,18 @@
             }
 
             nextTurn() {
-                this.turn = this.turn === 0 ? 1 : 0;
+                const maxP = this.pieces.length;
+                this.turn = (this.turn + 1) % maxP;
                 this.waitingRoll = true;
                 this.diceEl.innerText = '🎲';
 
-                let pName = (this.turn === 0) ? 'Dino 🦕' : ((this.gameMode === 'pve') ? 'Oca 🦆' : 'J2 🦖');
+                let pName;
+                if (this.turn === 0) pName = 'Dino 🦕';
+                else if (this.gameMode === 'pve') pName = 'Oca 🦆';
+                else if (this.turn === 1) pName = 'J2 🦖';
+                else if (this.turn === 2) pName = 'J3 🐔';
+                else pName = 'J4 🦄';
+
                 this.statusEl.innerText = `Turno ${pName}`;
 
                 if (this.gameMode === 'pve' && this.turn === 1) {
@@ -6428,7 +6450,6 @@
                     }, 1000);
                 } else {
                     // PVP or Hybrid
-                    // Highlight or sound to indicate change
                     if(this.gameMode !== 'pve') this.app.audio.playPop();
                 }
             }
