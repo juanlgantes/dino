@@ -5,7 +5,7 @@ def check_hybrid4():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
-        path = os.path.abspath('indexdino.html')
+        path = os.path.abspath('index.html')
         page.goto(f'file://{path}')
 
         # Navigate
