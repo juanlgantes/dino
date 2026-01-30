@@ -14,8 +14,13 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.37 "Sequence Game"</title>
+    <title>v17.38 "Goose Fix & Stop Audio"</title>
     <!--
+        CHANGELOG v17.38
+        - [FIX] Oca: Corregido tamaño del tablero en móviles landscape (ahora cabe en pantalla).
+        - [FEATURE] Audio: Botón "Detener Voz" (🤫) añadido en actividades de preguntas y secuencias.
+        - [SYS] Audio: El botón Mute global ahora detiene la voz inmediatamente.
+
         CHANGELOG v17.37
         - [CONTENT] Nueva Actividad: "Secuencias" 🔢. Juego de patrones con 3 niveles para Números, Figuras y Colores.
 
@@ -1272,6 +1277,10 @@
                 setTimeout(() => this.playTone(800, 'sine', 0.4), 200);
             }
 
+            stop() {
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+            }
+
             speak(text) {
                 if (this.muted || !window.speechSynthesis || !text) return;
 
@@ -1459,7 +1468,6 @@
                 const btnSpeak = document.createElement('button');
                 btnSpeak.innerText = '🔊';
                 btnSpeak.style.cssText = 'background: #e0c3fc; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2em; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.1s;';
-                btnSpeak.active = () => btnSpeak.style.transform = 'scale(0.9)';
                 btnSpeak.onclick = (e) => {
                     e.stopPropagation();
                     this.speakCurrent();
@@ -1467,6 +1475,17 @@
                     setTimeout(() => btnSpeak.style.transform = 'scale(1)', 100);
                 };
                 questionH3.appendChild(btnSpeak);
+
+                const btnStop = document.createElement('button');
+                btnStop.innerText = '🤫';
+                btnStop.style.cssText = 'background: #ff7675; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2em; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.1s; margin-left: 10px;';
+                btnStop.onclick = (e) => {
+                    e.stopPropagation();
+                    this.app.audio.stop();
+                    btnStop.style.transform = 'scale(0.9)';
+                    setTimeout(() => btnStop.style.transform = 'scale(1)', 100);
+                };
+                questionH3.appendChild(btnStop);
 
                 card.appendChild(questionH3);
 
@@ -6032,7 +6051,7 @@
                         .goose-board {
                             width: auto;
                             height: auto;
-                            max-height: 90vh;
+                            max-height: 70vh;
                             max-width: calc(100% - 130px);
                             min-width: 200px;
                             aspect-ratio: 1/1;
@@ -6973,6 +6992,17 @@
                 speakBtn.onclick = () => this.speakSequence();
                 seqDiv.appendChild(speakBtn);
 
+                // Stop Button
+                const stopBtn = document.createElement('button');
+                stopBtn.innerHTML = '🤫';
+                stopBtn.style.cssText = `
+                    position: absolute; top: -20px; left: -20px; background: #ff7675;
+                    border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 1.5em;
+                    cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+                `;
+                stopBtn.onclick = () => window.app.audio.stop();
+                seqDiv.appendChild(stopBtn);
+
                 levelData.seq.forEach(item => {
                     const el = document.createElement('div');
                     el.style.cssText = `
@@ -7451,6 +7481,7 @@
                 document.getElementById('btnGlobalHome').onclick = () => this.nav.goHome();
                 document.getElementById('btnGlobalMute').onclick = (e) => {
                     this.audio.muted = !this.audio.muted;
+                    if (this.audio.muted) this.audio.stop();
                     e.currentTarget.textContent = this.audio.muted ? '🔇' : '🔊';
                 };
                 document.getElementById('btnStartKid').onclick = () => {
