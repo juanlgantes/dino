@@ -14,8 +14,13 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.37 "Sequence Game"</title>
+    <title>v17.38 "Goose Fix & Stop Audio"</title>
     <!--
+        CHANGELOG v17.38
+        - [FIX] Oca: Corregido tamaño del tablero en móviles landscape (ahora cabe en pantalla).
+        - [FEATURE] Audio: Botón "Detener Voz" (🤫) añadido en actividades de preguntas y secuencias.
+        - [SYS] Audio: El botón Mute global ahora detiene la voz inmediatamente.
+
         CHANGELOG v17.37
         - [CONTENT] Nueva Actividad: "Secuencias" 🔢. Juego de patrones con 3 niveles para Números, Figuras y Colores.
 
@@ -1166,6 +1171,18 @@
         ];
 
         /**
+         * 🖼️ SVG ASSETS (Visual Formula)
+         */
+        const SVG_ASSETS = {
+            'shape_triangle': `<svg viewBox="0 0 100 100"><polygon points="50,15 90,85 10,85" fill="#e74c3c" stroke="#c0392b" stroke-width="5"/></svg>`,
+            'shape_square': `<svg viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="5"/></svg>`,
+            'shape_circle': `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#2ecc71" stroke="#27ae60" stroke-width="5"/></svg>`,
+            'shape_star': `<svg viewBox="0 0 100 100"><polygon points="50,5 61,35 95,35 68,55 79,85 50,65 21,85 32,55 5,35 39,35" fill="#f1c40f" stroke="#f39c12" stroke-width="5"/></svg>`,
+            'shape_moon': `<svg viewBox="0 0 100 100"><path d="M50 10 A40 40 0 1 0 50 90 A30 30 0 1 1 50 10" fill="#9b59b6" stroke="#8e44ad" stroke-width="5"/></svg>`,
+            'shape_sun': `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="25" fill="#e67e22"/><g stroke="#e67e22" stroke-width="5"><line x1="50" y1="15" x2="50" y2="85"/><line x1="15" y1="50" x2="85" y2="50"/><line x1="25" y1="25" x2="75" y2="75"/><line x1="75" y1="25" x2="25" y2="75"/></g></svg>`
+        };
+
+        /**
          * 🎵 AUDIO ENGINE (From Dino 8)
          */
         class AudioEngine {
@@ -1258,6 +1275,10 @@
             playWin() {
                 this.playTone(500, 'sine', 0.2);
                 setTimeout(() => this.playTone(800, 'sine', 0.4), 200);
+            }
+
+            stop() {
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
             }
 
             speak(text) {
@@ -1447,7 +1468,6 @@
                 const btnSpeak = document.createElement('button');
                 btnSpeak.innerText = '🔊';
                 btnSpeak.style.cssText = 'background: #e0c3fc; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2em; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.1s;';
-                btnSpeak.active = () => btnSpeak.style.transform = 'scale(0.9)';
                 btnSpeak.onclick = (e) => {
                     e.stopPropagation();
                     this.speakCurrent();
@@ -1455,6 +1475,17 @@
                     setTimeout(() => btnSpeak.style.transform = 'scale(1)', 100);
                 };
                 questionH3.appendChild(btnSpeak);
+
+                const btnStop = document.createElement('button');
+                btnStop.innerText = '🤫';
+                btnStop.style.cssText = 'background: #ff7675; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2em; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.1s; margin-left: 10px;';
+                btnStop.onclick = (e) => {
+                    e.stopPropagation();
+                    this.app.audio.stop();
+                    btnStop.style.transform = 'scale(0.9)';
+                    setTimeout(() => btnStop.style.transform = 'scale(1)', 100);
+                };
+                questionH3.appendChild(btnStop);
 
                 card.appendChild(questionH3);
 
@@ -6020,7 +6051,7 @@
                         .goose-board {
                             width: auto;
                             height: auto;
-                            max-height: 90vh;
+                            max-height: 70vh;
                             max-width: calc(100% - 130px);
                             min-width: 200px;
                             aspect-ratio: 1/1;
@@ -6069,9 +6100,16 @@
                 btn3.innerHTML = '🎲 Híbrido<br><span style="font-size:0.6em">Dado Real</span>';
                 btn3.onclick = () => this.startGame('hybrid');
 
+                const btn4 = document.createElement('button');
+                btn4.className = 'mode-btn kid';
+                btn4.style.background = '#8e44ad';
+                btn4.innerHTML = '🎲 Híbrido 4<br><span style="font-size:0.6em">4P Real</span>';
+                btn4.onclick = () => this.startGame('hybrid4');
+
                 btnContainer.appendChild(btn1);
                 btnContainer.appendChild(btn2);
                 btnContainer.appendChild(btn3);
+                btnContainer.appendChild(btn4);
 
                 if (this.savedState) {
                     const btnResume = document.createElement('button');
@@ -6098,7 +6136,7 @@
                     this.gameMode = this.savedState.gameMode || 'pve';
                     this.pieces = this.savedState.pieces || [1, 1];
                     this.turn = this.savedState.turn || 0;
-                    this.skip = this.savedState.skip || [0, 0];
+                    this.skip = this.savedState.skip || [0, 0, 0, 0]; // Accommodate 4
                     this.startGame(this.gameMode, true);
                 }
             }
@@ -6115,6 +6153,18 @@
 
             startGame(mode, isRestore = false) {
                 this.gameMode = mode;
+
+                // Initialize Pieces
+                if (!isRestore) {
+                    if (this.gameMode === 'hybrid4') {
+                        this.pieces = [1, 1, 1, 1];
+                        this.skip = [0, 0, 0, 0];
+                    } else {
+                        this.pieces = [1, 1];
+                        this.skip = [0, 0];
+                    }
+                }
+
                 this.c.innerHTML = '';
                 this.waitingRoll = true;
 
@@ -6124,7 +6174,7 @@
                 // h.style.cssText = ''; // Removed inline styles in favor of class
 
                 this.statusEl = document.createElement('h3');
-                this.statusEl.innerText = (mode === 'hybrid') ? 'Tira tu dado' : '¡Tira el dado!';
+                this.statusEl.innerText = (mode === 'hybrid' || mode === 'hybrid4') ? 'Tira tu dado' : '¡Tira el dado!';
                 this.statusEl.style.fontSize = '1.1em';
                 this.statusEl.style.margin = '0';
 
@@ -6267,19 +6317,15 @@
 
             createTokens() {
                 this.tokens = [];
-                // P1: Dino (🦕)
-                let t1 = document.createElement('div');
-                t1.innerText = '🦕';
-                t1.style.cssText = 'position:absolute; font-size:2.2em; transition:all 0.5s; z-index:20; pointer-events:none; filter: drop-shadow(0 0 2px white);';
-                this.boardEl.append(t1);
-                this.tokens.push(t1);
+                const icons = ['🦕', (this.gameMode === 'pve' ? '🦆' : '🦖'), '🐔', '🦄'];
 
-                // P2: Oca/Friend (🦆 or 🦖)
-                let t2 = document.createElement('div');
-                t2.innerText = (this.gameMode === 'pve') ? '🦆' : '🦖';
-                t2.style.cssText = 'position:absolute; font-size:2.2em; transition:all 0.5s; z-index:20; pointer-events:none; filter: drop-shadow(0 0 2px white);';
-                this.boardEl.append(t2);
-                this.tokens.push(t2);
+                this.pieces.forEach((_, i) => {
+                    let t = document.createElement('div');
+                    t.innerText = icons[i] || '👤';
+                    t.style.cssText = 'position:absolute; font-size:2.2em; transition:all 0.5s; z-index:20; pointer-events:none; filter: drop-shadow(0 0 2px white);';
+                    this.boardEl.append(t);
+                    this.tokens.push(t);
+                });
             }
 
             updatePositions() {
@@ -6320,7 +6366,7 @@
                 }
 
                 // Hybrid Mode
-                if (this.gameMode === 'hybrid') {
+                if (this.gameMode === 'hybrid' || this.gameMode === 'hybrid4') {
                     this.diceInput.style.display = 'flex';
                     return;
                 }
@@ -6412,11 +6458,18 @@
             }
 
             nextTurn() {
-                this.turn = this.turn === 0 ? 1 : 0;
+                const maxP = this.pieces.length;
+                this.turn = (this.turn + 1) % maxP;
                 this.waitingRoll = true;
                 this.diceEl.innerText = '🎲';
 
-                let pName = (this.turn === 0) ? 'Dino 🦕' : ((this.gameMode === 'pve') ? 'Oca 🦆' : 'J2 🦖');
+                let pName;
+                if (this.turn === 0) pName = 'Dino 🦕';
+                else if (this.gameMode === 'pve') pName = 'Oca 🦆';
+                else if (this.turn === 1) pName = 'J2 🦖';
+                else if (this.turn === 2) pName = 'J3 🐔';
+                else pName = 'J4 🦄';
+
                 this.statusEl.innerText = `Turno ${pName}`;
 
                 if (this.gameMode === 'pve' && this.turn === 1) {
@@ -6428,7 +6481,6 @@
                     }, 1000);
                 } else {
                     // PVP or Hybrid
-                    // Highlight or sound to indicate change
                     if(this.gameMode !== 'pve') this.app.audio.playPop();
                 }
             }
@@ -6828,9 +6880,9 @@
                         { seq: [1, 2, 1, 2, '?'], ans: 1, opts: [1, 2, 3] }
                     ],
                     shapes: [
-                        { seq: ['🔺', '🟦', '🔺', '?'], ans: '🟦', opts: ['🔺', '🟦', '⭐'] },
-                        { seq: ['⭐', '🌙', '⭐', '🌙', '?'], ans: '⭐', opts: ['🌙', '⭐', '☀️'] },
-                        { seq: ['🟥', '🟥', '🔵', '🔵', '?'], ans: '🟥', opts: ['🟥', '🔵', '🟢'] }
+                        { seq: ['shape_triangle', 'shape_square', 'shape_triangle', '?'], ans: 'shape_square', opts: ['shape_triangle', 'shape_square', 'shape_star'] },
+                        { seq: ['shape_star', 'shape_moon', 'shape_star', 'shape_moon', '?'], ans: 'shape_star', opts: ['shape_moon', 'shape_star', 'shape_sun'] },
+                        { seq: ['shape_square', 'shape_square', 'shape_circle', 'shape_circle', '?'], ans: 'shape_square', opts: ['shape_square', 'shape_circle', 'shape_triangle'] }
                     ],
                     colors: [
                         { seq: ['🔴', '🔵', '🔴', '?'], ans: '🔵', opts: ['🔴', '🔵', '🟢'] },
@@ -6899,6 +6951,11 @@
                 this.playLevel();
             }
 
+            renderItem(item) {
+                if (SVG_ASSETS[item]) return SVG_ASSETS[item];
+                return item;
+            }
+
             playLevel() {
                 this.c.innerHTML = '';
                 const levelData = this.DATA[this.mode][this.level];
@@ -6921,8 +6978,30 @@
                 seqDiv.style.cssText = `
                     display: flex; gap: 10px; margin-top: 50px; justify-content: center;
                     background: white; padding: 20px; border-radius: 20px;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 90%; max-width: 600px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 90%; max-width: 600px; position: relative;
                 `;
+
+                // Speaker Button
+                const speakBtn = document.createElement('button');
+                speakBtn.innerHTML = '🔊';
+                speakBtn.style.cssText = `
+                    position: absolute; top: -20px; right: -20px; background: #f1c40f;
+                    border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 1.5em;
+                    cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+                `;
+                speakBtn.onclick = () => this.speakSequence();
+                seqDiv.appendChild(speakBtn);
+
+                // Stop Button
+                const stopBtn = document.createElement('button');
+                stopBtn.innerHTML = '🤫';
+                stopBtn.style.cssText = `
+                    position: absolute; top: -20px; left: -20px; background: #ff7675;
+                    border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 1.5em;
+                    cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+                `;
+                stopBtn.onclick = () => window.app.audio.stop();
+                seqDiv.appendChild(stopBtn);
 
                 levelData.seq.forEach(item => {
                     const el = document.createElement('div');
@@ -6931,10 +7010,9 @@
                         font-size: 2em; border: 2px solid #bdc3c7; border-radius: 10px;
                         background: ${item === '?' ? '#ecf0f1' : 'white'};
                         color: ${item === '?' ? '#e74c3c' : '#2c3e50'};
-                        font-weight: bold;
+                        font-weight: bold; overflow: hidden;
                     `;
-                    el.textContent = item;
-                    // Animation for appearing
+                    el.innerHTML = this.renderItem(item);
                     el.animate([{ transform: 'scale(0)' }, { transform: 'scale(1)' }], 300);
                     seqDiv.appendChild(el);
                 });
@@ -6948,21 +7026,62 @@
 
                 levelData.opts.forEach(opt => {
                     const btn = document.createElement('button');
-                    btn.textContent = opt;
+                    // Check if opt is an SVG key
+                    if (SVG_ASSETS[opt]) {
+                        btn.innerHTML = SVG_ASSETS[opt];
+                        const svgEl = btn.querySelector('svg');
+                        if(svgEl) {
+                            svgEl.style.width = '100%';
+                            svgEl.style.height = '100%';
+                        }
+                    } else {
+                        btn.textContent = opt;
+                    }
+
                     btn.className = 'mode-btn kid';
-                    btn.style.width = 'auto';
+                    btn.style.width = '80px';
+                    btn.style.height = '80px';
+                    btn.style.flexShrink = '0'; // Prevent deformation
+                    btn.style.padding = '5px';
                     btn.style.minWidth = '80px';
                     btn.style.background = '#a29bfe';
+                    btn.style.display = 'flex';
+                    btn.style.alignItems = 'center';
+                    btn.style.justifyContent = 'center';
+
                     btn.onclick = () => this.check(opt, levelData.ans);
                     optDiv.appendChild(btn);
                 });
                 this.c.appendChild(optDiv);
+
+                // Auto Speak
+                setTimeout(() => this.speakSequence(), 500);
+            }
+
+            speakSequence() {
+                const levelData = this.DATA[this.mode][this.level];
+                // Map special chars to words
+                const map = {
+                    'shape_triangle': 'Triángulo', 'shape_square': 'Cuadrado', 'shape_star': 'Estrella',
+                    'shape_moon': 'Luna', 'shape_sun': 'Sol', 'shape_circle': 'Círculo',
+                    '🔺': 'Triángulo', '🟦': 'Cuadrado', '⭐': 'Estrella', '🌙': 'Luna', '☀️': 'Sol',
+                    '🟥': 'Cuadrado Rojo', '🔵': 'Círculo Azul', '🔴': 'Rojo', '🟢': 'Verde',
+                    '🟡': 'Amarillo', '🟣': 'Morado', '⚫': 'Negro', '⚪': 'Blanco', '🟤': 'Marrón'
+                };
+
+                const text = levelData.seq.map(i => {
+                    if (i === '?') return '¿Qué sigue?';
+                    return map[i] || (i.toString().startsWith('shape_') ? 'Figura' : i);
+                }).join(', ');
+
+                window.app.audio.speak(text);
             }
 
             check(val, ans) {
                 if (val === ans) {
                     window.app.audio.playWin();
                     window.app.addScore(10);
+                    window.app.audio.speak('¡Correcto!');
 
                     const f = document.createElement('div');
                     f.textContent = 'Correcto! 🎉';
@@ -6983,6 +7102,7 @@
                     }, 1500);
                 } else {
                     window.app.audio.playError();
+                    window.app.audio.speak('Inténtalo de nuevo');
                 }
             }
 
@@ -7361,6 +7481,7 @@
                 document.getElementById('btnGlobalHome').onclick = () => this.nav.goHome();
                 document.getElementById('btnGlobalMute').onclick = (e) => {
                     this.audio.muted = !this.audio.muted;
+                    if (this.audio.muted) this.audio.stop();
                     e.currentTarget.textContent = this.audio.muted ? '🔇' : '🔊';
                 };
                 document.getElementById('btnStartKid').onclick = () => {
