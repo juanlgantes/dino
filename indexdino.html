@@ -1069,6 +1069,10 @@
                 setTimeout(() => this.playTone(800, 'sine', 0.4), 200);
             }
 
+            stop() {
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+            }
+
             speak(text, lang = "es-ES") {
                 if (this.muted || !window.speechSynthesis || !text) return;
 
@@ -1323,7 +1327,12 @@
                     btn.className = 'mode-btn kid';
                     btn.style.cssText = 'font-size:1.2em; padding:15px 25px; background: white; color: #333; box-shadow: 0 5px 0 #ddd; margin:0; width:auto;';
 
-                    btn.onclick = () => this.check(day, btn);
+                    // Update: Speak on click, then check
+                    btn.onclick = () => {
+                        const langCode = this.lang === 'es' ? 'es-ES' : 'en-US';
+                        app.audio.speak(day, langCode);
+                        this.check(day, btn);
+                    };
                     optionsContainer.appendChild(btn);
                 });
                 this.c.appendChild(optionsContainer);
@@ -1337,6 +1346,16 @@
                 exit.style.left = '10px';
                 exit.onclick = () => app.nav.goDashboard();
                 this.c.appendChild(exit);
+
+                // Stop Audio Button
+                const stopBtn = document.createElement('button');
+                stopBtn.textContent = '🤫';
+                stopBtn.className = 'nav-btn';
+                stopBtn.style.position = 'absolute';
+                stopBtn.style.bottom = '10px';
+                stopBtn.style.right = '10px';
+                stopBtn.onclick = () => app.audio.stop();
+                this.c.appendChild(stopBtn);
             }
 
             check(selectedDay, btnEl) {
@@ -1345,8 +1364,8 @@
                 if (selectedDay === correctDay) {
                     // Correct
                     app.audio.playPop();
-                    const langCode = this.lang === 'es' ? 'es-ES' : 'en-US';
-                    app.audio.speak(selectedDay, langCode);
+                    // const langCode = this.lang === 'es' ? 'es-ES' : 'en-US';
+                    // app.audio.speak(selectedDay, langCode); // Spoken on click now
 
                     this.currentStep++;
 
