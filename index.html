@@ -14,8 +14,14 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v17.38 "Goose Fix & Stop Audio"</title>
+    <title>v17.39 "Robotics Layout & Safety"</title>
     <!--
+        CHANGELOG v17.39
+        - [VISUAL] Robótica: Nuevo diseño "Side-by-Side" en PC/Landscape para aprovechar el espacio.
+        - [FIX] Robótica: Solucionado error que permitía seguir ejecutando código tras parar el juego (Fix Loop Safety).
+        - [FIX] System: Añadido manejo global de errores (Toast Rojo) para evitar pantallas blancas.
+        - [FIX] System: Limpieza automática de partidas guardadas al ganar (evita cargar partida terminada).
+
         CHANGELOG v17.38
         - [FIX] Oca: Corregido tamaño del tablero en móviles landscape (ahora cabe en pantalla).
         - [FEATURE] Audio: Botón "Detener Voz" (🤫) añadido en actividades de preguntas y secuencias.
@@ -173,6 +179,21 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script>
+        // GLOBAL ERROR HANDLER
+        // GLOBAL ERROR HANDLER
+        window.onerror = function (message, source, lineno, colno, error) {
+            // IGNORE RESIZE OBSERVER LOOP LIMIT EXCEEDED
+            // This is a benign error in some browsers when resizing canvas/logic
+            if (message && message.includes && message.includes('ResizeObserver')) return;
+
+            console.error('Global Error:', message, error);
+            const t = document.createElement('div');
+            t.style.cssText = 'position:fixed; top:0; left:0; width:100%; padding:10px; background:red; color:white; z-index:9999; text-align:center;';
+            t.innerText = '⚠️ Ocurrió un error. Por favor recarga la página.';
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 5000);
+        };
+
         // REGISTER SERVICE WORKER
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -261,8 +282,10 @@
 
         /* --- LAYOUT & TRANSITIONS --- */
         .container {
-            max-width: 1000px;
-            margin: 60px auto 0;
+            max-width: 1200px;
+            /* Increased from 1000px */
+            margin: 20px auto 0;
+            /* Reduced from 60px */
             padding-bottom: 20px;
         }
 
@@ -383,12 +406,45 @@
             color: var(--text-dark);
         }
 
+        .area-card.locked {
+            filter: grayscale(0.9);
+            opacity: 0.7;
+            position: relative;
+        }
+
+        .area-card.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4em;
+            text-shadow: 0 0 10px black;
+            opacity: 1;
+            filter: grayscale(0);
+            /* Keep lock yellow */
+        }
+
+        .cost-badge {
+            background: #fff3cd;
+            color: #d35400;
+            /* Darker orange for contrast */
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 5px;
+            display: inline-block;
+            border: 2px solid #f39c12;
+        }
+
         /* --- GAME ENGINE (CANVAS) --- */
         .game-canvas-container {
             position: relative;
             width: 100%;
-            height: 60vh;
-            min-height: 400px;
+            height: 75vh;
+            /* Increased from 60vh */
+            min-height: 500px;
+            /* Increased min-height */
             background: linear-gradient(to bottom, #87CEEB 0%, #90EE90 70%);
             border-radius: 20px;
             overflow: auto;
@@ -727,6 +783,64 @@
             margin-top: 20px;
             box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.2);
         }
+
+        /* --- ROBOTICS RESPONSIVE LAYOUT --- */
+        .robotics-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .robotics-board-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .robotics-controls-section {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Landscape/Desktop Mode */
+        @media (min-width: 768px) and (orientation: landscape) {
+            .robotics-layout {
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .robotics-board-section {
+                width: 50%;
+                height: 100%;
+                justify-content: center;
+            }
+
+            .robotics-controls-section {
+                width: 45%;
+                justify-content: center;
+                height: 100%;
+            }
+
+            /* Adjust grid size for side-by-side */
+            .robotics-grid {
+                width: 100% !important;
+                max-width: 60vh !important;
+                /* Scale to height */
+                aspect-ratio: 1/1;
+            }
+        }
     </style>
 </head>
 
@@ -811,11 +925,20 @@
                 <div style="flex-grow: 1;">
                     <h2 id="gameTitle" style="margin: 0; font-size: 1.5em; line-height: 1.2;">Juego</h2>
                 </div>
-                <div
-                    style="font-size: 1.5em; background: #fff3cd; padding: 5px 15px; border-radius: 20px; white-space: nowrap;">
-                    <span id="scoreLabel">⭐</span> <span id="gameScore" class="pop-target">0</span>
-                    <span id="livesContainer" style="margin-left: 10px; display:none;">❤️ <span
-                            id="gameLives">3</span></span>
+                <div style="display:flex; gap:10px; align-items: center;">
+                    <!-- Global Wallet -->
+                    <div title="Tus Estrellas Totales"
+                        style="font-size: 1.5em; background: #dff9fb; padding: 5px 15px; border-radius: 20px; white-space: nowrap; border: 2px solid #81ecec;">
+                        🎒 <span id="gameGlobalStars">0</span>
+                    </div>
+
+                    <!-- Session Score -->
+                    <div
+                        style="font-size: 1.5em; background: #fff3cd; padding: 5px 15px; border-radius: 20px; white-space: nowrap;">
+                        <span id="scoreLabel">⭐</span> <span id="gameScore" class="pop-target">0</span>
+                        <span id="livesContainer" style="margin-left: 10px; display:none;">❤️ <span
+                                id="gameLives">3</span></span>
+                    </div>
                 </div>
             </div>
 
@@ -874,19 +997,24 @@
         <section id="view-eval-root" class="content-section hidden">
             <h2 style="text-align:center; color:#2c3e50; margin-bottom:20px;">Evaluaciones</h2>
             <div style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
-                <button class="mode-btn" onclick="alert('Próximamente')" style="background: #3498db; color: white;">1º Infantil</button>
-                <button class="mode-btn" onclick="app.nav.show('eval-level-3')" style="background: #e74c3c; color: white;">3º Infantil</button>
+                <button class="mode-btn" onclick="alert('Próximamente')" style="background: #3498db; color: white;">1º
+                    Infantil</button>
+                <button class="mode-btn" onclick="app.nav.show('eval-level-3')"
+                    style="background: #e74c3c; color: white;">3º Infantil</button>
             </div>
-            <button class="nav-btn" onclick="app.nav.show('kid-dash')" style="margin-top: 30px; margin-left: auto; margin-right: auto; position: static;">⬅️</button>
+            <button class="nav-btn" onclick="app.nav.show('kid-dash')"
+                style="margin-top: 30px; margin-left: auto; margin-right: auto; position: static;">⬅️</button>
         </section>
 
         <!-- EVAL LEVEL 3 -->
         <section id="view-eval-level-3" class="content-section hidden">
             <h2 style="text-align:center; color:#e74c3c; margin-bottom:20px;">3º Infantil</h2>
             <div style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
-                <button class="mode-btn" onclick="app.nav.show('eval-term-2')" style="background: #f1c40f; color: white;">2º Trimestre</button>
+                <button class="mode-btn" onclick="app.nav.show('eval-term-2')"
+                    style="background: #f1c40f; color: white;">2º Trimestre</button>
             </div>
-            <button class="nav-btn" onclick="app.nav.show('eval-root')" style="margin-top: 30px; margin-left: auto; margin-right: auto; position: static;">⬅️</button>
+            <button class="nav-btn" onclick="app.nav.show('eval-root')"
+                style="margin-top: 30px; margin-left: auto; margin-right: auto; position: static;">⬅️</button>
         </section>
 
         <!-- EVAL TERM 2 -->
@@ -894,13 +1022,19 @@
             <h2 style="text-align:center; color:#f1c40f; margin-bottom:20px;">2º Trimestre</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
                 <button class="mode-btn" style="background: #95a5a6; color: white; font-size: 1.2em;">📝 Manual</button>
-                <button class="mode-btn" style="background: #2ecc71; color: white; font-size: 1.2em;">🌱 Crecimiento en Armonía</button>
-                <button class="mode-btn" style="background: #3498db; color: white; font-size: 1.2em;">🌍 Descubrimiento del Entorno</button>
-                <button class="mode-btn" style="background: #9b59b6; color: white; font-size: 1.2em;">🗣️ Comunicación y Representación</button>
-                <button class="mode-btn" style="background: #e67e22; color: white; font-size: 1.2em;">🇬🇧 Inglés</button>
-                <button class="mode-btn" style="background: #f39c12; color: white; font-size: 1.2em;">✝️ Religión</button>
+                <button class="mode-btn" style="background: #2ecc71; color: white; font-size: 1.2em;">🌱 Crecimiento en
+                    Armonía</button>
+                <button class="mode-btn" style="background: #3498db; color: white; font-size: 1.2em;">🌍 Descubrimiento
+                    del Entorno</button>
+                <button class="mode-btn" style="background: #9b59b6; color: white; font-size: 1.2em;">🗣️ Comunicación y
+                    Representación</button>
+                <button class="mode-btn" style="background: #e67e22; color: white; font-size: 1.2em;">🇬🇧
+                    Inglés</button>
+                <button class="mode-btn" style="background: #f39c12; color: white; font-size: 1.2em;">✝️
+                    Religión</button>
             </div>
-            <button class="nav-btn" onclick="app.nav.show('eval-level-3')" style="margin-top: 30px; margin-left: auto; margin-right: auto; position: static;">⬅️</button>
+            <button class="nav-btn" onclick="app.nav.show('eval-level-3')"
+                style="margin-top: 30px; margin-left: auto; margin-right: auto; position: static;">⬅️</button>
         </section>
     </div>
 
@@ -948,34 +1082,39 @@
                 type: 'movement',
                 icon: '🎮', // Added for v9 UI
                 theme: 'var(--theme-aventura)', // Added for v9 UI
+                cost: 25 // STAR COST
             },
             surf: {
                 title: '🏄‍♂️ Dino Surfer',
                 description: '¡Consigue 10 estrellas para ganar!',
                 type: 'surf',
                 icon: '🌊',
-                theme: 'linear-gradient(180deg, #4facfe 0%, #00f2fe 100%)'
+                theme: 'linear-gradient(180deg, #4facfe 0%, #00f2fe 100%)',
+                cost: 25
             },
             soccer: {
                 title: '⚽ Dino Penaltis',
                 description: '¡Marca 3 goles para ganar!',
                 type: 'soccer',
                 icon: '🥅',
-                theme: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
+                theme: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+                cost: 25
             },
             kart: {
                 title: '🏎️ Dino Karts',
                 description: '¡Sobrevive 2 minutos!',
                 type: 'kart',
                 icon: '⏱️',
-                theme: 'linear-gradient(180deg, #dd3e54 0%, #6be585 100%)'
+                theme: 'linear-gradient(180deg, #dd3e54 0%, #6be585 100%)',
+                cost: 25
             },
             fighter: {
                 title: '🥋 Dino Fighter',
                 description: '¡Vence al T-Rex en combate!',
                 type: 'fighter',
                 icon: '🥊',
-                theme: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+                theme: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                cost: 25
             },
             musica: {
                 title: '🎹 Piano Mágico',
@@ -1115,35 +1254,40 @@
                 description: '¡Gana a Dino!',
                 type: 'connect_four',
                 icon: '🔴',
-                theme: 'linear-gradient(135deg, #2980b9 0%, #6dd5fa 100%)'
+                theme: 'linear-gradient(135deg, #2980b9 0%, #6dd5fa 100%)',
+                cost: 10
             },
             checkers: {
                 title: '🏁 Damas',
                 description: '¡Salta y gana!',
                 type: 'checkers',
                 icon: '🏁',
-                theme: 'linear-gradient(135deg, #8e44ad 0%, #c0392b 100%)'
+                theme: 'linear-gradient(135deg, #8e44ad 0%, #c0392b 100%)',
+                cost: 10
             },
             parchis: {
                 title: '🎲 Parchís',
                 description: '¡Corre a casa!',
                 type: 'parchis',
                 icon: '🎲',
-                theme: 'linear-gradient(135deg, #f1c40f 0%, #e67e22 100%)'
+                theme: 'linear-gradient(135deg, #f1c40f 0%, #e67e22 100%)',
+                cost: 10
             },
             oca: {
                 title: '🦆 Oca',
                 description: '¡Llega al 63!',
                 type: 'goose',
                 icon: '🦆',
-                theme: 'linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%)'
+                theme: 'linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%)',
+                cost: 10
             },
             chess: {
                 title: '♟️ Ajedrez',
                 description: 'Jaque Mate 🦖',
                 type: 'chess',
                 icon: '♟️',
-                theme: 'linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%)'
+                theme: 'linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%)',
+                cost: 10
             },
             robotica: {
                 title: '🤖 Robótica / Coding',
@@ -1309,8 +1453,8 @@
                     if (this._voices.length === 0) this._voices = window.speechSynthesis.getVoices();
 
                     const voice = this._voices.find(v => v.lang === 'es-ES' || v.lang === 'es_ES') ||
-                                  this._voices.find(v => v.lang.startsWith('es')) ||
-                                  this._voices.find(v => v.default);
+                        this._voices.find(v => v.lang.startsWith('es')) ||
+                        this._voices.find(v => v.default);
 
                     if (voice) {
                         utterance.voice = voice;
@@ -3505,15 +3649,15 @@
                     },
                     move: (e) => {
                         // Only prevent default if we are actively dragging the dino
-                        if(this.dragTarget) {
-                            if(e.cancelable) e.preventDefault();
+                        if (this.dragTarget) {
+                            if (e.cancelable) e.preventDefault();
                             this.updateDragTarget(e);
                         }
                     },
                     end: (e) => {
                         // Only prevent default if we were dragging
-                        if(this.dragTarget) {
-                            if(e.cancelable) e.preventDefault();
+                        if (this.dragTarget) {
+                            if (e.cancelable) e.preventDefault();
                             this.dragTarget = null;
                         }
                     }
@@ -3545,7 +3689,7 @@
                 }
                 this.level = idx;
                 const t = document.getElementById('mazeTitle');
-                if(t) t.textContent = `Nivel ${this.level + 1}`;
+                if (t) t.textContent = `Nivel ${this.level + 1}`;
 
                 const map = this.levels[idx];
                 this.grid = map.map(row => row.split(''));
@@ -3557,8 +3701,8 @@
                     for (let x = 0; x < this.grid[y].length; x++) {
                         if (this.grid[y][x] === 'S') {
                             this.p = {
-                                x: x * this.tileSize + this.tileSize/2,
-                                y: y * this.tileSize + this.tileSize/2
+                                x: x * this.tileSize + this.tileSize / 2,
+                                y: y * this.tileSize + this.tileSize / 2
                             };
                         }
                     }
@@ -3566,7 +3710,7 @@
             }
 
             resizeCanvas() {
-                if(!this.grid || this.grid.length === 0) return;
+                if (!this.grid || this.grid.length === 0) return;
 
                 // Capture current relative pos
                 let relX = 0.5, relY = 0.5;
@@ -3610,7 +3754,7 @@
                     // Vector to target
                     const dx = this.dragTarget.x - this.p.x;
                     const dy = this.dragTarget.y - this.p.y;
-                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    const dist = Math.sqrt(dx * dx + dy * dy);
 
                     if (dist > 5) { // Deadzone
                         // Normalize
@@ -3640,10 +3784,10 @@
                 // Check bounding box (Player is size * 0.6)
                 const rad = this.tileSize * 0.3;
                 const testPoints = [
-                    {x: x - rad, y: y - rad},
-                    {x: x + rad, y: y - rad},
-                    {x: x - rad, y: y + rad},
-                    {x: x + rad, y: y + rad}
+                    { x: x - rad, y: y - rad },
+                    { x: x + rad, y: y - rad },
+                    { x: x - rad, y: y + rad },
+                    { x: x + rad, y: y + rad }
                 ];
 
                 for (let pt of testPoints) {
@@ -3703,7 +3847,7 @@
                             this.ctx.font = `${this.tileSize * 0.7}px Arial`;
                             this.ctx.textAlign = 'center';
                             this.ctx.textBaseline = 'middle';
-                            this.ctx.fillText('🥚', px + this.tileSize/2, py + this.tileSize/2);
+                            this.ctx.fillText('🥚', px + this.tileSize / 2, py + this.tileSize / 2);
                         }
                     }
                 }
@@ -3717,7 +3861,7 @@
 
             cleanup() {
                 this.running = false;
-                if(this.ro) this.ro.disconnect();
+                if (this.ro) this.ro.disconnect();
 
                 if (this.handlers) {
                     window.removeEventListener('mousemove', this.handlers.move);
@@ -3786,65 +3930,65 @@
                     {
                         name: "ESTRELLA ⭐",
                         points: [
-                            {x:0.5, y:0.1}, {x:0.6, y:0.4}, {x:0.9, y:0.4}, {x:0.65, y:0.6},
-                            {x:0.75, y:0.9}, {x:0.5, y:0.7}, {x:0.25, y:0.9}, {x:0.35, y:0.6},
-                            {x:0.1, y:0.4}, {x:0.4, y:0.4}, {x:0.5, y:0.1}
+                            { x: 0.5, y: 0.1 }, { x: 0.6, y: 0.4 }, { x: 0.9, y: 0.4 }, { x: 0.65, y: 0.6 },
+                            { x: 0.75, y: 0.9 }, { x: 0.5, y: 0.7 }, { x: 0.25, y: 0.9 }, { x: 0.35, y: 0.6 },
+                            { x: 0.1, y: 0.4 }, { x: 0.4, y: 0.4 }, { x: 0.5, y: 0.1 }
                         ]
                     },
                     {
                         name: "CORAZÓN ❤️",
                         points: [
-                            {x:0.5, y:0.3}, {x:0.7, y:0.1}, {x:0.9, y:0.3}, {x:0.9, y:0.5},
-                            {x:0.5, y:0.9}, {x:0.1, y:0.5}, {x:0.1, y:0.3}, {x:0.3, y:0.1},
-                            {x:0.5, y:0.3}
+                            { x: 0.5, y: 0.3 }, { x: 0.7, y: 0.1 }, { x: 0.9, y: 0.3 }, { x: 0.9, y: 0.5 },
+                            { x: 0.5, y: 0.9 }, { x: 0.1, y: 0.5 }, { x: 0.1, y: 0.3 }, { x: 0.3, y: 0.1 },
+                            { x: 0.5, y: 0.3 }
                         ]
                     },
                     {
                         name: "CASA 🏠",
                         points: [
-                            {x:0.2, y:0.4}, {x:0.5, y:0.1}, {x:0.8, y:0.4}, {x:0.8, y:0.9},
-                            {x:0.2, y:0.9}, {x:0.2, y:0.4}
+                            { x: 0.2, y: 0.4 }, { x: 0.5, y: 0.1 }, { x: 0.8, y: 0.4 }, { x: 0.8, y: 0.9 },
+                            { x: 0.2, y: 0.9 }, { x: 0.2, y: 0.4 }
                         ]
                     },
                     {
                         name: "BARCO ⛵",
                         points: [
-                            {x:0.2, y:0.7}, {x:0.8, y:0.7}, {x:0.7, y:0.9}, {x:0.3, y:0.9},
-                            {x:0.2, y:0.7}, {x:0.5, y:0.6}, {x:0.5, y:0.1}, {x:0.2, y:0.6},
-                            {x:0.8, y:0.6}, {x:0.5, y:0.1}
+                            { x: 0.2, y: 0.7 }, { x: 0.8, y: 0.7 }, { x: 0.7, y: 0.9 }, { x: 0.3, y: 0.9 },
+                            { x: 0.2, y: 0.7 }, { x: 0.5, y: 0.6 }, { x: 0.5, y: 0.1 }, { x: 0.2, y: 0.6 },
+                            { x: 0.8, y: 0.6 }, { x: 0.5, y: 0.1 }
                         ]
                     },
                     {
                         name: "LUNA 🌙",
                         points: [
-                            {x:0.5, y:0.1}, {x:0.7, y:0.2}, {x:0.8, y:0.5}, {x:0.7, y:0.8},
-                            {x:0.5, y:0.9}, {x:0.6, y:0.7}, {x:0.65, y:0.5}, {x:0.6, y:0.3},
-                            {x:0.5, y:0.1}
+                            { x: 0.5, y: 0.1 }, { x: 0.7, y: 0.2 }, { x: 0.8, y: 0.5 }, { x: 0.7, y: 0.8 },
+                            { x: 0.5, y: 0.9 }, { x: 0.6, y: 0.7 }, { x: 0.65, y: 0.5 }, { x: 0.6, y: 0.3 },
+                            { x: 0.5, y: 0.1 }
                         ]
                     },
                     {
                         name: "SOL ☀️",
                         points: [
-                            {x:0.5, y:0.2}, {x:0.65, y:0.25}, {x:0.8, y:0.5}, {x:0.65, y:0.75},
-                            {x:0.5, y:0.8}, {x:0.35, y:0.75}, {x:0.2, y:0.5}, {x:0.35, y:0.25},
-                            {x:0.5, y:0.2}
+                            { x: 0.5, y: 0.2 }, { x: 0.65, y: 0.25 }, { x: 0.8, y: 0.5 }, { x: 0.65, y: 0.75 },
+                            { x: 0.5, y: 0.8 }, { x: 0.35, y: 0.75 }, { x: 0.2, y: 0.5 }, { x: 0.35, y: 0.25 },
+                            { x: 0.5, y: 0.2 }
                         ]
                     },
                     {
                         name: "ÁRBOL 🌲",
                         points: [
-                            {x:0.5, y:0.1}, {x:0.7, y:0.4}, {x:0.6, y:0.4}, {x:0.8, y:0.7},
-                            {x:0.6, y:0.7}, {x:0.6, y:0.9}, {x:0.4, y:0.9}, {x:0.4, y:0.7},
-                            {x:0.2, y:0.7}, {x:0.4, y:0.4}, {x:0.3, y:0.4}, {x:0.5, y:0.1}
+                            { x: 0.5, y: 0.1 }, { x: 0.7, y: 0.4 }, { x: 0.6, y: 0.4 }, { x: 0.8, y: 0.7 },
+                            { x: 0.6, y: 0.7 }, { x: 0.6, y: 0.9 }, { x: 0.4, y: 0.9 }, { x: 0.4, y: 0.7 },
+                            { x: 0.2, y: 0.7 }, { x: 0.4, y: 0.4 }, { x: 0.3, y: 0.4 }, { x: 0.5, y: 0.1 }
                         ]
                     },
                     {
                         name: "COCHE 🚗",
                         points: [
-                            {x:0.2, y:0.7}, {x:0.1, y:0.5}, {x:0.2, y:0.5}, {x:0.3, y:0.3},
-                            {x:0.6, y:0.3}, {x:0.7, y:0.5}, {x:0.9, y:0.5}, {x:0.9, y:0.7},
-                            {x:0.2, y:0.7}, {x:0.3, y:0.8}, {x:0.4, y:0.7}, {x:0.7, y:0.7},
-                            {x:0.8, y:0.8}, {x:0.9, y:0.7}
+                            { x: 0.2, y: 0.7 }, { x: 0.1, y: 0.5 }, { x: 0.2, y: 0.5 }, { x: 0.3, y: 0.3 },
+                            { x: 0.6, y: 0.3 }, { x: 0.7, y: 0.5 }, { x: 0.9, y: 0.5 }, { x: 0.9, y: 0.7 },
+                            { x: 0.2, y: 0.7 }, { x: 0.3, y: 0.8 }, { x: 0.4, y: 0.7 }, { x: 0.7, y: 0.7 },
+                            { x: 0.8, y: 0.8 }, { x: 0.9, y: 0.7 }
                         ]
                     }
                 ];
@@ -3948,7 +4092,7 @@
                 this.maxDots = this.dots.length;
                 this.currentDot = 1;
                 this.documentTitle = document.getElementById("dotsTitle");
-                if(this.documentTitle) this.documentTitle.textContent = `Nivel ${this.level + 1}: ${this.currentDot} ➡️ ${this.currentDot + 1}`;
+                if (this.documentTitle) this.documentTitle.textContent = `Nivel ${this.level + 1}: ${this.currentDot} ➡️ ${this.currentDot + 1}`;
                 this.lines = [];
                 this.draw();
             }
@@ -5305,10 +5449,10 @@
             }
         }
 
-                /**
-         * 🎲 PARCHIS GAME (Ludo Simplified)
-         * 2-4 Players.
-         */
+        /**
+ * 🎲 PARCHIS GAME (Ludo Simplified)
+ * 2-4 Players.
+ */
         class ParchisGame {
             constructor(data, container, savedState) {
                 this.data = data;
@@ -5611,10 +5755,10 @@
                     const sub = playerIdx % 4;
                     // Grid 11x11. Corners 4x4.
                     let bx = 0, by = 0;
-                    if (p === 0) { bx=1; by=1; } // Red: TL
-                    if (p === 1) { bx=7; by=1; } // Yel: TR
-                    if (p === 2) { bx=7; by=7; } // Grn: BR
-                    if (p === 3) { bx=1; by=7; } // Blu: BL
+                    if (p === 0) { bx = 1; by = 1; } // Red: TL
+                    if (p === 1) { bx = 7; by = 1; } // Yel: TR
+                    if (p === 2) { bx = 7; by = 7; } // Grn: BR
+                    if (p === 3) { bx = 1; by = 7; } // Blu: BL
 
                     const r = by + Math.floor(sub / 2);
                     const c = bx + (sub % 2);
@@ -5651,7 +5795,7 @@
             }
 
             updatePieces() {
-                if(!this.pieceEls) return;
+                if (!this.pieceEls) return;
 
                 this.pieceEls.forEach((el, i) => {
                     const pos = this.pieces[i];
@@ -5872,10 +6016,10 @@
             }
 
             checkWin() {
-                for(let p=0; p<4; p++) {
-                    const start = p*4;
+                for (let p = 0; p < 4; p++) {
+                    const start = p * 4;
                     // Check if all 4 pieces are in goal (>100)
-                    const wins = this.pieces.slice(start, start+4).every(pos => pos > 100);
+                    const wins = this.pieces.slice(start, start + 4).every(pos => pos > 100);
 
                     if (wins) {
                         this.gameOver = true;
@@ -6181,9 +6325,9 @@
                 if (isRestore && this.turn !== 0 && this.gameMode === 'pve') {
                     // If resuming and it was AI turn?
                     // Let's just reset to waiting for roll to avoid instant AI move confusion or just set text
-                    this.statusEl.innerText = `Turno ${this.turn===0 ? 'Dino 🦕' : 'Oca 🦆'}`;
+                    this.statusEl.innerText = `Turno ${this.turn === 0 ? 'Dino 🦕' : 'Oca 🦆'}`;
                 } else if (isRestore) {
-                     this.statusEl.innerText = `Turno ${this.turn===0 ? 'Dino 🦕' : ((this.gameMode === 'pve') ? 'Oca 🦆' : 'J2 🦖')}`;
+                    this.statusEl.innerText = `Turno ${this.turn === 0 ? 'Dino 🦕' : ((this.gameMode === 'pve') ? 'Oca 🦆' : 'J2 🦖')}`;
                 }
 
                 this.diceEl = document.createElement('div');
@@ -6203,7 +6347,7 @@
                 backBtn.innerText = '🔙';
                 backBtn.style.cssText = 'background:none; border:none; font-size:2em; cursor:pointer;';
                 backBtn.onclick = () => {
-                    if(confirm('¿Salir al menú de la Oca?')) {
+                    if (confirm('¿Salir al menú de la Oca?')) {
                         this.cleanup();
                         this.init();
                     }
@@ -6289,15 +6433,15 @@
                     x += dx; y += dy;
                 }
 
-                for(let r=0; r<8; r++){
-                    for(let c=0; c<8; c++){
+                for (let r = 0; r < 8; r++) {
+                    for (let c = 0; c < 8; c++) {
                         let val = matrix[r][c];
-                        if(val > 63) continue;
+                        if (val > 63) continue;
 
                         let cell = document.createElement('div');
                         cell.dataset.index = val;
                         cell.style.cssText = `
-                            grid-row: ${r+1}; grid-column: ${c+1};
+                            grid-row: ${r + 1}; grid-column: ${c + 1};
                             background:#ecf0f1; border-radius:2px; position:relative;
                             display:flex; justify-content:center; align-items:center;
                             font-size:1em; color:#7f8c8d; font-weight:bold;
@@ -6306,9 +6450,9 @@
                         cell.innerHTML = `<span>${val}</span>`;
 
                         // Iconos Grandes
-                        if(this.DINOS.includes(val)) { cell.style.background='#f1c40f'; cell.innerHTML += '<div style="font-size:1.8em">🦕</div>'; }
-                        else if(this.SPECIALS[val]) { cell.style.background='#e74c3c'; cell.style.color='white'; cell.innerHTML += '<div style="font-size:1.8em">⚠️</div>'; }
-                        else if(val===63) { cell.style.background='#2ecc71'; cell.innerHTML = '<div style="font-size:2em">🥚</div>'; }
+                        if (this.DINOS.includes(val)) { cell.style.background = '#f1c40f'; cell.innerHTML += '<div style="font-size:1.8em">🦕</div>'; }
+                        else if (this.SPECIALS[val]) { cell.style.background = '#e74c3c'; cell.style.color = 'white'; cell.innerHTML += '<div style="font-size:1.8em">⚠️</div>'; }
+                        else if (val === 63) { cell.style.background = '#2ecc71'; cell.innerHTML = '<div style="font-size:2em">🥚</div>'; }
 
                         this.boardEl.append(cell);
                     }
@@ -6334,7 +6478,7 @@
                     let cell = this.boardEl.querySelector(`div[data-index='${pos}']`);
                     if (!cell) cell = this.boardEl.querySelector(`div[data-index='1']`);
 
-                    if(cell) {
+                    if (cell) {
                         let x = cell.offsetLeft + (cell.offsetWidth / 2) - (token.offsetWidth / 2 || 15);
                         let y = cell.offsetTop + (cell.offsetHeight / 2) - (token.offsetHeight / 2 || 15);
 
@@ -6373,7 +6517,7 @@
 
                 // Standard Roll
                 this.waitingRoll = false;
-                let val = Math.floor(Math.random()*6)+1;
+                let val = Math.floor(Math.random() * 6) + 1;
                 this.processRoll(val);
             }
 
@@ -6387,7 +6531,7 @@
                 let current = this.pieces[this.turn];
                 let target = current + steps;
 
-                if(target > 63) target = 63 - (target - 63);
+                if (target > 63) target = 63 - (target - 63);
 
                 this.pieces[this.turn] = target;
                 this.updatePositions();
@@ -6397,7 +6541,7 @@
             }
 
             checkRules(pos) {
-                if(pos === 63) {
+                if (pos === 63) {
                     this.statusEl.innerText = (this.turn === 0) ? '¡GANASTE! 🎉' : (this.gameMode === 'pve' ? '¡La Oca Gana! 🦆' : '¡J2 Gana! 🎉');
                     this.app.audio.speak(this.turn === 0 ? 'Ganaste' : 'Oca gana');
                     this.app.audio.playWin();
@@ -6407,7 +6551,7 @@
                         const ov = document.createElement('div');
                         ov.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:100; border-radius:10px;';
                         ov.innerHTML = `
-                            <div style="font-size:5em;">${this.turn===0 ? '🏆' : '🦆'}</div>
+                            <div style="font-size:5em;">${this.turn === 0 ? '🏆' : '🦆'}</div>
                             <h2 style="color:white; margin:20px;">${this.statusEl.innerText}</h2>
                             <button class="mode-btn kid" style="background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
                             <button class="mode-btn kid" style="margin-top:10px;" onclick="app.nav.goDashboard()">🏠 Salir</button>
@@ -6417,12 +6561,12 @@
                     return;
                 }
 
-                if(this.DINOS.includes(pos)) {
+                if (this.DINOS.includes(pos)) {
                     this.statusEl.innerText = '¡De Dino a Dino! 🦕';
                     this.app.audio.speak('De dino a dino');
 
                     let idx = this.DINOS.indexOf(pos);
-                    let next = this.DINOS[idx+1] || 63;
+                    let next = this.DINOS[idx + 1] || 63;
 
                     this.pieces[this.turn] = next;
                     this.updatePositions();
@@ -6430,7 +6574,7 @@
                     // If AI (PVE Turn 1), Auto Roll again
                     if (this.gameMode === 'pve' && this.turn === 1) {
                         this.wait(() => {
-                            let val = Math.floor(Math.random()*6)+1;
+                            let val = Math.floor(Math.random() * 6) + 1;
                             this.diceEl.innerText = '🎲 ' + val;
                             this.app.audio.speak('Oca saca ' + val);
                             this.processRoll(val);
@@ -6442,16 +6586,16 @@
                     return;
                 }
 
-                if(this.SPECIALS[pos]) {
+                if (this.SPECIALS[pos]) {
                     let r = this.SPECIALS[pos];
                     this.statusEl.innerText = r.msg;
                     this.app.audio.speak(r.msg);
 
-                    if(r.t) {
+                    if (r.t) {
                         this.pieces[this.turn] = r.t;
                         this.updatePositions();
                     }
-                    if(r.skip) this.skip[this.turn] = r.skip;
+                    if (r.skip) this.skip[this.turn] = r.skip;
                 }
 
                 this.nextTurn();
@@ -6474,14 +6618,14 @@
 
                 if (this.gameMode === 'pve' && this.turn === 1) {
                     this.wait(() => {
-                        let val = Math.floor(Math.random()*6)+1;
+                        let val = Math.floor(Math.random() * 6) + 1;
                         this.diceEl.innerText = '🎲 ' + val;
                         this.app.audio.speak('Oca saca ' + val);
                         this.processRoll(val);
                     }, 1000);
                 } else {
                     // PVP or Hybrid
-                    if(this.gameMode !== 'pve') this.app.audio.playPop();
+                    if (this.gameMode !== 'pve') this.app.audio.playPop();
                 }
             }
 
@@ -7030,7 +7174,7 @@
                     if (SVG_ASSETS[opt]) {
                         btn.innerHTML = SVG_ASSETS[opt];
                         const svgEl = btn.querySelector('svg');
-                        if(svgEl) {
+                        if (svgEl) {
                             svgEl.style.width = '100%';
                             svgEl.style.height = '100%';
                         }
@@ -7116,7 +7260,7 @@
                 `;
             }
 
-            cleanup() {}
+            cleanup() { }
         }
 
         /**
@@ -7135,64 +7279,64 @@
                 this.levels = [
                     {
                         grid: [
-                            [0,0,0,0,0],
-                            [0,2,1,3,0],
-                            [0,0,0,0,0],
-                            [0,0,0,0,0],
-                            [0,0,0,0,0]
+                            [0, 0, 0, 0, 0],
+                            [0, 2, 1, 3, 0],
+                            [0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0],
+                            [0, 0, 0, 0, 0]
                         ],
                         startDir: 1 // 0=N, 1=E, 2=S, 3=W
                     },
                     {
                         grid: [
-                            [0,0,0,0,0],
-                            [0,2,1,0,0],
-                            [0,0,1,0,0],
-                            [0,0,3,0,0],
-                            [0,0,0,0,0]
+                            [0, 0, 0, 0, 0],
+                            [0, 2, 1, 0, 0],
+                            [0, 0, 1, 0, 0],
+                            [0, 0, 3, 0, 0],
+                            [0, 0, 0, 0, 0]
                         ],
                         startDir: 1
                     },
                     {
                         grid: [
-                            [0,0,3,0,0],
-                            [0,0,1,0,0],
-                            [0,1,1,0,0],
-                            [0,2,0,0,0],
-                            [0,0,0,0,0]
+                            [0, 0, 3, 0, 0],
+                            [0, 0, 1, 0, 0],
+                            [0, 1, 1, 0, 0],
+                            [0, 2, 0, 0, 0],
+                            [0, 0, 0, 0, 0]
                         ],
                         startDir: 1
                     },
                     {
                         // Level 4: ZigZag
                         grid: [
-                            [2,1,1,0,0],
-                            [0,0,1,0,0],
-                            [0,0,1,1,1],
-                            [0,0,0,0,1],
-                            [0,0,0,0,3]
+                            [2, 1, 1, 0, 0],
+                            [0, 0, 1, 0, 0],
+                            [0, 0, 1, 1, 1],
+                            [0, 0, 0, 0, 1],
+                            [0, 0, 0, 0, 3]
                         ],
                         startDir: 1
                     },
                     {
                         // Level 5: La Vuelta (U-Turn)
                         grid: [
-                            [1,1,1,1,3],
-                            [1,0,0,0,0],
-                            [1,0,0,0,0],
-                            [1,0,0,0,0],
-                            [2,0,0,0,0]
+                            [1, 1, 1, 1, 3],
+                            [1, 0, 0, 0, 0],
+                            [1, 0, 0, 0, 0],
+                            [1, 0, 0, 0, 0],
+                            [2, 0, 0, 0, 0]
                         ],
                         startDir: 0 // Up
                     },
                     {
                         // Level 6: Espiral
                         grid: [
-                            [2,1,1,1,1],
-                            [0,0,0,0,1],
-                            [1,3,0,0,1],
-                            [1,0,0,0,1],
-                            [1,1,1,1,1]
+                            [2, 1, 1, 1, 1],
+                            [0, 0, 0, 0, 1],
+                            [1, 3, 0, 0, 1],
+                            [1, 0, 0, 0, 1],
+                            [1, 1, 1, 1, 1]
                         ],
                         startDir: 1 // Right
                     }
@@ -7211,9 +7355,9 @@
 
             resetRobot() {
                 const grid = this.currentLevelData.grid;
-                for(let r=0; r<grid.length; r++) {
-                    for(let c=0; c<grid[0].length; c++) {
-                        if(grid[r][c] === 2) {
+                for (let r = 0; r < grid.length; r++) {
+                    for (let c = 0; c < grid[0].length; c++) {
+                        if (grid[r][c] === 2) {
                             this.robot.x = c;
                             this.robot.y = r;
                         }
@@ -7222,14 +7366,23 @@
                 this.robot.dir = this.currentLevelData.startDir;
             }
 
+            cleanup() {
+                this.c.innerHTML = '';
+                this.c.className = ''; // Remove .robotics-layout to avoid bleeding into other games
+                this.running = false;
+            }
+
             render() {
                 this.c.innerHTML = '';
+                this.c.className = 'robotics-layout';
+                // Remove inline styles that conflict with CSS class
                 this.c.style.background = '#2c3e50';
-                this.c.style.display = 'flex';
-                this.c.style.flexDirection = 'column';
-                this.c.style.alignItems = 'center';
-                this.c.style.justifyContent = 'flex-start';
-                this.c.style.padding = '10px';
+                // this.c.style.display = 'flex'; // Handled by CSS
+                // this.c.style.flexDirection = 'column'; // Handled by CSS
+
+                // --- SECTION 1: BOARD (Header + Grid) ---
+                const boardSection = document.createElement('div');
+                boardSection.className = 'robotics-board-section';
 
                 // Header & Level Nav
                 const header = document.createElement('div');
@@ -7238,7 +7391,7 @@
                 const btnPrev = document.createElement('button');
                 btnPrev.innerHTML = '⬅️';
                 btnPrev.style.cssText = `background:none; border:none; font-size:2em; cursor:pointer; opacity: ${this.level > 0 ? 1 : 0.3};`;
-                btnPrev.onclick = () => { if(this.level > 0) { this.level--; this.init(); } };
+                btnPrev.onclick = () => { if (this.level > 0) { this.level--; this.init(); } };
 
                 const h = document.createElement('h2');
                 h.innerHTML = `🤖 Nivel ${this.level + 1}`;
@@ -7248,15 +7401,16 @@
                 const btnNext = document.createElement('button');
                 btnNext.innerHTML = '➡️';
                 btnNext.style.cssText = `background:none; border:none; font-size:2em; cursor:pointer; opacity: ${this.level < this.levels.length - 1 ? 1 : 0.3};`;
-                btnNext.onclick = () => { if(this.level < this.levels.length - 1) { this.level++; this.init(); } };
+                btnNext.onclick = () => { if (this.level < this.levels.length - 1) { this.level++; this.init(); } };
 
                 header.appendChild(btnPrev);
                 header.appendChild(h);
                 header.appendChild(btnNext);
-                this.c.appendChild(header);
+                boardSection.appendChild(header);
 
                 // Grid Container
                 const gridEl = document.createElement('div');
+                gridEl.className = 'robotics-grid'; // New CSS Class
                 gridEl.style.cssText = `
                     display: grid;
                     grid-template-columns: repeat(5, 1fr);
@@ -7270,8 +7424,8 @@
                 `;
 
                 const grid = this.currentLevelData.grid;
-                for(let r=0; r<grid.length; r++) {
-                    for(let c=0; c<grid[0].length; c++) {
+                for (let r = 0; r < grid.length; r++) {
+                    for (let c = 0; c < grid[0].length; c++) {
                         const cell = document.createElement('div');
                         cell.style.cssText = `
                             background: ${grid[r][c] === 0 ? '#34495e' : '#576574'};
@@ -7279,10 +7433,10 @@
                             font-size: 2em; border-radius: 4px;
                         `;
 
-                        if(grid[r][c] === 3) cell.innerHTML = '🔋'; // Goal
+                        if (grid[r][c] === 3) cell.innerHTML = '🔋'; // Goal
 
                         // Robot
-                        if(this.robot.x === c && this.robot.y === r) {
+                        if (this.robot.x === c && this.robot.y === r) {
                             cell.innerHTML = '<span>🤖</span>';
                             const rot = this.robot.dir * 90;
                             cell.firstChild.style.transform = `rotate(${rot}deg)`;
@@ -7292,16 +7446,21 @@
                         gridEl.appendChild(cell);
                     }
                 }
-                this.c.appendChild(gridEl);
+                boardSection.appendChild(gridEl);
+                this.c.appendChild(boardSection);
+
+                // --- SECTION 2: CONTROLS (Queue + Buttons + Run) ---
+                const controlsSection = document.createElement('div');
+                controlsSection.className = 'robotics-controls-section';
 
                 // Queue Display
                 const queueEl = document.createElement('div');
                 queueEl.style.cssText = `
-                    width: 95%; min-height: 50px; background: #222;
+                    width: 100%; min-height: 50px; background: #222;
                     border-radius: 5px; padding: 5px; display: flex; gap: 5px;
-                    overflow-x: auto; margin-bottom: 10px; color: white; align-items: center;
+                    overflow-x: auto; margin-bottom: 10px; color: white; align-items: center; justify-content: flex-start;
                 `;
-                if(this.program.length === 0) queueEl.innerHTML = '<span style="color:#666">...</span>';
+                if (this.program.length === 0) queueEl.innerHTML = '<span style="color:#666">...</span>';
                 this.program.forEach((cmd, i) => {
                     const icon = this.getIcon(cmd);
                     const sp = document.createElement('span');
@@ -7309,11 +7468,11 @@
                     sp.style.cssText = 'background:#555; padding:5px; border-radius:3px;';
                     queueEl.appendChild(sp);
                 });
-                this.c.appendChild(queueEl);
+                controlsSection.appendChild(queueEl);
 
                 // Controls
                 const controls = document.createElement('div');
-                controls.style.cssText = `display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; width: 95%; max-width: 400px;`;
+                controls.style.cssText = `display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; width: 100%;`;
 
                 this.createBtn(controls, '⬆️', '#2ecc71', () => this.addCmd('F'));
                 this.createBtn(controls, '↺', '#f1c40f', () => this.addCmd('L'));
@@ -7321,22 +7480,24 @@
                 this.createBtn(controls, '⌫', '#e67e22', () => { this.program.pop(); this.render(); }); // Backspace
                 this.createBtn(controls, '🗑️', '#e74c3c', () => { this.program = []; this.render(); }); // Clear All
 
-                this.c.appendChild(controls);
+                controlsSection.appendChild(controls);
 
                 // Run Button
                 const runBtn = document.createElement('button');
                 runBtn.textContent = this.running ? '🏃 Ejecutando...' : '▶️ EJECUTAR';
                 runBtn.className = 'mode-btn kid';
-                runBtn.style.cssText = `margin-top: 15px; background: ${this.running ? '#7f8c8d' : '#00d2d3'}; width: 95%; max-width: 400px;`;
+                runBtn.style.cssText = `margin-top: 15px; background: ${this.running ? '#7f8c8d' : '#00d2d3'}; width: 100%; padding: 15px; font-size: 1.2em;`;
                 runBtn.onclick = () => this.runProgram();
-                this.c.appendChild(runBtn);
+                controlsSection.appendChild(runBtn);
 
                 // Exit
                 const exit = document.createElement('button');
                 exit.textContent = '🏠 Salir';
-                exit.style.cssText = 'background:none; border:none; color:white; margin-top:10px; font-size:1.2em;';
+                exit.style.cssText = 'background:none; border:none; color:white; margin-top:10px; font-size:1.2em; cursor: pointer;';
                 exit.onclick = () => window.app.nav.goDashboard();
-                this.c.appendChild(exit);
+                controlsSection.appendChild(exit);
+
+                this.c.appendChild(controlsSection);
             }
 
             createBtn(parent, text, color, fn) {
@@ -7347,53 +7508,54 @@
                     font-size: 2em; padding: 10px; cursor: pointer; color: white;
                     box-shadow: 0 4px 0 rgba(0,0,0,0.3);
                 `;
-                b.onclick = () => { if(!this.running) fn(); };
+                b.onclick = () => { if (!this.running) fn(); };
                 parent.appendChild(b);
             }
 
             getIcon(cmd) {
-                if(cmd === 'F') return '⬆️';
-                if(cmd === 'L') return '↺';
-                if(cmd === 'R') return '↻';
+                if (cmd === 'F') return '⬆️';
+                if (cmd === 'L') return '↺';
+                if (cmd === 'R') return '↻';
                 return '?';
             }
 
             addCmd(cmd) {
-                if(this.program.length < 10) {
+                if (this.program.length < 10) {
                     this.program.push(cmd);
                     this.render();
                 }
             }
 
             async runProgram() {
-                if(this.running || this.program.length === 0) return;
+                if (this.running || this.program.length === 0) return;
                 this.running = true;
                 this.resetRobot();
                 this.render();
 
-                for(let i=0; i<this.program.length; i++) {
+                for (let i = 0; i < this.program.length; i++) {
                     await new Promise(r => setTimeout(r, this.speed));
+                    if (!this.running) return; // FIX: Stop if game ended
                     const cmd = this.program[i];
 
-                    if(cmd === 'F') {
+                    if (cmd === 'F') {
                         let nx = this.robot.x;
                         let ny = this.robot.y;
-                        if(this.robot.dir === 0) ny--;
-                        if(this.robot.dir === 1) nx++;
-                        if(this.robot.dir === 2) ny++;
-                        if(this.robot.dir === 3) nx--;
+                        if (this.robot.dir === 0) ny--;
+                        if (this.robot.dir === 1) nx++;
+                        if (this.robot.dir === 2) ny++;
+                        if (this.robot.dir === 3) nx--;
 
-                        if(this.isValid(nx, ny)) {
+                        if (this.isValid(nx, ny)) {
                             this.robot.x = nx;
                             this.robot.y = ny;
                         } else {
                             window.app.audio.playError();
                         }
                     }
-                    else if(cmd === 'L') {
+                    else if (cmd === 'L') {
                         this.robot.dir = (this.robot.dir - 1 + 4) % 4;
                     }
-                    else if(cmd === 'R') {
+                    else if (cmd === 'R') {
                         this.robot.dir = (this.robot.dir + 1) % 4;
                     }
 
@@ -7402,11 +7564,11 @@
                 }
 
                 const grid = this.currentLevelData.grid;
-                if(grid[this.robot.y][this.robot.x] === 3) {
+                if (grid[this.robot.y][this.robot.x] === 3) {
                     window.app.audio.playWin();
                     setTimeout(() => {
                         this.level++;
-                        if(this.level >= this.levels.length) {
+                        if (this.level >= this.levels.length) {
                             this.winGame();
                         } else {
                             this.init();
@@ -7422,8 +7584,8 @@
 
             isValid(x, y) {
                 const grid = this.currentLevelData.grid;
-                if(y < 0 || y >= grid.length || x < 0 || x >= grid[0].length) return false;
-                if(grid[y][x] === 0) return false;
+                if (y < 0 || y >= grid.length || x < 0 || x >= grid[0].length) return false;
+                if (grid[y][x] === 0) return false;
                 return true;
             }
 
@@ -7570,18 +7732,42 @@
                     if (mode === 'root' && isArcade) return; // Hide games in root
                     if (mode === 'arcade' && !isArcade) return; // Hide quizzes in arcade
 
+                    const hasCost = data.cost && data.cost > 0;
+                    const isLocked = hasCost && this.state.totalStars < data.cost;
+
                     const div = document.createElement('div');
                     div.className = 'area-card';
+                    if (isLocked) div.classList.add('locked');
+
                     div.style.background = data.theme;
                     div.dataset.key = key;
+
+                    let costUI = '<div class="stars">⭐⭐⭐</div>'; // Default
+                    if (hasCost) {
+                        costUI = `<div class="cost-badge">⭐ ${data.cost}</div>`;
+                    }
+
                     div.innerHTML = `
-                        <div style="font-size: 4em;">${data.icon}</div>
-                        <h3>${data.title}</h3>
-                        <div class="stars">⭐⭐⭐</div>
-                    `;
+                <div style="font-size: 4em;">${data.icon}</div>
+                <h3>${data.title}</h3>
+                ${costUI}
+            `;
                     div.onclick = () => this.startGame(key);
                     grid.appendChild(div);
                 });
+            }
+
+            showToast(msg) {
+                const el = document.createElement('div');
+                el.style.cssText = `
+            position: fixed; bottom: 20%; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 15px 30px;
+            border-radius: 30px; font-size: 1.2em; z-index: 3000;
+            animation: pop 0.3s;
+        `;
+                el.textContent = msg;
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 2000);
             }
 
             saveGame(gameKey, state) {
@@ -7604,15 +7790,35 @@
             }
 
             startGame(key) {
+                const data = ACTIVITIES_DATA[key];
+
+                // Cost Logic (Spend Stars)
+                if (data.cost && data.cost > 0) {
+                    if (this.state.totalStars < data.cost) {
+                        this.audio.playError();
+                        this.showToast(`Necesitas ${data.cost} Estrellas ⭐`);
+                        return; // Block start
+                    }
+                    // Deduct
+                    this.state.totalStars -= data.cost;
+                    this.updateUI();
+                    this.persistState();
+                }
+
                 this.currentGameKey = key; // Save for Replay
                 this.nav.show('game');
                 const canvas = document.getElementById('gameArea');
-                const data = ACTIVITIES_DATA[key];
+
                 document.getElementById('gameTitle').textContent = data.title;
 
                 if (this.gameInstance && typeof this.gameInstance.cleanup === 'function') {
                     this.gameInstance.cleanup();
                 }
+
+                // DEFENSIVE CLEANUP: Reset container completely to prevent CSS/Style leaks
+                canvas.className = 'game-canvas-container'; // Restore base layout class
+                canvas.removeAttribute('style'); // Remove backgrounds/borders
+                canvas.innerHTML = '';
 
                 // Check for save
                 const savedState = this.getSavedGame(key);
@@ -7674,6 +7880,11 @@
             }
 
             updateParentStats(starsToAdd = 0, activitiesToAdd = 0, source = 'quiz') {
+                // FIX: Cleanup Saved Game on Win
+                if (starsToAdd > 0 && this.currentGameKey) {
+                    localStorage.removeItem('savedGame_' + this.currentGameKey);
+                }
+
                 // Double check cap for persistent stats
                 if (source === 'movement' && this.state.movementStars >= 200) {
                     starsToAdd = 0;
@@ -7874,6 +8085,10 @@
                 // Update Cinema Score too if visible
                 const cineScore = document.getElementById('cinemaScore');
                 if (cineScore) cineScore.textContent = this.state.totalStars;
+
+                // Update Game Global Score (Wallet)
+                const gameGlobalStars = document.getElementById('gameGlobalStars');
+                if (gameGlobalStars) gameGlobalStars.textContent = this.state.totalStars;
             }
 
             openCinema() {
