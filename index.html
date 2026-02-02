@@ -14,8 +14,13 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v18.2 "Symphonic Days"</title>
+    <title>v18.3 "Ultimate Days"</title>
     <!--
+        CHANGELOG v18.3
+        - [GAMEPLAY] Días de la Semana: Ronda de Bonus "Contexto" (Cole vs Casa).
+        - [GAMEPLAY] Días de la Semana: Fase Final "Rueda del Tiempo" (Comprensión Cíclica).
+        - [VISUAL] Animación "Victory Lap" del tren.
+
         CHANGELOG v18.2
         - [UX] Días de la Semana: Identidad visual única (Iconos/Colores) y mnemotecnia (Lunes=Luna, Domingo=Sol).
         - [UX] Días de la Semana: "Maestro Fantasma" (Pistas automáticas tras 8s de inactividad).
@@ -1596,29 +1601,36 @@
                 this.data = data;
                 this.c = container;
                 this.lang = 'es'; // es | en
-                this.currentStep = 0; // 0 to 6
-                this.shuffled = [];
-                this.hintTimeout = null;
-                this.isReviewing = false; // New state
+                this.isReviewing = false;
+                this.isBonusRound = false;
+                this.bonusQuestionsCount = 0;
+                this.maxBonusQuestions = 3;
+                this.isCyclePhase = false;
+                this.cycleRoundCount = 0;
+
+                this.activities = {
+                    school: ['🎒', '📚', '🏫', '✏️', '🚌', '📓'],
+                    home: ['⚽', '🎮', '🧸', '🌳', '🏠', '🛌']
+                };
 
                 this.daysConfig = {
                     es: [
-                        { name: 'Lunes', color: '#bdc3c7', icon: '🌑', note: 261.63 }, // C4
-                        { name: 'Martes', color: '#e74c3c', icon: '🔴', note: 293.66 }, // D4
-                        { name: 'Miércoles', color: '#e67e22', icon: '🟠', note: 329.63 }, // E4
-                        { name: 'Jueves', color: '#9b59b6', icon: '⚡', note: 349.23 }, // F4
-                        { name: 'Viernes', color: '#ff9ff3', icon: '💖', note: 392.00 }, // G4
-                        { name: 'Sábado', color: '#2ecc71', icon: '🌳', note: 440.00 }, // A4
-                        { name: 'Domingo', color: '#f1c40f', icon: '☀️', note: 493.88 }  // B4
+                        { name: 'Lunes', color: '#bdc3c7', icon: '🌑', note: 261.63, type: 'school' },
+                        { name: 'Martes', color: '#e74c3c', icon: '🔴', note: 293.66, type: 'school' },
+                        { name: 'Miércoles', color: '#e67e22', icon: '🟠', note: 329.63, type: 'school' },
+                        { name: 'Jueves', color: '#9b59b6', icon: '⚡', note: 349.23, type: 'school' },
+                        { name: 'Viernes', color: '#ff9ff3', icon: '💖', note: 392.00, type: 'school' },
+                        { name: 'Sábado', color: '#2ecc71', icon: '🌳', note: 440.00, type: 'home' },
+                        { name: 'Domingo', color: '#f1c40f', icon: '☀️', note: 493.88, type: 'home' }
                     ],
                     en: [
-                        { name: 'Monday', color: '#bdc3c7', icon: '🌑', note: 261.63 },
-                        { name: 'Tuesday', color: '#e74c3c', icon: '🔴', note: 293.66 },
-                        { name: 'Wednesday', color: '#e67e22', icon: '🟠', note: 329.63 },
-                        { name: 'Thursday', color: '#9b59b6', icon: '⚡', note: 349.23 },
-                        { name: 'Friday', color: '#ff9ff3', icon: '💖', note: 392.00 },
-                        { name: 'Saturday', color: '#2ecc71', icon: '🌳', note: 440.00 },
-                        { name: 'Sunday', color: '#f1c40f', icon: '☀️', note: 493.88 }
+                        { name: 'Monday', color: '#bdc3c7', icon: '🌑', note: 261.63, type: 'school' },
+                        { name: 'Tuesday', color: '#e74c3c', icon: '🔴', note: 293.66, type: 'school' },
+                        { name: 'Wednesday', color: '#e67e22', icon: '🟠', note: 329.63, type: 'school' },
+                        { name: 'Thursday', color: '#9b59b6', icon: '⚡', note: 349.23, type: 'school' },
+                        { name: 'Friday', color: '#ff9ff3', icon: '💖', note: 392.00, type: 'school' },
+                        { name: 'Saturday', color: '#2ecc71', icon: '🌳', note: 440.00, type: 'home' },
+                        { name: 'Sunday', color: '#f1c40f', icon: '☀️', note: 493.88, type: 'home' }
                     ]
                 };
 
@@ -1654,6 +1666,10 @@
                 this.lang = lang;
                 this.currentStep = 0;
                 this.isReviewing = false;
+                this.isBonusRound = false;
+                this.bonusQuestionsCount = 0;
+                this.isCyclePhase = false;
+                this.cycleRoundCount = 0;
                 // Shuffle config objects
                 this.shuffled = [...this.daysConfig[lang]].sort(() => Math.random() - 0.5);
                 this.renderGame();
@@ -1721,7 +1737,8 @@
 
                 // 1. Train / Timeline - Now with interactions!
                 const trainContainer = document.createElement('div');
-                trainContainer.style.cssText = 'display:flex; gap:5px; padding:10px; width:100%; overflow-x:auto; background:rgba(255,255,255,0.5); border-radius:15px; margin-bottom:10px; min-height:90px; align-items:center;';
+                trainContainer.id = 'days-train-container'; // ID for animation
+                trainContainer.style.cssText = 'display:flex; gap:5px; padding:10px; width:100%; overflow-x:auto; background:rgba(255,255,255,0.5); border-radius:15px; margin-bottom:10px; min-height:90px; align-items:center; position:relative;';
 
                 this.daysConfig[this.lang].forEach((dayObj, i) => {
                     const slot = document.createElement('div');
@@ -1907,10 +1924,238 @@
                     delay += 2500; // Gap for child to repeat
                 });
 
-                // Final Win
+                // Trigger Animation instead of immediate win
                 setTimeout(() => {
+                    this.animateTrainJourney();
+                }, delay + 500);
+            }
+
+            animateTrainJourney() {
+                const train = document.getElementById('days-train-container');
+                if (!train) { this.winGame(); return; }
+
+                // Sound Effect: "Choo Choo" (Two quick notes interactively)
+                app.audio.playTone(523.25, 'square', 0.1); // C5
+                setTimeout(() => app.audio.playTone(698.46, 'square', 0.2), 150); // F5
+
+                // 1. Depart to Right
+                const departAnim = train.animate([
+                    { transform: 'translateX(0)', easing: 'ease-in-out' },
+                    { transform: 'translateX(-30px)', easing: 'ease-out' }, // Anticipation
+                    { transform: 'translateX(150%)', easing: 'ease-in' }   // Fly off
+                ], { duration: 1200 });
+
+                departAnim.onfinish = () => {
+                    // 2. Return from Left
+                    train.style.transform = 'translateX(-150%)'; // Move to left side instantly
+
+                    const returnAnim = train.animate([
+                        { transform: 'translateX(-150%)' },
+                        { transform: 'translateX(0)' }
+                    ], { duration: 1000, easing: 'ease-out' });
+                    // Whoosh sound
+                    app.audio.playTone(100, 'sawtooth', 0.5);
+
+                    returnAnim.onfinish = () => {
+                        // 3. Arrived! Start Bonus Round!
+                        setTimeout(() => this.startBonusRound(), 500);
+                    };
+                };
+            }
+
+            startBonusRound() {
+                this.isBonusRound = true;
+                this.renderBonusRound();
+            }
+
+            renderBonusRound() {
+                this.c.innerHTML = '';
+                this.c.style.justifyContent = 'center';
+
+                if (this.bonusQuestionsCount >= this.maxBonusQuestions) {
+                    this.startCyclePhase(); // Go to Wheel
+                    return;
+                }
+
+                // Pick random day
+                const randomDay = this.daysConfig[this.lang][Math.floor(Math.random() * 7)];
+                const isSchool = randomDay.type === 'school';
+
+                // Question
+                const question = document.createElement('div');
+                question.innerHTML = this.lang === 'es' ?
+                    `¿Qué hacemos el <br><span style="font-size:1.5em; color:${randomDay.color}">${randomDay.name} ${randomDay.icon}</span>?` :
+                    `What do we do on <br><span style="font-size:1.5em; color:${randomDay.color}">${randomDay.name} ${randomDay.icon}</span>?`;
+                question.style.cssText = 'font-size:2em; color:#fff; text-align:center; font-weight:bold; margin-bottom:40px; text-shadow:2px 2px 4px rgba(0,0,0,0.2);';
+                this.c.appendChild(question);
+
+                app.audio.speak(question.textContent, this.lang === 'es' ? 'es-ES' : 'en-US');
+
+                // Options
+                const optionsDiv = document.createElement('div');
+                optionsDiv.style.cssText = 'display:flex; gap:30px; justify-content:center;';
+
+                // Prepare Correct and Wrong options
+                const correctPool = isSchool ? this.activities.school : this.activities.home;
+                const wrongPool = isSchool ? this.activities.home : this.activities.school;
+
+                const correctIcon = correctPool[Math.floor(Math.random() * correctPool.length)];
+                const wrongIcon = wrongPool[Math.floor(Math.random() * wrongPool.length)];
+
+                // Shuffle placement
+                const opts = [
+                    { icon: correctIcon, isCorrect: true },
+                    { icon: wrongIcon, isCorrect: false }
+                ].sort(() => Math.random() - 0.5);
+
+                opts.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.textContent = opt.icon;
+                    btn.className = 'mode-btn kid';
+                    btn.style.cssText = 'font-size:4em; padding:20px 40px; border-radius:30px; background:white; box-shadow:0 10px 0 rgba(0,0,0,0.1); transition:transform 0.2s;';
+
+                    btn.onclick = () => {
+                        if (opt.isCorrect) {
+                            app.audio.playPop();
+                            this.playConfetti(btn);
+                            btn.style.background = '#2ecc71';
+
+                            const praise = this.lang === 'es' ? '¡Sí! ¡Correcto!' : 'Yes! Correct!';
+                            app.audio.speak(praise, this.lang === 'es' ? 'es-ES' : 'en-US');
+
+                            setTimeout(() => {
+                                this.bonusQuestionsCount++;
+                                this.renderBonusRound();
+                            }, 1500);
+                        } else {
+                            app.audio.playError();
+                            btn.animate([
+                                { transform: 'rotate(0)' }, { transform: 'rotate(-10deg)' },
+                                { transform: 'rotate(10deg)' }, { transform: 'rotate(0)' }
+                            ], 300);
+
+                            const correction = this.lang === 'es' ?
+                                (isSchool ? `No, el ${randomDay.name} vamos a la escuela.` : `No, el ${randomDay.name} estamos en casa.`) :
+                                (isSchool ? `No, on ${randomDay.name} we go to school.` : `No, on ${randomDay.name} we are at home.`);
+                            app.audio.speak(correction, this.lang === 'es' ? 'es-ES' : 'en-US');
+                        }
+                    };
+                    optionsDiv.appendChild(btn);
+                });
+
+                this.c.appendChild(optionsDiv);
+
+                // Controls
+                this.addControls();
+            }
+
+            startCyclePhase() {
+                this.isCyclePhase = true;
+                this.cycleRoundCount = 0;
+
+                const intro = this.lang === 'es' ?
+                    '¡Ya casi! Ahora la Rueda del Tiempo.' :
+                    'Almost there! Now the Wheel of Time.';
+                app.audio.speak(intro, this.lang === 'es' ? 'es-ES' : 'en-US');
+
+                setTimeout(() => this.renderCycleRound(), 2000);
+            }
+
+            renderCycleRound() {
+                this.c.innerHTML = '';
+                this.c.style.justifyContent = 'center';
+                this.c.style.position = 'relative'; // For absolute positioning of wheel items
+
+                if (this.cycleRoundCount >= 3) {
                     this.winGame();
-                }, delay + 1000);
+                    return;
+                }
+
+                // Logic: Pick a start day. Ensure specific rounds cover Sat/Sun
+                let seedIndex;
+                if (this.cycleRoundCount === 2) {
+                    seedIndex = 6; // Force Sunday -> Monday check on last round
+                } else {
+                    seedIndex = Math.floor(Math.random() * 6); // 0-5
+                }
+
+                const currentDay = this.daysConfig[this.lang][seedIndex];
+                const nextIndex = (seedIndex + 1) % 7;
+                const nextDay = this.daysConfig[this.lang][nextIndex];
+
+                // Title
+                const title = document.createElement('h2');
+                title.textContent = this.lang === 'es' ? '¿Qué va después?' : 'What comes next?';
+                title.style.cssText = 'position:absolute; top:20px; color:#d63384; font-size:2em; width:100%; text-align:center;';
+                this.c.appendChild(title);
+
+                // Wheel Container
+                const wheelSize = 300;
+                const wheel = document.createElement('div');
+                wheel.style.cssText = `
+                    width:${wheelSize}px; height:${wheelSize}px; border: 5px dashed rgba(255,255,255,0.5); 
+                    border-radius:50%; position:relative; display:flex; justify-content:center; align-items:center;
+                    margin-top: 40px;
+                `;
+
+                // Center Prompt
+                const center = document.createElement('div');
+                center.style.cssText = 'text-align:center; z-index:10; background:white; padding:20px; border-radius:50%; box-shadow:0 10px 20px rgba(0,0,0,0.1); width:120px; height:120px; display:flex; flex-direction:column; justify-content:center; align-items:center;';
+                center.innerHTML = `<div style="font-size:2.5em;">${currentDay.icon}</div><div style="font-weight:bold; color:${currentDay.color}">${currentDay.name}</div><div style="font-size:2em; color:#333; margin-top:-5px;">⤵️</div>`;
+                wheel.appendChild(center);
+
+                // Orbiting Days
+                this.daysConfig[this.lang].forEach((day, i) => {
+                    const angle = (i * 2 * Math.PI) / 7 - (Math.PI / 2); // Start at top (-90deg)
+                    const r = wheelSize / 2;
+                    const x = r * Math.cos(angle);
+                    const y = r * Math.sin(angle);
+
+                    const planet = document.createElement('button');
+                    planet.className = 'mode-btn kid';
+                    planet.innerHTML = day.icon; // Just icon to keep clean
+                    planet.style.cssText = `
+                        position:absolute; left:50%; top:50%; width:60px; height:60px; 
+                        margin-left:-30px; margin-top:-30px; border-radius:50%; padding:0;
+                        transform: translate(${x}px, ${y}px); background: white; font-size:2em;
+                        box-shadow: 0 4px 0 ${day.color}; border: 2px solid ${day.color};
+                    `;
+
+                    planet.onclick = () => {
+                        if (day.name === nextDay.name) {
+                            app.audio.playPop();
+                            planet.style.background = '#2ecc71';
+                            planet.style.transform += ' scale(1.3)';
+
+                            const phrase = this.lang === 'es' ?
+                                `¡Sí! Después del ${currentDay.name} va el ${nextDay.name}.` :
+                                `Yes! After ${currentDay.name} comes ${nextDay.name}.`;
+                            app.audio.speak(phrase, this.lang === 'es' ? 'es-ES' : 'en-US');
+
+                            setTimeout(() => {
+                                this.cycleRoundCount++;
+                                this.renderCycleRound();
+                            }, 2000);
+                        } else {
+                            app.audio.playError();
+                            planet.animate([
+                                { transform: `translate(${x}px, ${y}px) scale(1)` },
+                                { transform: `translate(${x}px, ${y}px) scale(0.9)` },
+                                { transform: `translate(${x}px, ${y}px) scale(1)` }
+                            ], 200);
+                        }
+                    };
+                    wheel.appendChild(planet);
+                });
+
+                this.c.appendChild(wheel);
+
+                const instruction = this.lang === 'es' ?
+                    `Después del ${currentDay.name} va...` :
+                    `After ${currentDay.name} comes...`;
+                app.audio.speak(instruction, this.lang === 'es' ? 'es-ES' : 'en-US');
+
+                this.addControls();
             }
 
             playConfetti(element) {
