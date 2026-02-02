@@ -14,8 +14,14 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v18.0 "Bilingual Days"</title>
+    <title>v18.2 "Symphonic Days"</title>
     <!--
+        CHANGELOG v18.2
+        - [UX] Días de la Semana: Identidad visual única (Iconos/Colores) y mnemotecnia (Lunes=Luna, Domingo=Sol).
+        - [UX] Días de la Semana: "Maestro Fantasma" (Pistas automáticas tras 8s de inactividad).
+        - [UX] Días de la Semana: Fase "Sinfónica" de repaso. Escala musical interactiva al completar la semana.
+        - [UX] Días de la Semana: Feedback correccional hablado y celebración con confeti.
+
         CHANGELOG v18.0
         - [FEATURE] Nuevo Juego: "Días de la Semana" (DaysWeekGame). Aprende el orden en Español e Inglés.
         - [SYS] AudioEngine: Soporte multi-idioma (ES/EN) para voces.
@@ -1592,10 +1598,28 @@
                 this.lang = 'es'; // es | en
                 this.currentStep = 0; // 0 to 6
                 this.shuffled = [];
+                this.hintTimeout = null;
+                this.isReviewing = false; // New state
 
-                this.days = {
-                    es: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
-                    en: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                this.daysConfig = {
+                    es: [
+                        { name: 'Lunes', color: '#bdc3c7', icon: '🌑', note: 261.63 }, // C4
+                        { name: 'Martes', color: '#e74c3c', icon: '🔴', note: 293.66 }, // D4
+                        { name: 'Miércoles', color: '#e67e22', icon: '🟠', note: 329.63 }, // E4
+                        { name: 'Jueves', color: '#9b59b6', icon: '⚡', note: 349.23 }, // F4
+                        { name: 'Viernes', color: '#ff9ff3', icon: '💖', note: 392.00 }, // G4
+                        { name: 'Sábado', color: '#2ecc71', icon: '🌳', note: 440.00 }, // A4
+                        { name: 'Domingo', color: '#f1c40f', icon: '☀️', note: 493.88 }  // B4
+                    ],
+                    en: [
+                        { name: 'Monday', color: '#bdc3c7', icon: '🌑', note: 261.63 },
+                        { name: 'Tuesday', color: '#e74c3c', icon: '🔴', note: 293.66 },
+                        { name: 'Wednesday', color: '#e67e22', icon: '🟠', note: 329.63 },
+                        { name: 'Thursday', color: '#9b59b6', icon: '⚡', note: 349.23 },
+                        { name: 'Friday', color: '#ff9ff3', icon: '💖', note: 392.00 },
+                        { name: 'Saturday', color: '#2ecc71', icon: '🌳', note: 440.00 },
+                        { name: 'Sunday', color: '#f1c40f', icon: '☀️', note: 493.88 }
+                    ]
                 };
 
                 this.init();
@@ -1605,7 +1629,6 @@
                 this.c.innerHTML = '';
                 this.c.style.cssText = 'background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); display:flex; flex-direction:column; align-items:center; padding:10px; font-family:"Fredoka",sans-serif; height:100%; overflow:hidden;';
 
-                // Language Selection Screen
                 const title = document.createElement('h2');
                 title.textContent = '📅 Días de la Semana';
                 title.style.cssText = 'color:#d63384; font-size:3em; margin-bottom:30px; text-align:center; text-shadow:2px 2px 0 white;';
@@ -1613,13 +1636,13 @@
 
                 const btnES = document.createElement('button');
                 btnES.className = 'mode-btn kid';
-                btnES.textContent = '🇪🇸 Español';
+                btnES.innerHTML = '🇪🇸 Español';
                 btnES.style.marginBottom = '20px';
                 btnES.onclick = () => this.startGame('es');
 
                 const btnEN = document.createElement('button');
                 btnEN.className = 'mode-btn kid';
-                btnEN.textContent = '🇬🇧 English';
+                btnEN.innerHTML = '🇬🇧 English';
                 btnEN.style.background = '#3498db';
                 btnEN.onclick = () => this.startGame('en');
 
@@ -1630,93 +1653,177 @@
             startGame(lang) {
                 this.lang = lang;
                 this.currentStep = 0;
-                this.shuffled = [...this.days[lang]].sort(() => Math.random() - 0.5);
+                this.isReviewing = false;
+                // Shuffle config objects
+                this.shuffled = [...this.daysConfig[lang]].sort(() => Math.random() - 0.5);
                 this.renderGame();
                 this.playPrompt();
             }
 
             playPrompt() {
-                const targetDay = this.days[this.lang][this.currentStep];
-                const text = this.lang === 'es' ? `¿Cuál es el día ${this.currentStep + 1}?` : `Which is day ${this.currentStep + 1}?`;
-                // app.audio.speak(text, this.lang === 'es' ? 'es-ES' : 'en-US');
-                // Simplified instruction
-                if (this.currentStep === 0) {
-                    app.audio.speak(this.lang === 'es' ? "Ordena los días. Primero: " + targetDay : "Order the days. First: " + targetDay, this.lang === 'es' ? 'es-ES' : 'en-US');
-                }
+                if (this.isReviewing) return;
+                this.clearHint();
+                const target = this.daysConfig[this.lang][this.currentStep];
+                const text = this.lang === 'es' ?
+                    `Busca: ${target.name}. ${target.icon}` :
+                    `Find: ${target.name}. ${target.icon}`;
+
+                app.audio.speak(text, this.lang === 'es' ? 'es-ES' : 'en-US');
+                this.startHintTimer();
+            }
+
+            startHintTimer() {
+                if (this.isReviewing) return;
+                this.clearHint();
+                this.hintTimeout = setTimeout(() => {
+                    // Visual Hint: Pulse the correct button
+                    const correctBtn = Array.from(document.querySelectorAll('.day-option-btn'))
+                        .find(b => b.textContent.includes(this.daysConfig[this.lang][this.currentStep].name));
+
+                    if (correctBtn) {
+                        correctBtn.animate([
+                            { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(255, 215, 0, 0.7)' },
+                            { transform: 'scale(1.1)', boxShadow: '0 0 0 10px rgba(255, 215, 0, 0)' },
+                            { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(255, 215, 0, 0)' }
+                        ], { duration: 1000, iterations: Infinity });
+
+                        // Audio Hint
+                        const t = this.daysConfig[this.lang][this.currentStep];
+                        const hintText = this.lang === 'es' ?
+                            `Mira, es de color ${this.getColorName(t.color)}. ¡El ${t.name}!` :
+                            `Look! It's ${t.name}!`;
+                        app.audio.speak(hintText, this.lang === 'es' ? 'es-ES' : 'en-US');
+                    }
+                }, 8000); // 8 seconds patience
+            }
+
+            clearHint() {
+                if (this.hintTimeout) clearTimeout(this.hintTimeout);
+                // Stop animations if any (hard to target specific animation via JS API without ref, but re-render clears it)
+            }
+
+            getColorName(hex) {
+                // Quick helper for Spanish hints
+                if (hex === '#e74c3c') return 'rojo';
+                if (hex === '#f1c40f') return 'amarillo';
+                if (hex === '#2ecc71') return 'verde';
+                if (hex === '#3498db') return 'azul';
+                if (hex === '#9b59b6') return 'morado';
+                if (hex === '#e67e22') return 'naranja';
+                if (hex === '#bdc3c7') return 'gris';
+                if (hex === '#ff9ff3') return 'rosa';
+                return 'bonito';
             }
 
             renderGame() {
                 this.c.innerHTML = '';
-                this.c.style.justifyContent = 'space-between'; // Layout
+                this.c.style.justifyContent = 'space-between';
 
-                // 1. Train / Timeline (Top)
+                // 1. Train / Timeline - Now with interactions!
                 const trainContainer = document.createElement('div');
-                trainContainer.style.cssText = 'display:flex; gap:5px; padding:10px; width:100%; overflow-x:auto; background:rgba(255,255,255,0.5); border-radius:15px; margin-bottom:10px; min-height:80px; align-items:center;';
+                trainContainer.style.cssText = 'display:flex; gap:5px; padding:10px; width:100%; overflow-x:auto; background:rgba(255,255,255,0.5); border-radius:15px; margin-bottom:10px; min-height:90px; align-items:center;';
 
-                // Slots
-                this.days[this.lang].forEach((day, i) => {
+                this.daysConfig[this.lang].forEach((dayObj, i) => {
                     const slot = document.createElement('div');
                     const isFilled = i < this.currentStep;
+
                     slot.style.cssText = `
-                        min-width: 80px; height: 60px; border: 2px dashed #d63384;
-                        border-radius: 10px; display:flex; align-items:center; justify-content:center;
+                        min-width: 80px; height: 70px; border: 2px dashed #d63384;
+                        border-radius: 10px; display:flex; flex-direction:column; align-items:center; justify-content:center;
                         font-weight:bold; color: #d63384; background: ${isFilled ? '#fff' : 'transparent'};
-                        flex-shrink: 0; font-size: 1.2em; border-style: ${isFilled ? 'solid' : 'dashed'};
+                        flex-shrink: 0; font-size: 1.1em; border-style: ${isFilled ? 'solid' : 'dashed'};
                         transition: all 0.3s;
+                        cursor: ${isFilled && this.isReviewing ? 'pointer' : 'default'};
                     `;
-                    slot.textContent = isFilled ? day : (i + 1);
+
+                    // ID for review targeting
+                    slot.id = `day-slot-${i}`;
+
                     if (isFilled) {
-                        slot.style.color = '#2ecc71';
-                        slot.style.borderColor = '#2ecc71';
-                        slot.textContent = day;
-                    } else if (i === this.currentStep) {
-                        slot.style.background = 'rgba(255,255,255,0.3)';
-                        slot.style.transform = 'scale(1.1)';
+                        slot.innerHTML = `<span style="font-size:1.5em">${dayObj.icon}</span><span>${dayObj.name}</span>`;
+                        slot.style.border = `3px solid ${dayObj.color}`;
+                        slot.style.color = '#333';
+
+                        // Interactive Piano Note when reviewing
+                        if (this.isReviewing) {
+                            slot.onclick = () => {
+                                app.audio.playTone(dayObj.note, 'sine', 0.3);
+                                slot.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.2)' }, { transform: 'scale(1)' }], 200);
+                            };
+                        }
+
+                    } else {
+                        slot.textContent = (i + 1);
+                        if (i === this.currentStep) {
+                            slot.style.background = 'rgba(255,255,255,0.3)';
+                            slot.style.transform = 'scale(1.1)';
+                            slot.style.borderColor = '#fff';
+                        }
                     }
                     trainContainer.appendChild(slot);
                 });
                 this.c.appendChild(trainContainer);
 
-                // 2. Instructions
+                // 2. Instructions / Review Message
                 const instr = document.createElement('div');
-                instr.textContent = this.lang === 'es' ? 'Toca el siguiente día:' : 'Tap the next day:';
-                instr.style.cssText = 'font-size:1.5em; color:#d63384; margin:10px; text-align:center; font-weight:bold;';
+                if (this.isReviewing) {
+                    instr.textContent = this.lang === 'es' ? '¡Repite conmigo!' : 'Repeat with me!';
+                } else {
+                    const target = this.daysConfig[this.lang][this.currentStep];
+                    if (target) {
+                        instr.innerHTML = this.lang === 'es' ?
+                            `Busca: <span style="color:${target.color}; font-size:1.2em">${target.name} ${target.icon}</span>` :
+                            `Find: <span style="color:${target.color}; font-size:1.2em">${target.name} ${target.icon}</span>`;
+                    }
+                }
+                instr.style.cssText = 'font-size:1.5em; color:#fff; margin:10px; text-align:center; font-weight:bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);';
                 this.c.appendChild(instr);
 
-                // 3. Scrambled Options (Bottom)
-                const optionsContainer = document.createElement('div');
-                optionsContainer.style.cssText = 'display:flex; flex-wrap:wrap; gap:15px; justify-content:center; padding:20px; flex-grow:1; align-content:flex-start;';
+                // 3. Options (Hidden during review)
+                if (!this.isReviewing) {
+                    const optionsContainer = document.createElement('div');
+                    optionsContainer.style.cssText = 'display:flex; flex-wrap:wrap; gap:15px; justify-content:center; padding:20px; flex-grow:1; align-content:flex-start;';
 
-                this.shuffled.forEach(day => {
-                    // Check if already placed
-                    if (this.days[this.lang].indexOf(day) < this.currentStep) return;
+                    this.shuffled.forEach(dayObj => {
+                        const correctSeq = this.daysConfig[this.lang];
+                        const idxCorrect = correctSeq.findIndex(d => d.name === dayObj.name);
+                        if (idxCorrect < this.currentStep) return;
 
-                    const btn = document.createElement('button');
-                    btn.textContent = day;
-                    btn.className = 'mode-btn kid';
-                    btn.style.cssText = 'font-size:1.2em; padding:15px 25px; background: white; color: #333; box-shadow: 0 5px 0 #ddd; margin:0; width:auto;';
+                        const btn = document.createElement('button');
+                        btn.className = 'mode-btn kid day-option-btn';
+                        btn.innerHTML = `<div style="font-size:1.5em; margin-bottom:5px;">${dayObj.icon}</div>${dayObj.name}`;
+                        btn.style.cssText = `
+                            font-size:1.1em; padding:10px 15px; 
+                            background: white; color: #333; 
+                            box-shadow: 0 5px 0 ${dayObj.color}; 
+                            border-bottom: 5px solid ${dayObj.color};
+                            margin:0; width:auto; min-width: 100px;
+                        `;
 
-                    // Update: Speak on click, then check
-                    btn.onclick = () => {
-                        const langCode = this.lang === 'es' ? 'es-ES' : 'en-US';
-                        app.audio.speak(day, langCode);
-                        this.check(day, btn);
-                    };
-                    optionsContainer.appendChild(btn);
-                });
-                this.c.appendChild(optionsContainer);
+                        btn.onclick = () => {
+                            const langCode = this.lang === 'es' ? 'es-ES' : 'en-US';
+                            app.audio.speak(dayObj.name, langCode);
+                            this.check(dayObj, btn);
+                        };
+                        optionsContainer.appendChild(btn);
+                    });
+                    this.c.appendChild(optionsContainer);
+                }
 
-                // Exit
+                // Controls
+                this.addControls();
+            }
+
+            addControls() {
                 const exit = document.createElement('button');
                 exit.textContent = '🏠';
                 exit.className = 'nav-btn';
                 exit.style.position = 'absolute';
                 exit.style.bottom = '10px';
                 exit.style.left = '10px';
-                exit.onclick = () => app.nav.goDashboard();
+                exit.onclick = () => { this.clearHint(); app.nav.goDashboard(); };
                 this.c.appendChild(exit);
 
-                // Stop Audio Button
                 const stopBtn = document.createElement('button');
                 stopBtn.textContent = '🤫';
                 stopBtn.className = 'nav-btn';
@@ -1727,55 +1834,135 @@
                 this.c.appendChild(stopBtn);
             }
 
-            check(selectedDay, btnEl) {
-                const correctDay = this.days[this.lang][this.currentStep];
+            check(selectedObj, btnEl) {
+                this.clearHint();
+                const correctObj = this.daysConfig[this.lang][this.currentStep];
 
-                if (selectedDay === correctDay) {
-                    // Correct
+                if (selectedObj.name === correctObj.name) {
                     app.audio.playPop();
-                    // const langCode = this.lang === 'es' ? 'es-ES' : 'en-US';
-                    // app.audio.speak(selectedDay, langCode); // Spoken on click now
-
+                    this.playConfetti(btnEl);
                     this.currentStep++;
 
-                    // Win?
                     if (this.currentStep >= 7) {
-                        this.winGame();
+                        this.startReviewPhase(); // TRIGGER REVIEW INSTEAD OF WIN
                     } else {
-                        this.renderGame();
+                        setTimeout(() => {
+                            this.renderGame();
+                            this.playPrompt();
+                        }, 500);
                     }
                 } else {
-                    // Wrong
                     app.audio.playError();
                     btnEl.animate([
                         { transform: 'translateX(0)' }, { transform: 'translateX(-10px)' },
                         { transform: 'translateX(10px)' }, { transform: 'translateX(0)' }
                     ], 300);
+
+                    const feedback = this.lang === 'es' ?
+                        `Ese es ${selectedObj.name}. Busca ${correctObj.name}.` :
+                        `That is ${selectedObj.name}. Find ${correctObj.name}.`;
+                    app.audio.speak(feedback, this.lang === 'es' ? 'es-ES' : 'en-US');
+                    this.startHintTimer();
+                }
+            }
+
+            startReviewPhase() {
+                this.isReviewing = true;
+                this.renderGame(); // Re-render to show simplified view (no options)
+
+                const intro = this.lang === 'es' ?
+                    '¡Tren completo! Ahora, repite conmigo para ganar tu premio.' :
+                    'Train complete! Now, repeat with me to win your prize.';
+
+                app.audio.speak(intro, this.lang === 'es' ? 'es-ES' : 'en-US');
+
+                // Sequence the review
+                let delay = 4000; // Wait for intro
+                const days = this.daysConfig[this.lang];
+
+                days.forEach((day, index) => {
+                    setTimeout(() => {
+                        // 1. Highlight Slot
+                        const slot = document.getElementById(`day-slot-${index}`);
+                        if (slot) {
+                            slot.style.transform = 'scale(1.3)';
+                            slot.style.zIndex = '10';
+                            slot.style.boxShadow = '0 0 20px white';
+                        }
+
+                        // 2. Play Note & Speak
+                        app.audio.playTone(day.note, 'sine', 0.5);
+                        app.audio.speak(day.name, this.lang === 'es' ? 'es-ES' : 'en-US');
+
+                        // 3. Reset after a bit
+                        setTimeout(() => {
+                            if (slot) {
+                                slot.style.transform = 'scale(1)';
+                                slot.style.zIndex = '1';
+                                slot.style.boxShadow = 'none';
+                            }
+                        }, 1500);
+
+                    }, delay);
+                    delay += 2500; // Gap for child to repeat
+                });
+
+                // Final Win
+                setTimeout(() => {
+                    this.winGame();
+                }, delay + 1000);
+            }
+
+            playConfetti(element) {
+                const rect = element.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                for (let i = 0; i < 20; i++) {
+                    const p = document.createElement('div');
+                    const color = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6'][Math.floor(Math.random() * 5)];
+                    p.style.cssText = `
+                        position:fixed; top:${centerY}px; left:${centerX}px; width:10px; height:10px;
+                        background:${color}; pointer-events:none; border-radius:50%; z-index:9999;
+                    `;
+                    document.body.appendChild(p);
+                    const angle = Math.random() * Math.PI * 2;
+                    const velocity = 50 + Math.random() * 100;
+                    const tx = Math.cos(angle) * velocity;
+                    const ty = Math.sin(angle) * velocity;
+                    p.animate([
+                        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+                        { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
+                    ], { duration: 600, easing: 'ease-out' }).onfinish = () => p.remove();
                 }
             }
 
             winGame() {
                 this.c.innerHTML = '';
                 this.c.style.justifyContent = 'center';
+                this.clearHint();
                 app.audio.playWin();
+                this.playConfetti(this.c);
+                setTimeout(() => this.playConfetti(this.c), 300);
+                setTimeout(() => this.playConfetti(this.c), 600);
 
-                const msg = this.lang === 'es' ? '¡Muy bien!' : 'Well done!';
+                const msg = this.lang === 'es' ? '¡Súper Bien!' : 'Awesome!';
+                // Only speak if not already spoken in review (or to reinforce)
                 app.audio.speak(msg, this.lang === 'es' ? 'es-ES' : 'en-US');
-                app.updateParentStats(20, 1, 'days_week'); // Reward
+                app.updateParentStats(20, 1, 'days_week');
 
                 this.c.innerHTML = `
-                    <div style="text-align: center; padding: 40px; background: rgba(255,255,255,0.9); border-radius: 20px;">
-                        <div style="font-size: 6em;">📅</div>
+                    <div style="text-align: center; padding: 40px; background: rgba(255,255,255,0.9); border-radius: 20px; animation: pop 0.5s;">
+                        <div style="font-size: 6em;">🌟🏆🌟</div>
                         <h2 style="color: #2ecc71; font-size:3em;">${msg}</h2>
-                        <p style="font-size:1.5em; color:#555;">${this.lang === 'es' ? '¡Sabes los días!' : 'You know the days!'}</p>
-                        <button class="mode-btn kid" style="margin-top:20px; background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Replay</button>
+                        <button class="mode-btn kid" style="margin-top:20px; background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar</button>
                         <div style="height:10px"></div>
-                        <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Menu</button>
+                        <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
                     </div>
                 `;
             }
 
-            cleanup() { }
+            cleanup() { this.clearHint(); }
         }
 
         class QuizGame {
