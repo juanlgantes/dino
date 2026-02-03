@@ -962,6 +962,41 @@
                 type: 'chess',
                 icon: '♟️',
                 theme: 'linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%)'
+            },
+            memory: {
+                title: '🧠 Memorama',
+                description: '¡Encuentra las parejas!',
+                type: 'memory',
+                icon: '🧠',
+                theme: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'
+            },
+            simon: {
+                title: '🔊 Simón Dino',
+                description: '¡Repite la secuencia!',
+                type: 'simon',
+                icon: '🔊',
+                theme: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+            },
+            whack: {
+                title: '🔨 Topo Dino',
+                description: '¡Atrapa a los dinos!',
+                type: 'whack',
+                icon: '🔨',
+                theme: 'linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)'
+            },
+            arkanoid: {
+                title: '🧱 Arkanoid',
+                description: '¡Rompe los bloques!',
+                type: 'arkanoid',
+                icon: '🧱',
+                theme: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+            },
+            sorting: {
+                title: '♻️ Reciclaje',
+                description: '¡Clasifica la basura!',
+                type: 'sorting',
+                icon: '♻️',
+                theme: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
             }
         };
 
@@ -6169,7 +6204,7 @@
                 const grid = document.getElementById('activitiesGrid');
                 grid.innerHTML = '';
 
-                const ARCADE_KEYS = ['aventura', 'surf', 'soccer', 'kart', 'fighter', 'laberinto', 'unir_puntos', 'connect_four', 'checkers', 'parchis', 'oca', 'chess'];
+                const ARCADE_KEYS = ['aventura', 'surf', 'soccer', 'kart', 'fighter', 'laberinto', 'unir_puntos', 'connect_four', 'checkers', 'parchis', 'oca', 'chess', 'memory', 'simon', 'whack', 'arkanoid', 'sorting'];
 
                 // 1. Render Specific Folder Header/Back Button?
                 if (mode === 'arcade') {
@@ -6271,6 +6306,16 @@
                     this.gameInstance = new GooseGame(data, canvas);
                 } else if (data.type === 'days_week') {
                     this.gameInstance = new DaysWeekGame(data, canvas);
+                } else if (data.type === 'memory') {
+                    this.gameInstance = new MemoryGame(data, canvas);
+                } else if (data.type === 'simon') {
+                    this.gameInstance = new SimonGame(data, canvas);
+                } else if (data.type === 'whack') {
+                    this.gameInstance = new WhackGame(data, canvas);
+                } else if (data.type === 'arkanoid') {
+                    this.gameInstance = new ArkanoidGame(data, canvas);
+                } else if (data.type === 'sorting') {
+                    this.gameInstance = new SortingGame(data, canvas);
                 } else {
                     this.gameInstance = new QuizGame(data, this);
                 }
@@ -6557,6 +6602,827 @@
                 document.body.appendChild(el);
                 setTimeout(() => el.remove(), 2000);
             }
+        }
+
+        /**
+         * ♻️ SORTING GAME (Reciclaje)
+         */
+        class SortingGame {
+            constructor(data, container) {
+                this.data = data;
+                this.c = container;
+                this.score = 0;
+                this.running = true;
+                this.items = [];
+                this.bins = [];
+                this.dragItem = null;
+                this.init();
+            }
+
+            init() {
+                this.c.innerHTML = '';
+                this.c.style.cssText = 'background: linear-gradient(to bottom, #87CEEB 0%, #a8e063 100%); position:relative; overflow:hidden; touch-action:none;';
+
+                // Bins
+                const binData = [
+                    { id: 'organic', color: '#e67e22', icon: '🍂', label: 'Orgánico' },
+                    { id: 'plastic', color: '#f1c40f', icon: '🥤', label: 'Plástico' },
+                    { id: 'paper', color: '#3498db', icon: '📰', label: 'Papel' }
+                ];
+
+                const binContainer = document.createElement('div');
+                binContainer.style.cssText = 'position:absolute; bottom:10px; width:100%; display:flex; justify-content:space-around;';
+
+                binData.forEach(b => {
+                    const bin = document.createElement('div');
+                    bin.dataset.id = b.id;
+                    bin.style.cssText = `
+                        width: 80px; height: 100px; background: ${b.color};
+                        border: 4px solid white; border-radius: 10px 10px 0 0;
+                        display: flex; flex-direction: column; align-items: center; justify-content: center;
+                        font-weight: bold; color: white;
+                    `;
+                    bin.innerHTML = `<div style="font-size:2em;">${b.icon}</div>${b.label}`;
+                    binContainer.appendChild(bin);
+                    this.bins.push({ el: bin, id: b.id });
+                });
+                this.c.appendChild(binContainer);
+
+                // Score
+                this.scoreEl = document.createElement('div');
+                this.scoreEl.style.cssText = 'position:absolute; top:10px; left:10px; font-size:1.5em; background:white; padding:5px 15px; border-radius:20px; box-shadow:0 2px 5px rgba(0,0,0,0.2);';
+                this.scoreEl.textContent = '⭐ 0';
+                this.c.appendChild(this.scoreEl);
+
+                // Loop
+                this.spawnLoop();
+
+                // Events (Drag)
+                this.c.addEventListener('touchmove', (e) => this.handleMove(e), { passive: false });
+                this.c.addEventListener('mousemove', (e) => this.handleMove(e));
+                this.c.addEventListener('touchend', () => this.handleUp());
+                this.c.addEventListener('mouseup', () => this.handleUp());
+            }
+
+            spawnLoop() {
+                if (!this.running) return;
+                if (this.items.length < 5) this.spawnItem();
+                setTimeout(() => this.spawnLoop(), 2000);
+            }
+
+            spawnItem() {
+                const types = [
+                    { type: 'organic', icon: '🍎' }, { type: 'organic', icon: '🍌' }, { type: 'organic', icon: '🦴' },
+                    { type: 'plastic', icon: '🥤' }, { type: 'plastic', icon: '🧴' }, { type: 'plastic', icon: '🛍️' },
+                    { type: 'paper', icon: '📰' }, { type: 'paper', icon: '📦' }, { type: 'paper', icon: '✉️' }
+                ];
+                const t = types[Math.floor(Math.random() * types.length)];
+
+                const el = document.createElement('div');
+                el.textContent = t.icon;
+                el.style.cssText = `
+                    position: absolute; top: -50px; left: ${Math.random() * 80 + 10}%;
+                    font-size: 3em; cursor: grab; transition: transform 0.1s;
+                    user-select: none; z-index: 10;
+                `;
+
+                // Mouse Down
+                const startDrag = (e) => {
+                    e.preventDefault();
+                    this.dragItem = item;
+                    el.style.cursor = 'grabbing';
+                    el.style.transform = 'scale(1.2)';
+                    app.audio.playPop();
+                };
+                el.addEventListener('mousedown', startDrag);
+                el.addEventListener('touchstart', startDrag);
+
+                this.c.appendChild(el);
+
+                const item = { el: el, type: t.type, x: parseFloat(el.style.left), y: -50, vy: 0.5 + Math.random(), dragging: false };
+                this.items.push(item);
+
+                // Physics Loop for this item? No, central loop better.
+                if (!this.animLoop) {
+                    this.animLoop = requestAnimationFrame(() => this.update());
+                }
+            }
+
+            update() {
+                if (!this.running) return;
+
+                this.items.forEach(item => {
+                    if (item.dragging) return;
+
+                    item.y += item.vy;
+                    item.el.style.top = item.y + 'px';
+
+                    if (item.y > this.c.offsetHeight) {
+                        this.removeItem(item);
+                        // Penalty?
+                    }
+                });
+
+                this.animLoop = requestAnimationFrame(() => this.update());
+            }
+
+            handleMove(e) {
+                if (!this.dragItem) return;
+                e.preventDefault();
+
+                const rect = this.c.getBoundingClientRect();
+                const cx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+                const cy = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+
+                const item = this.dragItem;
+                item.dragging = true;
+                item.x = cx; // Store relative x (pixels now, convert if needed but style expects absolute px usually or %)
+                // Actually style set previously was %. Let's switch to px for drag.
+
+                item.el.style.left = (cx - 20) + 'px'; // Centering
+                item.el.style.top = (cy - 20) + 'px';
+            }
+
+            handleUp() {
+                if (!this.dragItem) return;
+
+                const item = this.dragItem;
+                item.dragging = false;
+                item.el.style.cursor = 'grab';
+                item.el.style.transform = 'scale(1)';
+
+                // Check Drop
+                const rect = item.el.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                let dropped = false;
+                this.bins.forEach(bin => {
+                    const br = bin.el.getBoundingClientRect();
+                    if (centerX > br.left && centerX < br.right && centerY > br.top && centerY < br.bottom) {
+                        dropped = true;
+                        if (bin.id === item.type) {
+                            // Correct
+                            app.audio.playWin(); // Ding
+                            this.score += 10;
+                            this.scoreEl.textContent = '⭐ ' + this.score;
+                            // Visual Feedback
+                            bin.el.style.transform = 'scale(1.1)';
+                            setTimeout(() => bin.el.style.transform = 'scale(1)', 200);
+                        } else {
+                            // Wrong
+                            app.audio.playError();
+                        }
+                        this.removeItem(item);
+                    }
+                });
+
+                if (!dropped) {
+                    // Reset to gravity
+                    item.y = parseFloat(item.el.style.top);
+                    // item.x needs update if we switch back to update() logic
+                }
+
+                this.dragItem = null;
+
+                if (this.score >= 100) this.win();
+            }
+
+            removeItem(item) {
+                item.el.remove();
+                this.items = this.items.filter(i => i !== item);
+            }
+
+            win() {
+                this.running = false;
+                cancelAnimationFrame(this.animLoop);
+                this.c.innerHTML = `
+                    <div style="text-align: center; padding: 40px; margin-top:50px; background:white; border-radius:20px;">
+                        <div style="font-size: 6em;">♻️</div>
+                        <h2 style="color: #2ecc71;">¡Planeta Limpio!</h2>
+                        <p style="font-size:1.5em;">Clasificaste 10 objetos</p>
+                        <button class="mode-btn kid" style="margin-top:20px; background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
+                        <div style="height:10px"></div>
+                        <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
+                    </div>
+                `;
+                app.audio.playWin();
+                app.updateParentStats(20, 1, 'sorting');
+            }
+
+            cleanup() {
+                this.running = false;
+                cancelAnimationFrame(this.animLoop);
+            }
+        }
+
+        /**
+         * 🧱 ARKANOID GAME
+         */
+        class ArkanoidGame {
+            constructor(data, container) {
+                this.data = data;
+                this.c = container;
+                this.running = true;
+                this.score = 0;
+                this.lives = 3;
+                this.ball = { x: 150, y: 300, dx: 3, dy: -3, r: 8 };
+                this.paddle = { x: 100, w: 80, h: 15 };
+                this.bricks = [];
+                this.width = container.offsetWidth;
+                this.height = container.offsetHeight;
+                this.init();
+            }
+
+            init() {
+                this.c.innerHTML = '';
+                this.c.style.cssText = 'background: #2c3e50; position:relative; overflow:hidden; touch-action:none;';
+
+                // Setup Canvas
+                this.canvas = document.createElement('canvas');
+                this.canvas.width = this.width;
+                this.canvas.height = this.height;
+                this.ctx = this.canvas.getContext('2d');
+                this.c.appendChild(this.canvas);
+
+                // Bricks
+                const rows = 5;
+                const cols = 7;
+                const pad = 10;
+                const w = (this.width - (cols + 1) * pad) / cols;
+                const h = 20;
+
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        this.bricks.push({
+                            x: c * (w + pad) + pad,
+                            y: r * (h + pad) + 40,
+                            w: w, h: h, status: 1
+                        });
+                    }
+                }
+
+                // Events
+                const movePaddle = (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    const rx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+                    this.paddle.x = rx - this.paddle.w / 2;
+                };
+                this.canvas.addEventListener('mousemove', movePaddle);
+                this.canvas.addEventListener('touchmove', movePaddle);
+
+                this.loop();
+            }
+
+            loop() {
+                if (!this.running) return;
+
+                this.update();
+                this.draw();
+                requestAnimationFrame(() => this.loop());
+            }
+
+            update() {
+                // Ball Movement
+                this.ball.x += this.ball.dx;
+                this.ball.y += this.ball.dy;
+
+                // Wall Collision
+                if (this.ball.x + this.ball.r > this.width || this.ball.x - this.ball.r < 0) this.ball.dx = -this.ball.dx;
+                if (this.ball.y - this.ball.r < 0) this.ball.dy = -this.ball.dy;
+
+                // Paddle Collision
+                if (
+                    this.ball.y + this.ball.r > this.height - 30 &&
+                    this.ball.x > this.paddle.x &&
+                    this.ball.x < this.paddle.x + this.paddle.w
+                ) {
+                    this.ball.dy = -Math.abs(this.ball.dy); // Force Up
+                    app.audio.playPop();
+                }
+
+                // Brick Collision
+                let activeBricks = 0;
+                this.bricks.forEach(b => {
+                    if (b.status === 1) {
+                        activeBricks++;
+                        if (
+                            this.ball.x > b.x && this.ball.x < b.x + b.w &&
+                            this.ball.y > b.y && this.ball.y < b.y + b.h
+                        ) {
+                            this.ball.dy = -this.ball.dy;
+                            b.status = 0;
+                            this.score += 10;
+                            app.audio.playPop();
+                        }
+                    }
+                });
+
+                if (activeBricks === 0) this.win();
+
+                // Death
+                if (this.ball.y > this.height) {
+                    this.lives--;
+                    if (this.lives > 0) {
+                        this.ball.x = this.width / 2;
+                        this.ball.y = 300;
+                        this.ball.dy = -3;
+                        app.audio.playError();
+                    } else {
+                        this.gameOver();
+                    }
+                }
+            }
+
+            draw() {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+
+                // Ball
+                this.ctx.beginPath();
+                this.ctx.arc(this.ball.x, this.ball.y, this.ball.r, 0, Math.PI * 2);
+                this.ctx.fillStyle = '#f1c40f';
+                this.ctx.fill();
+                this.ctx.closePath();
+
+                // Paddle
+                this.ctx.fillStyle = '#3498db';
+                this.ctx.fillRect(this.paddle.x, this.height - 30, this.paddle.w, this.paddle.h);
+
+                // Bricks
+                this.bricks.forEach(b => {
+                    if (b.status === 1) {
+                        this.ctx.fillStyle = '#e74c3c';
+                        this.ctx.fillRect(b.x, b.y, b.w, b.h);
+                    }
+                });
+
+                // HUD
+                this.ctx.fillStyle = 'white';
+                this.ctx.font = '20px Arial';
+                this.ctx.fillText(`Puntos: ${this.score}`, 10, 25);
+                this.ctx.fillText(`Vidas: ${this.lives}`, this.width - 90, 25);
+            }
+
+            win() {
+                this.running = false;
+                this.showEnd('¡Ganaste! 🧱🏆', true);
+            }
+
+            gameOver() {
+                this.running = false;
+                this.showEnd('¡Fin del Juego!', false);
+            }
+
+            showEnd(msg, win) {
+                const ov = document.createElement('div');
+                ov.style.cssText = `
+                    position: absolute; top:0; left:0; width:100%; height:100%;
+                    background: rgba(0,0,0,0.8); display:flex; flex-direction:column;
+                    align-items:center; justify-content:center;
+                `;
+                ov.innerHTML = `
+                    <h2 style="color:white; font-size:2em;">${msg}</h2>
+                    <p style="color:white;">Puntos: ${this.score}</p>
+                    <button class="mode-btn kid" onclick="app.startGame(app.currentGameKey)">🔄 Reintentar</button>
+                    <br>
+                    <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
+                `;
+                this.c.appendChild(ov);
+                if (win) {
+                    app.audio.playWin();
+                    app.updateParentStats(30, 1, 'arkanoid');
+                } else {
+                    app.audio.playError();
+                }
+            }
+
+            cleanup() {
+                this.running = false;
+            }
+        }
+
+        /**
+         * 🔨 WHACK-A-MOLE (Topo Dino)
+         */
+        class WhackGame {
+            constructor(data, container) {
+                this.data = data;
+                this.c = container;
+                this.score = 0;
+                this.lives = 3;
+                this.running = true;
+                this.holes = [];
+                this.lastHole = -1;
+                this.init();
+            }
+
+            init() {
+                this.c.innerHTML = '';
+                this.c.style.cssText = 'display:flex; flex-direction:column; align-items:center; background:#a5d6a7;';
+
+                // HUD
+                const hud = document.createElement('div');
+                hud.style.cssText = 'width:100%; padding:10px; display:flex; justify-content:space-between; font-size:1.5em; color:#2c3e50; font-weight:bold;';
+                hud.innerHTML = `<span>⭐ <span id="whackScore">0</span></span><span>❤️ <span id="whackLives">3</span></span>`;
+                this.c.appendChild(hud);
+
+                // Grid
+                const grid = document.createElement('div');
+                grid.style.cssText = `
+                    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+                    width: 90%; max-width: 400px; aspect-ratio: 1; margin-top: 20px;
+                `;
+
+                for (let i = 0; i < 9; i++) {
+                    const hole = document.createElement('div');
+                    hole.className = 'whack-hole';
+                    hole.style.cssText = `
+                        background: #795548; border-radius: 50%; position: relative;
+                        overflow: hidden; border: 5px solid #3e2723;
+                    `;
+
+                    const mole = document.createElement('div');
+                    mole.className = 'whack-mole';
+                    mole.style.cssText = `
+                        position: absolute; bottom: -100%; width: 100%; height: 100%;
+                        display: flex; justify-content: center; align-items: center;
+                        font-size: 4em; transition: bottom 0.2s; cursor: pointer;
+                    `;
+                    mole.onclick = () => this.hit(mole, i);
+
+                    hole.appendChild(mole);
+                    grid.appendChild(hole);
+                    this.holes.push({ el: hole, mole: mole, active: false });
+                }
+                this.c.appendChild(grid);
+
+                // Loop
+                this.gameLoop();
+            }
+
+            gameLoop() {
+                if (!this.running) return;
+
+                const time = 800 + Math.random() * 1000;
+                const holeIdx = this.randomHole();
+                const type = Math.random() > 0.8 ? 'bad' : 'good'; // 20% bad (Cactus/Bomb)
+
+                this.popUp(holeIdx, type);
+
+                setTimeout(() => this.gameLoop(), time);
+            }
+
+            randomHole() {
+                const idx = Math.floor(Math.random() * this.holes.length);
+                if (idx === this.lastHole) return this.randomHole();
+                this.lastHole = idx;
+                return idx;
+            }
+
+            popUp(idx, type) {
+                const h = this.holes[idx];
+                h.active = true;
+                h.type = type;
+
+                // Visuals
+                const mole = h.mole;
+                mole.textContent = type === 'good' ? '🦖' : '🌵';
+                mole.style.bottom = '0'; // Up
+
+                // Auto hide
+                setTimeout(() => {
+                    if (this.running && h.active) {
+                        mole.style.bottom = '-100%';
+                        h.active = false;
+                    }
+                }, 700 + Math.random() * 500);
+            }
+
+            hit(mole, idx) {
+                const h = this.holes[idx];
+                if (!h.active) return;
+
+                h.active = false;
+                mole.style.bottom = '-100%'; // Down immediately
+
+                if (h.type === 'good') {
+                    app.audio.playPop();
+                    this.score += 10;
+                    document.getElementById('whackScore').textContent = this.score;
+                    if (this.score >= 100) this.win();
+                } else {
+                    app.audio.playError();
+                    this.lives--;
+                    document.getElementById('whackLives').textContent = this.lives;
+                    this.c.style.background = '#ffcdd2';
+                    setTimeout(() => this.c.style.background = '#a5d6a7', 100);
+
+                    if (this.lives <= 0) this.gameOver();
+                }
+            }
+
+            win() {
+                this.running = false;
+                this.endScreen('¡Ganaste!', '#2ecc71', true);
+            }
+
+            gameOver() {
+                this.running = false;
+                this.endScreen('¡Inténtalo de nuevo!', '#e74c3c', false);
+            }
+
+            endScreen(msg, color, win) {
+                this.c.innerHTML = `
+                    <div style="text-align: center; padding: 40px; margin-top:50px;">
+                        <div style="font-size: 6em;">${win ? '🏆' : '🌵'}</div>
+                        <h2 style="color: ${color};">${msg}</h2>
+                        <p style="font-size:1.5em;">Puntos: ${this.score}</p>
+                        <button class="mode-btn kid" style="margin-top:20px; background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
+                        <div style="height:10px"></div>
+                        <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
+                    </div>
+                `;
+                if (win) {
+                    app.audio.playWin();
+                    app.updateParentStats(20, 1, 'whack');
+                }
+            }
+
+            cleanup() {
+                this.running = false;
+            }
+        }
+
+        /**
+         * 🔊 SIMON GAME (Dino Dice)
+         */
+        class SimonGame {
+            constructor(data, container) {
+                this.data = data;
+                this.c = container;
+                this.sequence = [];
+                this.playerSequence = [];
+                this.level = 0;
+                this.locked = true; // Wait for AI
+                this.colors = ['#e74c3c', '#2ecc71', '#f1c40f', '#3498db']; // Red, Green, Yellow, Blue
+                this.sounds = [261.63, 329.63, 392.00, 523.25]; // C E G C
+                this.init();
+            }
+
+            init() {
+                this.c.innerHTML = '';
+                this.c.style.cssText = 'display:flex; flex-direction:column; align-items:center; justify-content:center; background:#2c3e50;';
+
+                // Title
+                const title = document.createElement('h2');
+                title.textContent = '🔊 Simón Dino';
+                title.style.color = 'white';
+                this.c.appendChild(title);
+
+                // Grid
+                const grid = document.createElement('div');
+                grid.style.cssText = `
+                    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+                    width: 300px; height: 300px; margin-top: 20px;
+                `;
+
+                this.btns = [];
+                this.colors.forEach((col, i) => {
+                    const btn = document.createElement('div');
+                    btn.style.cssText = `
+                        background: ${col}; border-radius: 20px;
+                        opacity: 0.6; cursor: pointer; transition: all 0.1s;
+                        box-shadow: 0 5px 0 rgba(0,0,0,0.3); border: 4px solid rgba(0,0,0,0.1);
+                    `;
+                    // Interaction
+                    const activate = () => this.handleInput(i);
+                    btn.onmousedown = activate;
+                    btn.ontouchstart = (e) => { e.preventDefault(); activate(); };
+
+                    grid.appendChild(btn);
+                    this.btns.push(btn);
+                });
+
+                this.c.appendChild(grid);
+
+                // Status
+                this.statusEl = document.createElement('h3');
+                this.statusEl.style.cssText = 'color:white; margin-top:30px; font-size:1.5em;';
+                this.statusEl.textContent = '¡Atento!';
+                this.c.appendChild(this.statusEl);
+
+                // Exit
+                const exit = document.createElement('button');
+                exit.textContent = '🏠 Salir';
+                exit.className = 'mode-btn kid';
+                exit.style.marginTop = '20px';
+                exit.onclick = () => app.nav.goDashboard();
+                this.c.appendChild(exit);
+
+                // Start
+                setTimeout(() => this.nextRound(), 1000);
+            }
+
+            nextRound() {
+                this.level++;
+                this.playerSequence = [];
+                this.sequence.push(Math.floor(Math.random() * 4));
+                this.statusEl.textContent = `Nivel ${this.level}`;
+                this.locked = true;
+
+                // Play Sequence
+                let i = 0;
+                const interval = setInterval(() => {
+                    this.playSignal(this.sequence[i]);
+                    i++;
+                    if (i >= this.sequence.length) {
+                        clearInterval(interval);
+                        this.locked = false;
+                        this.statusEl.textContent = '¡Tu turno!';
+                    }
+                }, 800);
+            }
+
+            playSignal(idx) {
+                const btn = this.btns[idx];
+                btn.style.opacity = '1';
+                btn.style.transform = 'scale(0.95)';
+                app.audio.playTone(this.sounds[idx], 'sine', 0.3);
+
+                setTimeout(() => {
+                    btn.style.opacity = '0.6';
+                    btn.style.transform = 'scale(1)';
+                }, 300);
+            }
+
+            handleInput(idx) {
+                if (this.locked) return;
+
+                this.playSignal(idx);
+                this.playerSequence.push(idx);
+
+                // Check correctness
+                const currentStep = this.playerSequence.length - 1;
+                if (this.playerSequence[currentStep] !== this.sequence[currentStep]) {
+                    this.gameOver();
+                    return;
+                }
+
+                // Check complete
+                if (this.playerSequence.length === this.sequence.length) {
+                    this.locked = true;
+                    this.statusEl.textContent = '¡Bien!';
+                    app.audio.playWin();
+                    setTimeout(() => this.nextRound(), 1000);
+                }
+            }
+
+            gameOver() {
+                this.locked = true;
+                app.audio.playError();
+                this.statusEl.textContent = '¡Oh no!';
+                this.c.style.background = '#c0392b';
+
+                setTimeout(() => {
+                    this.c.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <div style="font-size: 6em;">🔊</div>
+                            <h2 style="color: white;">¡Juego Terminado!</h2>
+                            <p style="color:white; font-size:1.5em;">Llegaste al Nivel ${this.level}</p>
+                            <button class="mode-btn kid" style="margin-top:20px; background:#2ecc71;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
+                            <div style="height:10px"></div>
+                            <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
+                        </div>
+                    `;
+                    app.updateParentStats(this.level * 5, 1, 'simon');
+                }, 1000);
+            }
+
+            cleanup() {}
+        }
+
+        /**
+         * 🧠 MEMORY GAME (Memorama)
+         */
+        class MemoryGame {
+            constructor(data, container) {
+                this.data = data;
+                this.c = container;
+                this.cards = [];
+                this.flipped = [];
+                this.matched = 0;
+                this.locked = false;
+                this.init();
+            }
+
+            init() {
+                this.c.innerHTML = '';
+                this.c.style.cssText = 'display:flex; flex-direction:column; align-items:center; justify-content:center; background:#ffdde1;';
+
+                // Setup Grid
+                const grid = document.createElement('div');
+                grid.style.cssText = 'display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; padding:10px; width:100%; max-width:500px; aspect-ratio:1;';
+
+                // Content
+                const emojis = ['🦖', '🦕', '🥚', '🌋', '🍖', '🦴', '🌿', '🐾'];
+                const deck = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+
+                deck.forEach((item, i) => {
+                    const card = document.createElement('div');
+                    card.className = 'memory-card';
+                    card.style.cssText = `
+                        background: white; border-radius:10px; cursor:pointer;
+                        display:flex; justify-content:center; align-items:center;
+                        font-size:3em; box-shadow:0 4px 0 rgba(0,0,0,0.1);
+                        transform-style: preserve-3d; transition: transform 0.3s;
+                    `;
+
+                    // Front (Hidden)
+                    const front = document.createElement('div');
+                    front.textContent = '❓'; // Back of card
+
+                    card.onclick = () => this.flip(card, item, front);
+
+                    card.appendChild(front);
+                    grid.appendChild(card);
+                    this.cards.push({el: card, item: item, solved: false});
+                });
+
+                this.c.appendChild(grid);
+
+                // Exit
+                const exit = document.createElement('button');
+                exit.textContent = '🏠 Salir';
+                exit.className = 'mode-btn kid';
+                exit.style.marginTop = '20px';
+                exit.onclick = () => app.nav.goDashboard();
+                this.c.appendChild(exit);
+            }
+
+            flip(card, item, frontEl) {
+                if (this.locked || this.flipped.includes(card) || card.dataset.solved) return;
+
+                // Visual Flip
+                app.audio.playPop();
+                frontEl.textContent = item;
+                card.style.background = '#fff';
+                card.style.transform = 'scale(1.1)';
+
+                this.flipped.push(card);
+
+                if (this.flipped.length === 2) {
+                    this.checkMatch();
+                }
+            }
+
+            checkMatch() {
+                this.locked = true;
+                const [c1, c2] = this.flipped;
+                const i1 = c1.textContent;
+                const i2 = c2.textContent;
+
+                if (i1 === i2) {
+                    // Match
+                    app.audio.playWin();
+                    c1.dataset.solved = true;
+                    c2.dataset.solved = true;
+                    c1.style.background = '#2ecc71';
+                    c2.style.background = '#2ecc71';
+                    this.flipped = [];
+                    this.locked = false;
+                    this.matched++;
+                    if (this.matched === 8) this.win();
+                } else {
+                    // No Match
+                    app.audio.playError();
+                    setTimeout(() => {
+                        c1.textContent = '❓';
+                        c2.textContent = '❓';
+                        c1.style.transform = 'scale(1)';
+                        c2.style.transform = 'scale(1)';
+                        this.flipped = [];
+                        this.locked = false;
+                    }, 1000);
+                }
+            }
+
+            win() {
+                setTimeout(() => {
+                    this.c.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <div style="font-size: 6em;">🧠✨</div>
+                            <h2 style="color: #2ecc71;">¡Memoria Excelente!</h2>
+                            <button class="mode-btn kid" style="margin-top:20px;" onclick="app.startGame(app.currentGameKey)">🔄 Jugar Otra Vez</button>
+                            <div style="height:10px"></div>
+                            <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
+                        </div>
+                    `;
+                    app.audio.playWin();
+                    app.updateParentStats(20, 1, 'memory');
+                }, 500);
+            }
+
+            cleanup() {}
         }
 
         // 🚀 LAUNCH
