@@ -8063,10 +8063,17 @@
                 gridEl.style.cssText = `
                     display: grid;
                     grid-template-columns: repeat(${size}, 1fr);
-                    gap: 10px;
+                    grid-template-rows: repeat(${size}, 1fr);
+                    gap: 5px;
                     width: 95vmin; max-width: 600px;
+                    height: 95vmin; max-height: 600px;
                     aspect-ratio: 1/1;
                 `;
+                // Ajuste para móviles landscape donde altura < anchura
+                if (window.innerHeight < window.innerWidth) {
+                    gridEl.style.height = '80vh';
+                    gridEl.style.width = '80vh';
+                }
                 this.c.appendChild(gridEl);
 
                 // Generate Cards
@@ -8119,7 +8126,8 @@
 
             flipCard(cardEl, val) {
                 if (this.locked) return;
-                if (this.flipped.includes(cardEl)) return;
+                if (this.flipped.length >= 2) return;
+                if (this.flipped.some(item => item.el === cardEl)) return;
                 if (cardEl.classList.contains('matched')) return;
 
                 window.app.audio.playPop();
