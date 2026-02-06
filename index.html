@@ -934,32 +934,36 @@
         </section>
 
         <!-- GAME/ACTIVITY CONTAINER -->
-        <section id="view-game" class="content-section hidden">
-            <div style="display: flex; align-items: center; margin-bottom: 15px; gap: 15px;">
+        <section id="view-game" class="content-section hidden" style="padding: 0; overflow: hidden; position: relative; height: 90vh;">
+
+            <!-- FLOATING UI: LEFT (Back) -->
+            <div style="position: absolute; top: 10px; left: 10px; z-index: 1000;">
                 <button class="nav-btn" onclick="app.nav.goDashboard()"
                     style="width: 50px; height: 50px; font-size: 1.5em; background: #fff3cd; border: 2px solid #ffcc00;">⬅️</button>
-                <div style="flex-grow: 1;">
-                    <h2 id="gameTitle" style="margin: 0; font-size: 1.5em; line-height: 1.2;">Juego</h2>
-                </div>
-                <div style="display:flex; gap:10px; align-items: center;">
-                    <!-- Global Wallet -->
-                    <div title="Tus Estrellas Totales"
-                        style="font-size: 1.5em; background: #dff9fb; padding: 5px 15px; border-radius: 20px; white-space: nowrap; border: 2px solid #81ecec;">
-                        🎒 <span id="gameGlobalStars">0</span>
-                    </div>
+            </div>
 
-                    <!-- Session Score -->
-                    <div
-                        style="font-size: 1.5em; background: #fff3cd; padding: 5px 15px; border-radius: 20px; white-space: nowrap;">
-                        <span id="scoreLabel">⭐</span> <span id="gameScore" class="pop-target">0</span>
-                        <span id="livesContainer" style="margin-left: 10px; display:none;">❤️ <span
-                                id="gameLives">3</span></span>
-                    </div>
+            <!-- HIDDEN TITLE (To prevent JS errors) -->
+            <h2 id="gameTitle" style="display: none;">Juego</h2>
+
+            <!-- FLOATING UI: RIGHT (Stats) -->
+            <div style="position: absolute; top: 10px; right: 10px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
+                <!-- Global Wallet -->
+                <div title="Tus Estrellas Totales"
+                    style="font-size: 1.2em; background: rgba(255, 255, 255, 0.9); padding: 5px 15px; border-radius: 20px; white-space: nowrap; border: 2px solid #81ecec; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    🎒 <span id="gameGlobalStars">0</span>
+                </div>
+
+                <!-- Session Score -->
+                <div
+                    style="font-size: 1.2em; background: rgba(255, 255, 255, 0.9); padding: 5px 15px; border-radius: 20px; white-space: nowrap; border: 2px solid #f1c40f; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    <span id="scoreLabel">⭐</span> <span id="gameScore" class="pop-target">0</span>
+                    <span id="livesContainer" style="margin-left: 10px; display:none;">❤️ <span
+                            id="gameLives">3</span></span>
                 </div>
             </div>
 
             <!-- Game Area (Canvas/Quiz) -->
-            <div id="gameArea" class="game-canvas-container" style="background: white;">
+            <div id="gameArea" class="game-canvas-container" style="background: white; width: 100%; height: 100%; border: none; border-radius: 30px;">
                 <!-- Elements injected by JS -->
             </div>
         </section>
@@ -7983,6 +7987,7 @@
                 this.flipped = [];
                 this.matched = [];
                 this.locked = false;
+                this.timeouts = [];
 
                 this.ASSETS = ['🦕', '🦖', '🐢', '🐊', '🦎', '🐍', '🥚', '🍳', '🍎', '🍌', '🍇', '🍉', '🍓', '🍒', '🍍', '🥝', '🥥', '🦴'];
 
@@ -7990,6 +7995,7 @@
             }
 
             init() {
+                this.clearTimeouts();
                 this.c.innerHTML = '';
                 this.c.style.background = '#a18cd1';
                 this.c.style.display = 'flex';
@@ -8035,6 +8041,7 @@
             }
 
             startGame(size) {
+                this.clearTimeouts();
                 this.gridSize = size;
                 this.c.innerHTML = '';
                 this.flipped = [];
@@ -8043,7 +8050,7 @@
 
                 // Header
                 const header = document.createElement('div');
-                header.style.cssText = 'display:flex; justify-content:space-between; width:95%; max-width:600px; margin-bottom:10px; align-items:center;';
+                header.style.cssText = 'display:flex; justify-content:space-between; width:95%; max-width:600px; margin-bottom:10px; align-items:center; flex-shrink: 0;';
 
                 const btnBack = document.createElement('button');
                 btnBack.textContent = '🔙';
@@ -8058,22 +8065,21 @@
 
                 this.c.appendChild(header);
 
-                // Grid
+                // Grid Container - FLEXIBLE Layout
                 const gridEl = document.createElement('div');
                 gridEl.style.cssText = `
                     display: grid;
                     grid-template-columns: repeat(${size}, 1fr);
                     grid-template-rows: repeat(${size}, 1fr);
-                    gap: 5px;
-                    width: 95vmin; max-width: 600px;
-                    height: 95vmin; max-height: 600px;
+                    gap: 10px;
+                    width: 100%;
+                    max-width: 600px;
+                    height: auto;
                     aspect-ratio: 1/1;
+                    max-height: 100%; /* Constrain to parent */
+                    margin: 0 auto;
                 `;
-                // Ajuste para móviles landscape donde altura < anchura
-                if (window.innerHeight < window.innerWidth) {
-                    gridEl.style.height = '80vh';
-                    gridEl.style.width = '80vh';
-                }
+
                 this.c.appendChild(gridEl);
 
                 // Generate Cards
@@ -8145,7 +8151,7 @@
 
                 if (c1.val === c2.val) {
                     // Match
-                    setTimeout(() => {
+                    this.wait(() => {
                         window.app.audio.playWin(); // Small win sound
                         c1.el.classList.add('matched');
                         c2.el.classList.add('matched');
@@ -8163,7 +8169,7 @@
                     }, 500);
                 } else {
                     // No Match
-                    setTimeout(() => {
+                    this.wait(() => {
                         window.app.audio.playError();
                         c1.el.style.transform = 'rotateY(0deg)';
                         c2.el.style.transform = 'rotateY(0deg)';
@@ -8173,11 +8179,21 @@
                 }
             }
 
+            wait(fn, ms) {
+                const id = setTimeout(fn, ms);
+                this.timeouts.push(id);
+            }
+
+            clearTimeouts() {
+                this.timeouts.forEach(clearTimeout);
+                this.timeouts = [];
+            }
+
             winGame() {
                 window.app.audio.playWin();
                 window.app.updateParentStats(20, 1, 'memory');
 
-                setTimeout(() => {
+                this.wait(() => {
                     this.c.innerHTML = `
                         <div style="text-align: center; color: white;">
                             <div style="font-size: 6em;">🧠🏆</div>
@@ -8190,7 +8206,9 @@
                 }, 1000);
             }
 
-            cleanup() {}
+            cleanup() {
+                this.clearTimeouts();
+            }
         }
 
         /**
