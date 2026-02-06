@@ -7983,6 +7983,7 @@
                 this.flipped = [];
                 this.matched = [];
                 this.locked = false;
+                this.timeouts = [];
 
                 this.ASSETS = ['🦕', '🦖', '🐢', '🐊', '🦎', '🐍', '🥚', '🍳', '🍎', '🍌', '🍇', '🍉', '🍓', '🍒', '🍍', '🥝', '🥥', '🦴'];
 
@@ -7990,6 +7991,7 @@
             }
 
             init() {
+                this.clearTimeouts();
                 this.c.innerHTML = '';
                 this.c.style.background = '#a18cd1';
                 this.c.style.display = 'flex';
@@ -8035,6 +8037,7 @@
             }
 
             startGame(size) {
+                this.clearTimeouts();
                 this.gridSize = size;
                 this.c.innerHTML = '';
                 this.flipped = [];
@@ -8043,7 +8046,7 @@
 
                 // Header
                 const header = document.createElement('div');
-                header.style.cssText = 'display:flex; justify-content:space-between; width:95%; max-width:600px; margin-bottom:10px; align-items:center;';
+                header.style.cssText = 'display:flex; justify-content:space-between; width:95%; max-width:600px; margin-bottom:10px; align-items:center; flex-shrink: 0;';
 
                 const btnBack = document.createElement('button');
                 btnBack.textContent = '🔙';
@@ -8058,22 +8061,21 @@
 
                 this.c.appendChild(header);
 
-                // Grid
+                // Grid Container - FLEXIBLE Layout
                 const gridEl = document.createElement('div');
                 gridEl.style.cssText = `
                     display: grid;
                     grid-template-columns: repeat(${size}, 1fr);
                     grid-template-rows: repeat(${size}, 1fr);
-                    gap: 5px;
-                    width: 95vmin; max-width: 600px;
-                    height: 95vmin; max-height: 600px;
+                    gap: 10px;
+                    width: 100%;
+                    max-width: 600px;
+                    height: auto;
                     aspect-ratio: 1/1;
+                    max-height: 100%; /* Constrain to parent */
+                    margin: 0 auto;
                 `;
-                // Ajuste para móviles landscape donde altura < anchura
-                if (window.innerHeight < window.innerWidth) {
-                    gridEl.style.height = '80vh';
-                    gridEl.style.width = '80vh';
-                }
+
                 this.c.appendChild(gridEl);
 
                 // Generate Cards
@@ -8145,7 +8147,7 @@
 
                 if (c1.val === c2.val) {
                     // Match
-                    setTimeout(() => {
+                    this.wait(() => {
                         window.app.audio.playWin(); // Small win sound
                         c1.el.classList.add('matched');
                         c2.el.classList.add('matched');
@@ -8163,7 +8165,7 @@
                     }, 500);
                 } else {
                     // No Match
-                    setTimeout(() => {
+                    this.wait(() => {
                         window.app.audio.playError();
                         c1.el.style.transform = 'rotateY(0deg)';
                         c2.el.style.transform = 'rotateY(0deg)';
@@ -8173,11 +8175,21 @@
                 }
             }
 
+            wait(fn, ms) {
+                const id = setTimeout(fn, ms);
+                this.timeouts.push(id);
+            }
+
+            clearTimeouts() {
+                this.timeouts.forEach(clearTimeout);
+                this.timeouts = [];
+            }
+
             winGame() {
                 window.app.audio.playWin();
                 window.app.updateParentStats(20, 1, 'memory');
 
-                setTimeout(() => {
+                this.wait(() => {
                     this.c.innerHTML = `
                         <div style="text-align: center; color: white;">
                             <div style="font-size: 6em;">🧠🏆</div>
@@ -8190,7 +8202,9 @@
                 }, 1000);
             }
 
-            cleanup() {}
+            cleanup() {
+                this.clearTimeouts();
+            }
         }
 
         /**
