@@ -8672,12 +8672,18 @@
                 this.score = 0;
                 this.lives = 3;
                 this.level = 1;
+                this.ball.speed = 5;
                 this.running = true;
 
                 document.getElementById('livesContainer').style.display = 'inline';
                 document.getElementById('gameLives').textContent = this.lives;
                 window.app.addScore(0);
 
+                this.startLevel();
+            }
+
+            startLevel() {
+                this.running = true;
                 this.setupLevel();
                 this.resetBall();
                 this.loop();
@@ -8863,6 +8869,12 @@
             levelUp() {
                 this.running = false;
                 this.level++;
+
+                if(this.level > 5) {
+                    this.finalVictory();
+                    return;
+                }
+
                 this.ball.speed += 1;
                 window.app.audio.playWin();
 
@@ -8874,8 +8886,28 @@
 
                 setTimeout(() => {
                     this.ui.innerHTML = '';
-                    this.startGame(); // Re-use start logic but keep level
+                    this.startLevel();
                 }, 2000);
+            }
+
+            finalVictory() {
+                this.running = false;
+                window.app.audio.playWin();
+                window.app.updateParentStats(this.score + 100, 1, 'arkanoid');
+
+                this.ui.innerHTML = '';
+                this.ui.style.pointerEvents = 'auto';
+                this.ui.innerHTML = `
+                    <div style="text-align: center; background: rgba(255,255,255,0.9); padding: 30px; border-radius: 20px;">
+                        <div style="font-size: 6em;">🏆</div>
+                        <h1 style="color: #2ecc71;">¡Victoria Final!</h1>
+                        <p style="font-size: 1.5em;">¡Completaste los 5 Niveles!</p>
+                        <p>Puntuación: ${this.score}</p>
+                        <button class="mode-btn kid" style="background:#2ecc71; margin-top: 10px;" onclick="app.gameInstance.startGame()">🔄 Jugar Otra Vez</button>
+                        <div style="height:10px"></div>
+                        <button class="mode-btn kid" onclick="app.nav.goDashboard()">🏠 Salir</button>
+                    </div>
+                `;
             }
 
             gameOver() {
