@@ -7133,6 +7133,7 @@
             }
 
             renderSpiral() {
+                this.cellsCache = {};
                 const matrix = Array(8).fill().map(() => Array(8).fill(0));
                 let x = 0, y = 0, dx = 1, dy = 0;
 
@@ -7152,6 +7153,7 @@
 
                         let cell = document.createElement('div');
                         cell.dataset.index = val;
+                        this.cellsCache[val] = cell;
                         cell.style.cssText = `
                             grid-row: ${r + 1}; grid-column: ${c + 1};
                             background:#ecf0f1; border-radius:2px; position:relative;
@@ -7187,8 +7189,8 @@
             updatePositions() {
                 this.tokens.forEach((token, idx) => {
                     let pos = this.pieces[idx];
-                    let cell = this.boardEl.querySelector(`div[data-index='${pos}']`);
-                    if (!cell) cell = this.boardEl.querySelector(`div[data-index='1']`);
+                    let cell = this.cellsCache[pos];
+                    if (!cell) cell = this.cellsCache[1];
 
                     if (cell) {
                         let x = cell.offsetLeft + (cell.offsetWidth / 2) - (token.offsetWidth / 2 || 15);
