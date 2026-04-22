@@ -26,4 +26,23 @@ export class Navigation {
                 }
                 this.show('kid-dash');
             }
+
+            goBackFromGame() {
+                if (window.app.gameInstance && typeof window.app.gameInstance.cleanup === 'function') {
+                    window.app.gameInstance.cleanup();
+                }
+
+                const mode = window.app.currentFolderMode;
+                if (mode === 'english') {
+                    this.show('eval-english');
+                } else if (mode === 'comunicacion') {
+                    this.show('eval-comunicacion');
+                } else if (mode === 'arcade') {
+                    window.app.renderActivities('arcade');
+                    this.show('kid-dash');
+                } else {
+                    window.app.renderActivities('root');
+                    this.show('kid-dash');
+                }
+            }
         }

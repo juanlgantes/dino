@@ -58,7 +58,7 @@ export class PainterGame {
                 exit.textContent = '🏠 Salir';
                 exit.className = 'mode-btn kid';
                 exit.style.marginTop = '40px';
-                exit.onclick = () => window.app.nav.goDashboard();
+                exit.onclick = () => window.app.nav.goBackFromGame();
                 this.c.appendChild(exit);
             }
 

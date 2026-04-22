@@ -84,6 +84,8 @@ export class App {
 
 
             renderActivities(mode = 'root') {
+                this.currentFolderMode = mode; // Track origin for the back button
+
                 let gridId = 'activitiesGrid';
                 if (mode === 'english') {
                     gridId = 'englishActivitiesGrid';

@@ -165,7 +165,7 @@ export class ConnectDotsGame {
                 exit.textContent = "🏠 Salir";
                 exit.className = "mode-btn kid";
                 exit.style.marginTop = "20px";
-                exit.onclick = () => window.app.nav.goDashboard();
+                exit.onclick = () => window.app.nav.goBackFromGame();
                 this.c.appendChild(exit);
 
                 this.handleInput = (e) => {
@@ -303,7 +303,7 @@ export class ConnectDotsGame {
                     <p style="font-size:1.5em; color:#7f8c8d">Has completado todos los dibujos.</p>
                     <button class="mode-btn kid" style="margin-top:20px; background:#2ecc71;" onclick="window.app.startGame(window.app.currentGameKey)">🔄 Jugar Otra Vez</button>
                     <div style="height:10px"></div>
-                    <button class="mode-btn kid" onclick="window.app.nav.goDashboard()">🏠 Volver</button>
+                    <button class="mode-btn kid" onclick="window.app.nav.goBackFromGame()">🏠 Volver</button>
                 `;
                 this.c.appendChild(winDiv);
 
