@@ -22,7 +22,7 @@ export class EnglishMoodJumpGame {
     init() {
         this.c.innerHTML = `
             <div id="ground" style="position:absolute; bottom:0; width:100%; height:20%; background:#8B4513; border-top: 5px solid #228B22;"></div>
-            <div id="dino" style="position:absolute; left:50px; bottom:20%; font-size:3em; transition: bottom 0.3s, transform 0.3s; z-index:10;">🦕</div>
+            <div id="dino" style="position:absolute; left:50px; bottom:20%; font-size:3em; transition: bottom 0.5s ease-out, transform 0.3s; z-index:10; transform-origin: bottom;">🦕</div>
 
             <div style="position:absolute; bottom:10px; width:100%; display:flex; justify-content:space-around; z-index:20;">
                 <button id="btnDuck" style="padding:15px 30px; font-size:1.5em; background:#f1c40f; border:none; border-radius:10px; font-weight:bold;">⏬ Duck</button>
@@ -57,29 +57,33 @@ export class EnglishMoodJumpGame {
         const jump = () => {
             if (this.dino.isJumping || this.dino.isDucking || !this.running || this.paused) return;
             this.dino.isJumping = true;
-            this.dinoEl.style.bottom = '45%'; // Jump higher
-            window.app.audio.playPop(); // simple jump sound
+            this.dinoEl.style.bottom = '60%'; // Jump MUCH higher
+            window.app.audio.playPop();
+
+            // Hang in the air longer, then come down
             setTimeout(() => {
                 if (!this.running || this.paused) return;
                 this.dinoEl.style.bottom = '20%';
+                // Wait for the CSS transition (0.5s) to finish before allowing another jump
                 setTimeout(() => {
                     this.dino.isJumping = false;
-                }, 300);
-            }, 500);
+                }, 500);
+            }, 800); // 800ms hold time
         };
 
         const duck = () => {
             if (this.dino.isJumping || this.dino.isDucking || !this.running || this.paused) return;
             this.dino.isDucking = true;
-            this.dinoEl.style.transform = 'scaleY(0.5)';
-            this.dinoEl.style.transformOrigin = 'bottom';
+            this.dinoEl.style.transform = 'scaleY(0.4)'; // Duck lower
+
+            // Stay ducked much longer
             setTimeout(() => {
                 if (!this.running || this.paused) return;
                 this.dinoEl.style.transform = 'scaleY(1)';
                 setTimeout(() => {
                     this.dino.isDucking = false;
-                }, 100);
-            }, 600);
+                }, 300);
+            }, 1200); // 1.2 seconds duck duration
         };
 
         document.getElementById('btnJump').addEventListener('mousedown', jump);
@@ -130,18 +134,19 @@ export class EnglishMoodJumpGame {
         if (type.needsJump) {
             el.style.bottom = '20%'; // Ground level
         } else {
-            el.style.bottom = '28%'; // Head level (must duck)
+            el.style.bottom = '23%'; // Very low, forces duck to avoid collision
         }
 
         el.style.background = 'white';
-        el.style.padding = '5px 15px'; // Smaller padding
+        el.style.padding = '5px 10px'; // Even smaller padding horizontally
         el.style.borderRadius = '20px';
         el.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
-        el.style.fontSize = '1.2em'; // Smaller font
+        el.style.fontSize = '1.2em'; // Keep smaller font
         el.style.fontWeight = 'bold';
         el.style.display = 'flex';
         el.style.alignItems = 'center';
         el.style.gap = '5px';
+        el.style.maxWidth = '120px'; // Prevent very long clouds
         el.innerHTML = `<span>${type.icon}</span> <span>${type.word}</span>`;
 
         this.c.appendChild(el);
@@ -200,13 +205,14 @@ export class EnglishMoodJumpGame {
     }
 
     checkCollision(rect1, rect2) {
-        // Adjust hitboxes greatly for leniency for kids
-        // For clouds, rect1 is cloud, rect2 is Dino
+        // Horizontally: extremely forgiving so you don't clip the edges of long clouds
+        // Vertically: still forgiving, but strict enough to enforce jump/duck difference
+        // rect1 = cloud, rect2 = Dino
         return (
-            rect1.left < rect2.right - 40 &&
-            rect1.right > rect2.left + 40 &&
-            rect1.top < rect2.bottom - 20 &&
-            rect1.bottom > rect2.top + 20
+            rect1.left < rect2.right - 50 &&
+            rect1.right > rect2.left + 50 &&
+            rect1.top < rect2.bottom - 15 &&
+            rect1.bottom > rect2.top + 15
         );
     }
 
