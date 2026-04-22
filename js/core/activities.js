@@ -23,6 +23,11 @@ import { ArkanoidGame } from '../games/ArkanoidGame.js';
 import { RecycleGame } from '../games/RecycleGame.js';
 import { SnakeGame } from '../games/SnakeGame.js';
 import { RoboticsGame } from '../games/RoboticsGame.js';
+import { EnglishMoodJumpGame } from '../games/EnglishMoodJumpGame.js';
+import { EnglishPathGame } from '../games/EnglishPathGame.js';
+import { EnglishWeatherGame } from '../games/EnglishWeatherGame.js';
+import { EnglishFoodGame } from '../games/EnglishFoodGame.js';
+import { EnglishSimonGame } from '../games/EnglishSimonGame.js';
 
 export const ACTIVITIES_DATA = {
             aventura: {
@@ -337,7 +342,53 @@ export const ACTIVITIES_DATA = {
                 icon: '🐍',
                 theme: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
                 cost: 10
+            },
+            en_mood: {
+                title: '☁️ Mood Jump',
+                description: 'Jump over sad/angry!',
+                type: 'en_mood',
+                class: EnglishMoodJumpGame,
+                icon: '☁️',
+                theme: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+                cost: 0
+            },
+            en_path: {
+                title: '🥚 Months & Numbers',
+                description: 'Collect in order!',
+                type: 'en_path',
+                class: EnglishPathGame,
+                icon: '🥚',
+                theme: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
+                cost: 0
+            },
+            en_weather: {
+                title: '☀️ What\'s the weather?',
+                description: 'Interactive weather!',
+                type: 'en_weather',
+                class: EnglishWeatherGame,
+                icon: '☀️',
+                theme: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
+                cost: 0
+            },
+            en_food: {
+                title: '🍕 Dino Snack',
+                description: 'I like playing...',
+                type: 'en_food',
+                class: EnglishFoodGame,
+                icon: '🍕',
+                theme: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                cost: 0
+            },
+            en_simon: {
+                title: '🗣️ Simon Says',
+                description: 'Listen and act!',
+                type: 'en_simon',
+                class: EnglishSimonGame,
+                icon: '🗣️',
+                theme: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                cost: 0
             }
         };
 
 export const ARCADE_KEYS = ['aventura', 'surf', 'soccer', 'kart', 'fighter', 'laberinto', 'unir_puntos', 'connect_four', 'checkers', 'parchis', 'oca', 'chess', 'robotica', 'memory', 'simon', 'whack', 'arkanoid', 'recycling', 'snake'];
+export const ENGLISH_KEYS = ['en_mood', 'en_path', 'en_weather', 'en_food', 'en_simon'];

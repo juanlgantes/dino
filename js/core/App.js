@@ -1,4 +1,4 @@
-import { ACTIVITIES_DATA, ARCADE_KEYS } from './activities.js';
+import { ACTIVITIES_DATA, ARCADE_KEYS, ENGLISH_KEYS } from './activities.js';
 import { Navigation } from './Navigation.js';
 import { AudioEngine } from './AudioEngine.js';
 import { ParentalGate } from './ParentalGate.js';
@@ -84,7 +84,12 @@ export class App {
 
 
             renderActivities(mode = 'root') {
-                const grid = document.getElementById('activitiesGrid');
+                let gridId = 'activitiesGrid';
+                if (mode === 'english') {
+                    gridId = 'englishActivitiesGrid';
+                }
+                const grid = document.getElementById(gridId);
+                if (!grid) return;
                 grid.innerHTML = '';
 
 
@@ -127,10 +132,13 @@ export class App {
                 Object.keys(ACTIVITIES_DATA).forEach(key => {
                     const data = ACTIVITIES_DATA[key];
                     const isArcade = ARCADE_KEYS.includes(key);
+                    const isEnglish = ENGLISH_KEYS.includes(key);
 
                     // Filter Logic
-                    if (mode === 'root' && isArcade) return; // Hide games in root
-                    if (mode === 'arcade' && !isArcade) return; // Hide quizzes in arcade
+                    if (mode === 'root' && (isArcade || isEnglish)) return; // Hide arcade/english games in root
+                    if (mode === 'arcade' && !isArcade) return; // Hide non-arcade in arcade
+                    if (mode === 'english' && !isEnglish) return; // Hide non-english in english
+                    if ((mode === 'root' || mode === 'arcade') && isEnglish) return; // Hide english anywhere else
 
                     const hasCost = data.cost && data.cost > 0;
                     const isLocked = hasCost && this.state.totalStars < data.cost;

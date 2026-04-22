@@ -1,6 +1,6 @@
 export class Navigation {
             constructor() {
-                this.views = ['splash', 'kid-dash', 'game', 'parent', 'cinema', 'eval-root', 'eval-level-3', 'eval-term-2'];
+                this.views = ['splash', 'kid-dash', 'game', 'parent', 'cinema', 'eval-root', 'eval-level-3', 'eval-term-2', 'eval-english'];
             }
             show(viewId) {
                 this.views.forEach(v => {
