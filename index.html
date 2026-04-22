@@ -405,7 +405,7 @@
         <section id="view-eval-term-2" class="content-section hidden">
             <h2 style="text-align:center; color:#f1c40f; margin-bottom:20px;">2º Trimestre</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-                <button class="mode-btn" onclick="window.app.nav.show('eval-manual')" style="background: #95a5a6; color: white; font-size: 1.2em;">📝 Manual</button>
+                <button class="mode-btn" onclick="window.app.renderManual('term2'); window.app.nav.show('eval-manual')" style="background: #95a5a6; color: white; font-size: 1.2em;">📝 Manual</button>
                 <button class="mode-btn" style="background: #2ecc71; color: white; font-size: 1.2em;">🌱 Crecimiento en
                     Armonía</button>
                 <button class="mode-btn" style="background: #3498db; color: white; font-size: 1.2em;">🌍 Descubrimiento
@@ -442,63 +442,11 @@
         </section>
 
         <!-- EVAL MANUAL -->
-        <section id="view-eval-manual" class="content-section hidden" style="text-align:left; line-height: 1.6; max-width: 800px; margin: 0 auto; overflow-y: auto; max-height: 80vh;">
-            <h2 style="text-align:center; color:#2c3e50; margin-bottom:20px;">📝 Objetivos 2º Trimestre</h2>
+        <section id="view-eval-manual" class="content-section hidden" style="text-align:left; line-height: 1.8; max-width: 800px; margin: 0 auto; overflow-y: auto; max-height: 80vh; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
 
-            <h3 style="color:#9b59b6; border-bottom:2px solid #9b59b6; padding-bottom:5px;">🗣️ COMUNICACIÓN Y REPRESENTACIÓN DE LA REALIDAD</h3>
-            <ul style="margin-bottom:20px; font-size:1.1em;">
-                <li>Memorizo y verbalizo poesías y rimas.</li>
-                <li>Identificar los fonemas trabajados.</li>
-                <li>Trazo los fonemas trabajados con la direccionalidad correcta.</li>
-                <li>Utilizo técnicas plásticas como medio de comunicación y desarrollo de la creatividad.</li>
-                <li>Reconozco los instrumentos según sean de viento, cuerda o percusión.</li>
-                <li>Escucho y comprendo el argumento de un cuento y reconozco a los protagonistas.</li>
-                <li>Identifico los números del 0 al 8.</li>
-                <li>Trazo los números del 0 al 8.</li>
-            </ul>
-
-            <h3 style="color:#e67e22; border-bottom:2px solid #e67e22; padding-bottom:5px;">🇬🇧 INGLÉS</h3>
-            <ul style="margin-bottom:20px; font-size:1.1em;">
-                <li>Respondo a la fórmula de saludo y despedida: Good morning and good bye.</li>
-                <li>Respondo con la fórmula completa a la pregunta: How do you feel today?, con el vocabulario apropiado: happy, sad, angry, sleepy and scared.</li>
-                <li>Respondo correctamente a la pregunta: What ́s the weather like today?</li>
-                <li>Conozco los meses del año.</li>
-                <li>Cuento del 1 al 25 en inglés.</li>
-                <li>Identifico y respondo al vocabulario relacionado con la unidad: deportes, tiempo libre y comida.</li>
-                <li>Participo con agrado en los juegos y actividades propuestas.</li>
-                <li>Reconozco los colores.</li>
-            </ul>
-
-            <h3 style="color:#f39c12; border-bottom:2px solid #f39c12; padding-bottom:5px;">✝️ RELIGIÓN</h3>
-            <ul style="margin-bottom:20px; font-size:1.1em;">
-                <li>Conozco quiénes fueron algunos de los amigos de Jesús y cómo fue su relación con ellos.</li>
-                <li>Sé que la Pascua es la fiesta más importante para los cristianos.</li>
-            </ul>
-
-            <h3 style="color:#2ecc71; border-bottom:2px solid #2ecc71; padding-bottom:5px;">🌱 CRECIMIENTO EN ARMONÍA</h3>
-            <ul style="margin-bottom:20px; font-size:1.1em;">
-                <li>Manifiesto seguridad en mis capacidades motoras (equilibrio, desequilibrio, subir, bajar y caer).</li>
-                <li>Comparto los juguetes y participo en el juego.</li>
-                <li>He adquirido la coordinación óculo-manual necesaria para las actividades motoras de carácter fino.</li>
-                <li>Utilizo los juguetes de forma creativa, los cuido, conservo y ordeno.</li>
-                <li>Respeto las normas de clase.</li>
-                <li>Respeto a mis compañeros.</li>
-                <li>Identifico emociones y sentimientos en imágenes y en los demás.</li>
-                <li>Soy capaz de relajarme después de una actividad de movimiento.</li>
-                <li>Manifiesto actitudes de confianza en mis posibilidades para realizar las tareas encomendadas.</li>
-            </ul>
-
-            <h3 style="color:#3498db; border-bottom:2px solid #3498db; padding-bottom:5px;">🌍 DESCUBRIMIENTO Y EXPLORACIÓN DEL ENTORNO</h3>
-            <ul style="margin-bottom:20px; font-size:1.1em;">
-                <li>Conozco alimentos saludables.</li>
-                <li>Me oriento en relación a un objeto: cerca de, cerca-lejos.</li>
-                <li>Utilizo con propiedad los cuantificadores básicos: pesado-ligero, largo-corto y ancho-estrecho.</li>
-                <li>Identifico propiedades en los objetos: semejanzas y diferencias.</li>
-                <li>Relaciono los números del 0 al 8 con la cantidad correspondiente.</li>
-                <li>Conozco diferentes inventos relacionados con la ciencia.</li>
-                <li>Ordeno del 0 al 10 de manera creciente y decreciente.</li>
-                <li>Reconozco formas geométricas en objetos de uso habitual: cuadrado, triángulo, círculo, rectángulo, óvalo, rombo.</li>
-            </ul>
+            <div id="manualContentContainer">
+                <!-- Rendered dynamically via JS -->
+            </div>
 
             <button class="nav-btn" onclick="window.app.nav.show('eval-term-2')"
                 style="margin-top: 30px; display:block; margin-left: auto; margin-right: auto; position: static;">⬅️</button>

@@ -3,6 +3,7 @@ import { Navigation } from './Navigation.js';
 import { AudioEngine } from './AudioEngine.js';
 import { ParentalGate } from './ParentalGate.js';
 import { VIDEOS_DATA } from './constants.js';
+import { MANUALS_DATA } from './manuals.js';
 
 export class App {
             constructor() {
@@ -457,6 +458,28 @@ export class App {
                     btn.textContent = this.state.cinemaLocked ? '🔓 Desbloquear Cine' : '🔒 Bloquear Cine';
                     btn.style.background = this.state.cinemaLocked ? '#e74c3c' : '#2ecc71'; // Red/Green
                 }
+            }
+
+            renderManual(manualId) {
+                const container = document.getElementById('manualContentContainer');
+                if (!container) return;
+                container.innerHTML = '';
+
+                const data = MANUALS_DATA[manualId];
+                if (!data) return;
+
+                let html = `<h2 style="text-align:center; color:#2c3e50; margin-bottom:20px; font-family: 'Fredoka', sans-serif;">${data.title}</h2>`;
+
+                data.sections.forEach(sec => {
+                    html += `
+                        <h3 style="color:${sec.color}; border-bottom:2px solid ${sec.color}; padding-bottom:5px; font-size: 1.8em; font-family: 'Fredoka', sans-serif;">${sec.title}</h3>
+                        <ul style="margin-bottom:20px; font-size:1.4em;">
+                            ${sec.items.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    `;
+                });
+
+                container.innerHTML = html;
             }
 
             updateUI() {
