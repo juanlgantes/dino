@@ -92,7 +92,7 @@ export class ParchisGame {
                 exit.textContent = '🏠 Salir';
                 exit.className = 'mode-btn kid';
                 exit.style.marginTop = '40px';
-                exit.onclick = () => window.app.nav.goDashboard();
+                exit.onclick = () => window.app.nav.goBackFromGame();
                 this.c.appendChild(exit);
             }
 
@@ -245,7 +245,7 @@ export class ParchisGame {
                 exit.className = 'mode-btn kid';
                 exit.style.padding = '10px 20px';
                 exit.style.fontSize = '1em';
-                exit.onclick = () => window.app.nav.goDashboard();
+                exit.onclick = () => window.app.nav.goBackFromGame();
                 controls.appendChild(exit);
 
                 this.c.appendChild(controls);
@@ -582,7 +582,7 @@ export class ParchisGame {
                                 <h2 style="color:white; margin:20px;">${names[p]} GANA</h2>
                                 <div style="display:flex; gap:20px; flex-direction:column;">
                                     <button class="mode-btn kid" style="background:#2ecc71;" onclick="window.app.startGame(window.app.currentGameKey)">🔄 Jugar Otra Vez</button>
-                                    <button class="mode-btn kid" onclick="window.app.nav.goDashboard()">🏠 Salir</button>
+                                    <button class="mode-btn kid" onclick="window.app.nav.goBackFromGame()">🏠 Salir</button>
                                 </div>
                             `;
                             this.c.appendChild(ov);

@@ -42,7 +42,7 @@ export class SnakeGame {
                 exit.textContent = '🏠 Salir';
                 exit.className = 'mode-btn kid';
                 exit.style.marginTop = '20px';
-                exit.onclick = () => window.app.nav.goDashboard();
+                exit.onclick = () => window.app.nav.goBackFromGame();
                 this.c.appendChild(exit);
             }
 
@@ -117,7 +117,7 @@ export class SnakeGame {
                 exit.style.cssText = 'position:absolute; top:10px; right:10px;';
                 exit.onclick = () => {
                     this.running = false;
-                    window.app.nav.goDashboard();
+                    window.app.nav.goBackFromGame();
                 };
                 this.c.appendChild(exit);
             }
@@ -236,7 +236,7 @@ export class SnakeGame {
                         <p style="font-size: 1.5em;">Puntos: ${this.score}</p>
                         <button class="mode-btn kid" style="margin-top:20px; background:#00b894;" onclick="window.app.gameInstance.startGame()">🔄 Reintentar</button>
                         <br>
-                        <button class="mode-btn kid" style="margin-top:10px;" onclick="window.app.nav.goDashboard()">🏠 Salir</button>
+                        <button class="mode-btn kid" style="margin-top:10px;" onclick="window.app.nav.goBackFromGame()">🏠 Salir</button>
                     </div>
                 `;
             }

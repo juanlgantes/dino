@@ -168,7 +168,7 @@ export class CommArtGame {
         this.c.appendChild(overlay);
 
         document.getElementById('btnReplayArt').onclick = () => window.app.startGame(window.app.currentGameKey);
-        document.getElementById('btnExitArt').onclick = () => window.app.nav.goDashboard();
+        document.getElementById('btnExitArt').onclick = () => window.app.nav.goBackFromGame();
     }
 
     cleanup() {

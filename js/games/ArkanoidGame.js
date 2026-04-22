@@ -47,7 +47,7 @@ export class ArkanoidGame {
                 this.exitBtn.textContent = '🏠';
                 this.exitBtn.className = 'nav-btn';
                 this.exitBtn.style.cssText = 'position: absolute; top: 10px; right: 10px; pointer-events: auto;';
-                this.exitBtn.onclick = () => window.app.nav.goDashboard();
+                this.exitBtn.onclick = () => window.app.nav.goBackFromGame();
                 this.c.appendChild(this.exitBtn);
 
                 // Input
@@ -309,7 +309,7 @@ export class ArkanoidGame {
                         <p>Puntuación: ${this.score}</p>
                         <button class="mode-btn kid" style="background:#2ecc71; margin-top: 10px;" onclick="window.app.gameInstance.startGame()">🔄 Jugar Otra Vez</button>
                         <div style="height:10px"></div>
-                        <button class="mode-btn kid" onclick="window.app.nav.goDashboard()">🏠 Salir</button>
+                        <button class="mode-btn kid" onclick="window.app.nav.goBackFromGame()">🏠 Salir</button>
                     </div>
                 `;
             }

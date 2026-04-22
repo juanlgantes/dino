@@ -226,7 +226,7 @@ export class RoboticsGame {
                 const exit = document.createElement('button');
                 exit.textContent = '🏠 Salir';
                 exit.style.cssText = 'background:none; border:none; color:white; margin-top:10px; font-size:1.2em; cursor: pointer;';
-                exit.onclick = () => window.app.nav.goDashboard();
+                exit.onclick = () => window.app.nav.goBackFromGame();
                 controlsSection.appendChild(exit);
 
                 this.c.appendChild(controlsSection);
@@ -328,7 +328,7 @@ export class RoboticsGame {
                         <h1>¡Programación Completada!</h1>
                         <button class="mode-btn kid" style="margin-top:20px; background:#2ecc71;" onclick="window.app.startGame(window.app.currentGameKey)">🔄 Jugar Otra Vez</button>
                         <br>
-                        <button class="mode-btn kid" style="margin-top:10px;" onclick="window.app.nav.goDashboard()">🏠 Salir</button>
+                        <button class="mode-btn kid" style="margin-top:10px;" onclick="window.app.nav.goBackFromGame()">🏠 Salir</button>
                     </div>
                 `;
                 window.app.updateParentStats(30, 1, 'robotics');

@@ -56,7 +56,7 @@ export class MemoryGame {
                 exit.textContent = '🏠 Salir';
                 exit.className = 'mode-btn kid';
                 exit.style.marginTop = '40px';
-                exit.onclick = () => window.app.nav.goDashboard();
+                exit.onclick = () => window.app.nav.goBackFromGame();
                 this.c.appendChild(exit);
             }
 
@@ -220,7 +220,7 @@ export class MemoryGame {
                             <h1>¡Memoria Excelente!</h1>
                             <button class="mode-btn kid" style="margin-top:20px; background:#2ecc71;" onclick="window.app.gameInstance.init()">🔄 Jugar Otra Vez</button>
                             <br>
-                            <button class="mode-btn kid" style="margin-top:10px;" onclick="window.app.nav.goDashboard()">🏠 Salir</button>
+                            <button class="mode-btn kid" style="margin-top:10px;" onclick="window.app.nav.goBackFromGame()">🏠 Salir</button>
                         </div>
                     `;
                 }, 1000);
