@@ -7,7 +7,7 @@ export class EnglishMoodJumpGame {
         this.dino = { y: 0, isJumping: false, isDucking: false };
         this.clouds = [];
         this.score = 0;
-        this.speed = 4;
+        this.speed = 2.5; // Slower initial speed
 
         // Setup UI
         this.c.style.background = 'linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 100%)';
@@ -22,14 +22,14 @@ export class EnglishMoodJumpGame {
     init() {
         this.c.innerHTML = `
             <div id="ground" style="position:absolute; bottom:0; width:100%; height:20%; background:#8B4513; border-top: 5px solid #228B22;"></div>
-            <div id="dino" style="position:absolute; left:50px; bottom:20%; font-size:4em; transition: bottom 0.3s, transform 0.3s; z-index:10;">🦕</div>
+            <div id="dino" style="position:absolute; left:50px; bottom:20%; font-size:3em; transition: bottom 0.3s, transform 0.3s; z-index:10;">🦕</div>
 
             <div style="position:absolute; bottom:10px; width:100%; display:flex; justify-content:space-around; z-index:20;">
                 <button id="btnDuck" style="padding:15px 30px; font-size:1.5em; background:#f1c40f; border:none; border-radius:10px; font-weight:bold;">⏬ Duck</button>
                 <button id="btnJump" style="padding:15px 30px; font-size:1.5em; background:#3498db; color:white; border:none; border-radius:10px; font-weight:bold;">⏫ Jump</button>
             </div>
 
-            <button id="btnPause" style="position:absolute; top:20px; right:20px; width:50px; height:50px; font-size:1.5em; background:#fff3cd; border:2px solid #ffcc00; border-radius:10px; z-index:20; cursor:pointer;">⏸️</button>
+            <button id="btnPause" style="position:absolute; top:10px; left:70px; width:50px; height:50px; font-size:1.5em; background:#fff3cd; border:2px solid #ffcc00; border-radius:10px; z-index:20; cursor:pointer;">⏸️</button>
             <div id="scoreDisplay" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); font-size:2em; font-weight:bold; background:rgba(255,255,255,0.8); padding:5px 15px; border-radius:10px; z-index:20;">Score: 0</div>
 
             <div id="pauseMenu" style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:30; display:none;">
@@ -181,7 +181,7 @@ export class EnglishMoodJumpGame {
                 cloud.passed = true;
                 this.score++;
                 document.getElementById('scoreDisplay').textContent = 'Score: ' + this.score;
-                this.speed += 0.1; // Increase speed slightly
+                this.speed += 0.02; // Very slight speed increase to remain easy
 
                 if (this.score >= 10) { // Win at 10
                     this.endGame(true);
@@ -200,13 +200,13 @@ export class EnglishMoodJumpGame {
     }
 
     checkCollision(rect1, rect2) {
-        // Adjust hitboxes slightly for leniency
+        // Adjust hitboxes greatly for leniency for kids
         // For clouds, rect1 is cloud, rect2 is Dino
         return (
-            rect1.left < rect2.right - 30 &&
-            rect1.right > rect2.left + 30 &&
-            rect1.top < rect2.bottom - 10 &&
-            rect1.bottom > rect2.top + 10
+            rect1.left < rect2.right - 40 &&
+            rect1.right > rect2.left + 40 &&
+            rect1.top < rect2.bottom - 20 &&
+            rect1.bottom > rect2.top + 20
         );
     }
 
