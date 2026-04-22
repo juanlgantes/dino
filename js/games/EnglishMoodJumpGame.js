@@ -28,7 +28,15 @@ export class EnglishMoodJumpGame {
                 <button id="btnDuck" style="padding:15px 30px; font-size:1.5em; background:#f1c40f; border:none; border-radius:10px; font-weight:bold;">⏬ Duck</button>
                 <button id="btnJump" style="padding:15px 30px; font-size:1.5em; background:#3498db; color:white; border:none; border-radius:10px; font-weight:bold;">⏫ Jump</button>
             </div>
-            <div id="scoreDisplay" style="position:absolute; top:20px; right:20px; font-size:2em; font-weight:bold;">Score: 0</div>
+
+            <button id="btnPause" style="position:absolute; top:20px; right:20px; width:50px; height:50px; font-size:1.5em; background:#fff3cd; border:2px solid #ffcc00; border-radius:10px; z-index:20; cursor:pointer;">⏸️</button>
+            <div id="scoreDisplay" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); font-size:2em; font-weight:bold; background:rgba(255,255,255,0.8); padding:5px 15px; border-radius:10px; z-index:20;">Score: 0</div>
+
+            <div id="pauseMenu" style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:30; display:none;">
+                <h2 style="color:white; font-size:3em; margin-bottom:20px;">Pausado</h2>
+                <button id="btnResume" style="margin-bottom:10px; padding:15px 30px; font-size:1.5em; background:#2ecc71; color:white; border:none; border-radius:10px; cursor:pointer;">▶️ Continuar</button>
+                <button id="btnExit" style="padding:15px 30px; font-size:1.5em; background:#e74c3c; color:white; border:none; border-radius:10px; cursor:pointer;">🏠 Salir</button>
+            </div>
         `;
 
         this.dinoEl = document.getElementById('dino');
@@ -47,12 +55,12 @@ export class EnglishMoodJumpGame {
 
     bindEvents() {
         const jump = () => {
-            if (this.dino.isJumping || this.dino.isDucking || !this.running) return;
+            if (this.dino.isJumping || this.dino.isDucking || !this.running || this.paused) return;
             this.dino.isJumping = true;
-            this.dinoEl.style.bottom = '40%';
+            this.dinoEl.style.bottom = '45%'; // Jump higher
             window.app.audio.playPop(); // simple jump sound
             setTimeout(() => {
-                if (!this.running) return;
+                if (!this.running || this.paused) return;
                 this.dinoEl.style.bottom = '20%';
                 setTimeout(() => {
                     this.dino.isJumping = false;
@@ -61,12 +69,12 @@ export class EnglishMoodJumpGame {
         };
 
         const duck = () => {
-            if (this.dino.isJumping || this.dino.isDucking || !this.running) return;
+            if (this.dino.isJumping || this.dino.isDucking || !this.running || this.paused) return;
             this.dino.isDucking = true;
             this.dinoEl.style.transform = 'scaleY(0.5)';
             this.dinoEl.style.transformOrigin = 'bottom';
             setTimeout(() => {
-                if (!this.running) return;
+                if (!this.running || this.paused) return;
                 this.dinoEl.style.transform = 'scaleY(1)';
                 setTimeout(() => {
                     this.dino.isDucking = false;
@@ -75,20 +83,40 @@ export class EnglishMoodJumpGame {
         };
 
         document.getElementById('btnJump').addEventListener('mousedown', jump);
-        document.getElementById('btnJump').addEventListener('touchstart', (e) => { e.preventDefault(); jump(); });
+        document.getElementById('btnJump').addEventListener('touchstart', (e) => { e.preventDefault(); jump(); }, {passive:false});
 
         document.getElementById('btnDuck').addEventListener('mousedown', duck);
-        document.getElementById('btnDuck').addEventListener('touchstart', (e) => { e.preventDefault(); duck(); });
+        document.getElementById('btnDuck').addEventListener('touchstart', (e) => { e.preventDefault(); duck(); }, {passive:false});
+
+        document.getElementById('btnPause').addEventListener('click', () => this.togglePause());
+        document.getElementById('btnResume').addEventListener('click', () => this.togglePause());
+        document.getElementById('btnExit').addEventListener('click', () => window.app.nav.goBackFromGame());
+    }
+
+    togglePause() {
+        if (!this.running) return;
+        this.paused = !this.paused;
+        const menu = document.getElementById('pauseMenu');
+
+        if (this.paused) {
+            menu.style.display = 'flex';
+            clearTimeout(this.spawnTimer);
+            cancelAnimationFrame(this.loopTimeout);
+        } else {
+            menu.style.display = 'none';
+            this.loopTimeout = requestAnimationFrame(() => this.loop());
+            this.spawnTimer = setTimeout(() => this.spawnCloud(), 1000); // Resume spawning soon
+        }
     }
 
     spawnCloud() {
-        if (!this.running) return;
+        if (!this.running || this.paused) return;
 
         const types = [
-            { word: 'sad', needsJump: true },
-            { word: 'angry', needsJump: true },
-            { word: 'happy', needsJump: false },
-            { word: 'sleepy', needsJump: false }
+            { word: 'sad', icon: '😢', needsJump: true },
+            { word: 'angry', icon: '😠', needsJump: true },
+            { word: 'happy', icon: '😄', needsJump: false },
+            { word: 'sleepy', icon: '😴', needsJump: false }
         ];
 
         const type = types[Math.floor(Math.random() * types.length)];
@@ -100,18 +128,21 @@ export class EnglishMoodJumpGame {
 
         // High (needs duck) or Low (needs jump)
         if (type.needsJump) {
-            el.style.bottom = '22%';
+            el.style.bottom = '20%'; // Ground level
         } else {
-            el.style.bottom = '35%'; // higher
+            el.style.bottom = '28%'; // Head level (must duck)
         }
 
         el.style.background = 'white';
-        el.style.padding = '10px 20px';
+        el.style.padding = '5px 15px'; // Smaller padding
         el.style.borderRadius = '20px';
         el.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
-        el.style.fontSize = '1.5em';
+        el.style.fontSize = '1.2em'; // Smaller font
         el.style.fontWeight = 'bold';
-        el.textContent = type.word;
+        el.style.display = 'flex';
+        el.style.alignItems = 'center';
+        el.style.gap = '5px';
+        el.innerHTML = `<span>${type.icon}</span> <span>${type.word}</span>`;
 
         this.c.appendChild(el);
 
@@ -128,7 +159,7 @@ export class EnglishMoodJumpGame {
     }
 
     loop() {
-        if (!this.running) return;
+        if (!this.running || this.paused) return;
 
         // Update clouds
         for (let i = this.clouds.length - 1; i >= 0; i--) {
@@ -170,11 +201,12 @@ export class EnglishMoodJumpGame {
 
     checkCollision(rect1, rect2) {
         // Adjust hitboxes slightly for leniency
+        // For clouds, rect1 is cloud, rect2 is Dino
         return (
-            rect1.left < rect2.right - 20 &&
-            rect1.right > rect2.left + 20 &&
-            rect1.top < rect2.bottom - 20 &&
-            rect1.bottom > rect2.top + 20
+            rect1.left < rect2.right - 30 &&
+            rect1.right > rect2.left + 30 &&
+            rect1.top < rect2.bottom - 10 &&
+            rect1.bottom > rect2.top + 10
         );
     }
 
