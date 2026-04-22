@@ -29,7 +29,7 @@ export class EnglishWeatherGame {
 
             <div id="dinoWeather" style="position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); font-size:6em; z-index:5; transition: transform 0.5s;">🦕</div>
 
-            <div id="questionModal" style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:20; display:none;">
+            <div id="questionModal" style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:20; display:none; backdrop-filter: blur(2px);">
                 <h1 style="color:white; font-size:3em; margin-bottom:20px;">What's the weather?</h1>
                 <div id="weatherOptions" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;"></div>
                 <div style="margin-top:30px; display:flex; flex-direction:column; align-items:center;">
@@ -121,6 +121,10 @@ export class EnglishWeatherGame {
         } while (next.id === this.currentWeather);
 
         this.targetWeather = next;
+
+        // VISUAL FIX: Change the weather visually FIRST so the player knows what to answer.
+        this.setWeather(next.id);
+
         this.modal.style.display = 'flex';
 
         if (window.app.audio && window.app.audio.speak) {
@@ -185,7 +189,13 @@ export class EnglishWeatherGame {
             window.app.audio.playWin();
             window.app.addScore(5);
             this.modal.style.display = 'none';
-            this.setWeather(id);
+
+            // Pop animation on Dino to celebrate
+            this.dinoEl.animate([
+                { transform: 'translate(-50%, -50%) scale(1)' },
+                { transform: 'translate(-50%, -50%) scale(1.3)' },
+                { transform: 'translate(-50%, -50%) scale(1)' }
+            ], { duration: 300 });
 
             // Queue next event
             this.eventTimer = setTimeout(() => this.triggerEvent(), 6000 + Math.random() * 4000);
