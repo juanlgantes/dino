@@ -28,6 +28,12 @@ import { EnglishPathGame } from '../games/EnglishPathGame.js';
 import { EnglishWeatherGame } from '../games/EnglishWeatherGame.js';
 import { EnglishFoodGame } from '../games/EnglishFoodGame.js';
 import { EnglishSimonGame } from '../games/EnglishSimonGame.js';
+import { CommRhymesGame } from '../games/CommRhymesGame.js';
+import { CommPhonemesGame } from '../games/CommPhonemesGame.js';
+import { CommArtGame } from '../games/CommArtGame.js';
+import { CommInstrumentsGame } from '../games/CommInstrumentsGame.js';
+import { CommStoryGame } from '../games/CommStoryGame.js';
+import { CommNumbersGame } from '../games/CommNumbersGame.js';
 
 export const ACTIVITIES_DATA = {
             aventura: {
@@ -387,8 +393,63 @@ export const ACTIVITIES_DATA = {
                 icon: '🗣️',
                 theme: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
                 cost: 0
+            },
+            com_rhymes: {
+                title: '🎵 Poesías y Rimas',
+                description: '¡Completa la rima!',
+                type: 'com_rhymes',
+                class: CommRhymesGame,
+                icon: '🎵',
+                theme: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)',
+                cost: 0
+            },
+            com_phonemes: {
+                title: '🅰️ Fonemas Mágicos',
+                description: 'Traza y explota',
+                type: 'com_phonemes',
+                class: CommPhonemesGame,
+                icon: '🅰️',
+                theme: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+                cost: 0
+            },
+            com_art: {
+                title: '🎨 Plástica y Creatividad',
+                description: '¡Dibuja y crea!',
+                type: 'com_art',
+                class: CommArtGame,
+                icon: '🎨',
+                theme: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
+                cost: 0
+            },
+            com_instruments: {
+                title: '🎺 Instrumentos',
+                description: 'Viento, cuerda o percusión',
+                type: 'com_instruments',
+                class: CommInstrumentsGame,
+                icon: '🎺',
+                theme: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
+                cost: 0
+            },
+            com_story: {
+                title: '📖 Cuentos de Dino',
+                description: 'Escucha y comprende',
+                type: 'com_story',
+                class: CommStoryGame,
+                icon: '📖',
+                theme: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
+                cost: 0
+            },
+            com_numbers: {
+                title: '🔢 Números 0-8',
+                description: 'Traza y cuenta',
+                type: 'com_numbers',
+                class: CommNumbersGame,
+                icon: '🔢',
+                theme: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                cost: 0
             }
         };
 
 export const ARCADE_KEYS = ['aventura', 'surf', 'soccer', 'kart', 'fighter', 'laberinto', 'unir_puntos', 'connect_four', 'checkers', 'parchis', 'oca', 'chess', 'robotica', 'memory', 'simon', 'whack', 'arkanoid', 'recycling', 'snake'];
 export const ENGLISH_KEYS = ['en_mood', 'en_path', 'en_weather', 'en_food', 'en_simon'];
+export const COMUNICACION_KEYS = ['com_rhymes', 'com_phonemes', 'com_art', 'com_instruments', 'com_story', 'com_numbers'];
