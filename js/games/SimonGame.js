@@ -43,7 +43,7 @@ export class SimonGame {
     exit.textContent = "🏠 Salir";
     exit.className = "mode-btn kid";
     exit.style.marginTop = "20px";
-    exit.onclick = () => window.app.nav.goDashboard();
+    exit.onclick = () => window.app.nav.goBackFromGame();
     this.c.appendChild(exit);
   }
 
@@ -108,7 +108,7 @@ export class SimonGame {
     exit.className = "mode-btn kid";
     exit.style.padding = "10px 20px";
     exit.style.fontSize = "1em";
-    exit.onclick = () => window.app.nav.goDashboard();
+    exit.onclick = () => window.app.nav.goBackFromGame();
     controls.appendChild(exit);
     this.c.appendChild(controls);
   }
@@ -184,7 +184,7 @@ export class SimonGame {
                             <p style="font-size: 1.5em;">Llegaste al Nivel ${this.sequence.length}</p>
                             <button class="mode-btn kid" style="margin-top:20px; background:#2ecc71;" onclick="window.app.gameInstance.startGame()">🔄 Reintentar</button>
                             <br>
-                            <button class="mode-btn kid" style="margin-top:10px;" onclick="window.app.nav.goDashboard()">🏠 Salir</button>
+                            <button class="mode-btn kid" style="margin-top:10px;" onclick="window.app.nav.goBackFromGame()">🏠 Salir</button>
                         </div>
                     `;
       window.app.updateParentStats(this.sequence.length, 1, "simon");

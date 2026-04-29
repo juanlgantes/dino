@@ -221,7 +221,7 @@ export class GooseGame {
     exit.textContent = "🏠 Salir";
     exit.className = "mode-btn kid";
     exit.style.marginTop = "40px";
-    exit.onclick = () => window.app.nav.goDashboard();
+    exit.onclick = () => window.app.nav.goBackFromGame();
     this.c.appendChild(exit);
   }
 
@@ -548,7 +548,7 @@ export class GooseGame {
                             <div style="font-size:5em;">${this.turn === 0 ? "🏆" : "🦆"}</div>
                             <h2 style="color:white; margin:20px;">${this.statusEl.innerText}</h2>
                             <button class="mode-btn kid" style="background:#2ecc71;" onclick="window.app.startGame(window.app.currentGameKey)">🔄 Jugar Otra Vez</button>
-                            <button class="mode-btn kid" style="margin-top:10px;" onclick="window.app.nav.goDashboard()">🏠 Salir</button>
+                            <button class="mode-btn kid" style="margin-top:10px;" onclick="window.app.nav.goBackFromGame()">🏠 Salir</button>
                         `;
         this.c.appendChild(ov);
       }, 1000);

@@ -167,7 +167,7 @@ export class MazeGame {
     exit.textContent = "🏠 Salir";
     exit.className = "mode-btn kid";
     exit.style.marginTop = "10px";
-    exit.onclick = () => window.app.nav.goDashboard();
+    exit.onclick = () => window.app.nav.goBackFromGame();
     this.c.appendChild(exit);
   }
 
@@ -441,7 +441,7 @@ export class MazeGame {
                     <p>Has encontrado todos los huevos.</p>
                     <button class="mode-btn kid" style="margin-top:20px; background:#2ecc71;" onclick="window.app.startGame(window.app.currentGameKey)">🔄 Jugar Otra Vez</button>
                     <div style="height:10px"></div>
-                    <button class="mode-btn kid" onclick="window.app.nav.goDashboard()">🏠 Volver</button>
+                    <button class="mode-btn kid" onclick="window.app.nav.goBackFromGame()">🏠 Volver</button>
                 `;
     this.c.appendChild(winDiv);
 

@@ -335,7 +335,7 @@ export class FighterGame {
                         <h2 style="color: ${color};">${msg}</h2>
                         <button class="mode-btn kid" style="margin-top:20px; background:#2ecc71;" onclick="window.app.startGame(window.app.currentGameKey)">🔄 Jugar Otra Vez</button>
                         <div style="height:10px"></div>
-                        <button class="mode-btn kid" style="margin-top:10px;" onclick="window.app.nav.goDashboard()">🏠 Volver al Menú</button>
+                        <button class="mode-btn kid" style="margin-top:10px;" onclick="window.app.nav.goBackFromGame()">🏠 Volver al Menú</button>
                     </div>
                 `;
   }

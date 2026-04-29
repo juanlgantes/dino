@@ -61,7 +61,7 @@ export class RecycleGame {
     exit.textContent = "🏠";
     exit.className = "nav-btn";
     exit.style.cssText = "position:absolute; top:10px; right:10px;";
-    exit.onclick = () => window.app.nav.goDashboard();
+    exit.onclick = () => window.app.nav.goBackFromGame();
     this.c.appendChild(exit);
   }
 
@@ -87,7 +87,7 @@ export class RecycleGame {
     exit.className = "nav-btn";
     exit.style.cssText =
       "position:absolute; top:10px; right:10px; z-index:100;";
-    exit.onclick = () => window.app.nav.goDashboard();
+    exit.onclick = () => window.app.nav.goBackFromGame();
     this.c.appendChild(exit);
 
     // Bins Container
@@ -289,7 +289,7 @@ export class RecycleGame {
                         <p style="font-size: 1.5em;">Puntuación: ${this.score}</p>
                         <button class="mode-btn kid" style="margin-top:20px; background:#00b894;" onclick="window.app.gameInstance.startGame()">🔄 Jugar Otra Vez</button>
                         <div style="height:10px"></div>
-                        <button class="mode-btn kid" onclick="window.app.nav.goDashboard()">🏠 Salir</button>
+                        <button class="mode-btn kid" onclick="window.app.nav.goBackFromGame()">🏠 Salir</button>
                     </div>
                 `;
   }

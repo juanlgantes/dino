@@ -43,7 +43,7 @@ export class WhackGame {
     exit.textContent = "🏠 Salir";
     exit.className = "mode-btn kid";
     exit.style.marginTop = "20px";
-    exit.onclick = () => window.app.nav.goDashboard();
+    exit.onclick = () => window.app.nav.goBackFromGame();
     this.c.appendChild(exit);
   }
 
@@ -198,7 +198,7 @@ export class WhackGame {
                         <h2 style="color: #2d3436;">¡Juego Terminado!</h2>
                         <button class="mode-btn kid" style="margin-top:20px; background:#00cec9;" onclick="window.app.gameInstance.startGame()">🔄 Jugar Otra Vez</button>
                         <div style="height:10px"></div>
-                        <button class="mode-btn kid" onclick="window.app.nav.goDashboard()">🏠 Salir</button>
+                        <button class="mode-btn kid" onclick="window.app.nav.goBackFromGame()">🏠 Salir</button>
                     </div>
                 `;
   }
