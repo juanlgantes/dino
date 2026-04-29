@@ -43,4 +43,15 @@ export class Navigation {
     }
     this.show("kid-dash");
   }
+
+  goBackFromGame() {
+    if (
+      window.app.gameInstance &&
+      typeof window.app.gameInstance.cleanup === "function"
+    ) {
+      window.app.gameInstance.cleanup();
+    }
+    const mode = window.app.currentFolderMode || "kid-dash";
+    this.show(mode);
+  }
 }

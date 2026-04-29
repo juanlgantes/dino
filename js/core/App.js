@@ -243,6 +243,11 @@ export class App {
         this.gameInstance = new data.class(data, this);
       } else {
         this.gameInstance = new data.class(data, canvas);
+      if (typeof this.gameInstance.init === 'function') {
+          this.gameInstance.init();
+        } else if (typeof this.gameInstance.startGame === 'function') {
+          this.gameInstance.startGame();
+        }
       }
     }
   }

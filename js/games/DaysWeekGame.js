@@ -361,7 +361,7 @@ export class DaysWeekGame {
     exit.style.left = "10px";
     exit.onclick = () => {
       this.clearHint();
-      window.app.nav.goDashboard();
+      window.app.nav.goBackFromGame();
     };
     this.c.appendChild(exit);
 
@@ -785,7 +785,7 @@ export class DaysWeekGame {
                         <h2 style="color: #2ecc71; font-size:3em;">${msg}</h2>
                         <button class="mode-btn kid" style="margin-top:20px; background:#2ecc71;" onclick="window.app.startGame(window.app.currentGameKey)">🔄 Jugar</button>
                         <div style="height:10px"></div>
-                        <button class="mode-btn kid" onclick="window.app.nav.goDashboard()">🏠 Salir</button>
+                        <button class="mode-btn kid" onclick="window.app.nav.goBackFromGame()">🏠 Salir</button>
                     </div>
                 `;
   }
