@@ -28,6 +28,7 @@ export class RoomGame {
 
     // Caching references
     this.draggedItem = null;
+    this.init();
   }
 
   init() {

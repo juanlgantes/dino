@@ -6,6 +6,7 @@ export class BreatheGame {
     this.timer = null;
     this.cycles = 0;
     this.maxCycles = 3;
+    this.init();
   }
 
   init() {

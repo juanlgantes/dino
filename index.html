@@ -222,13 +222,12 @@
         setTimeout(() => t.remove(), 5000);
       };
 
-      // REGISTER SERVICE WORKER
+      // UNREGISTER SERVICE WORKER (Fix missing sw.js cache issue)
       if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker
-            .register("./sw.js")
-            .then((reg) => console.log("SW Registrado: ", reg.scope))
-            .catch((err) => console.log("SW Falló: ", err));
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+          }
         });
       }
     </script>
@@ -628,21 +627,21 @@
           <button
             class="mode-btn"
             onclick="window.app.nav.show('manuals')"
-            style="background: #95a5a6; color: white; font-size: 1.2em"
+            style="background: #95a5a6; color: white; font-size: 1.2em; white-space: normal; height: auto;"
           >
             📖 Manual Niños Inquietos
           </button>
           <button
             class="mode-btn"
             onclick="window.app.startGame('room')"
-            style="background: #2ecc71; color: white; font-size: 1.2em"
+            style="background: #2ecc71; color: white; font-size: 1.2em; white-space: normal; height: auto;"
           >
             🛏️ Ordena tu Habitación
           </button>
           <button
             class="mode-btn"
             onclick="window.app.startGame('breathe')"
-            style="background: #3498db; color: white; font-size: 1.2em"
+            style="background: #3498db; color: white; font-size: 1.2em; white-space: normal; height: auto;"
           >
             🧘 Respiración con Dino
           </button>
