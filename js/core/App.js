@@ -95,6 +95,7 @@ export class App {
   }
 
   renderActivities(mode = "root") {
+    this.currentFolderMode = mode;
     const grid = document.getElementById("activitiesGrid");
     grid.innerHTML = "";
 
@@ -140,6 +141,9 @@ export class App {
       // Filter Logic
       if (mode === "root" && isArcade) return; // Hide games in root
       if (mode === "arcade" && !isArcade) return; // Hide quizzes in arcade
+
+      // Hide special attention games from main dashboard
+      if (mode === "root" && (key === "room" || key === "breathe")) return;
 
       const hasCost = data.cost && data.cost > 0;
       const isLocked = hasCost && this.state.totalStars < data.cost;
@@ -243,11 +247,6 @@ export class App {
         this.gameInstance = new data.class(data, this);
       } else {
         this.gameInstance = new data.class(data, canvas);
-      if (typeof this.gameInstance.init === 'function') {
-          this.gameInstance.init();
-        } else if (typeof this.gameInstance.startGame === 'function') {
-          this.gameInstance.startGame();
-        }
       }
     }
   }
