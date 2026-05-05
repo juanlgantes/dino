@@ -14,8 +14,11 @@
             frame-ancestors 'none';
         ">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>v18.3 "Ultimate Days"</title>
+    <title>v18.4 "Fighter Boost"</title>
     <!--
+        CHANGELOG v18.4
+        - [PERF] Fighter: Optimizado rendimiento de barras de vida (Caching DOM).
+
         CHANGELOG v18.3
         - [GAMEPLAY] Días de la Semana: Ronda de Bonus "Contexto" (Cole vs Casa).
         - [GAMEPLAY] Días de la Semana: Fase Final "Rueda del Tiempo" (Comprensión Cíclica).
@@ -873,7 +876,7 @@
         <section id="view-splash" class="content-section" style="background: transparent; box-shadow: none;">
             <header class="app-header">
                 <h1>🦕 Aventura Preescolar</h1>
-                <p style="font-size: 1.2em;">v17.9 "Voice Boost"</p>
+                <p style="font-size: 1.2em;">v18.4 "Fighter Boost"</p>
             </header>
 
             <div class="mode-selector">
@@ -3490,6 +3493,10 @@
                 `;
                 this.c.appendChild(this.hud);
 
+                // Cache HP Bar elements
+                this.playerHpBar = document.getElementById('playerHpBar');
+                this.enemyHpBar = document.getElementById('enemyHpBar');
+
                 // Characters
                 // Player
                 this.pEl = document.createElement('div');
@@ -3709,8 +3716,8 @@
             }
 
             updateBars() {
-                document.getElementById('playerHpBar').style.width = this.playerHp + '%';
-                document.getElementById('enemyHpBar').style.width = this.enemyHp + '%';
+                if (this.playerHpBar) this.playerHpBar.style.width = this.playerHp + '%';
+                if (this.enemyHpBar) this.enemyHpBar.style.width = this.enemyHp + '%';
             }
 
             showFx(emoji, color) {
