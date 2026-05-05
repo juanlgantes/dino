@@ -170,6 +170,31 @@ export class App {
     });
   }
 
+  playConfetti(x, y) {
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement("div");
+      const color = ["#f1c40f", "#e74c3c", "#3498db", "#2ecc71", "#9b59b6"][
+        Math.floor(Math.random() * 5)
+      ];
+      p.style.cssText = `
+        position: fixed; top: ${y}px; left: ${x}px; width: 10px; height: 10px;
+        background: ${color}; pointer-events: none; border-radius: 50%; z-index: 9999;
+      `;
+      document.body.appendChild(p);
+      const angle = Math.random() * Math.PI * 2;
+      const velocity = 50 + Math.random() * 100;
+      const tx = Math.cos(angle) * velocity;
+      const ty = Math.sin(angle) * velocity;
+      p.animate(
+        [
+          { transform: "translate(0,0) scale(1)", opacity: 1 },
+          { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 },
+        ],
+        { duration: 800, easing: "ease-out" },
+      ).onfinish = () => p.remove();
+    }
+  }
+
   showToast(msg) {
     const el = document.createElement("div");
     el.style.cssText = `

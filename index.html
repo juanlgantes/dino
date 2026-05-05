@@ -222,11 +222,16 @@
         setTimeout(() => t.remove(), 5000);
       };
 
-      // UNREGISTER SERVICE WORKER (Fix missing sw.js cache issue)
+// UNREGISTER SERVICE WORKER (Fix missing sw.js cache issue)
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          let needsReload = false;
           for(let registration of registrations) {
             registration.unregister();
+            needsReload = true;
+          }
+          if (needsReload && !window.location.search.includes("reloaded=true")) {
+             window.location.search = "?reloaded=true";
           }
         });
       }
@@ -367,7 +372,7 @@
         <div style="position: absolute; top: 10px; left: 10px; z-index: 1000">
           <button
             class="nav-btn"
-            onclick="window.app.nav.goDashboard()"
+            onclick="window.app.nav.goBackFromGame()"
             style="
               width: 50px;
               height: 50px;
@@ -633,14 +638,14 @@
           </button>
           <button
             class="mode-btn"
-            onclick="window.app.startGame('room')"
+            onclick="window.app.currentFolderMode='eval-special'; window.app.startGame('room');"
             style="background: #2ecc71; color: white; font-size: 1.2em; white-space: normal; height: auto;"
           >
             🛏️ Ordena tu Habitación
           </button>
           <button
             class="mode-btn"
-            onclick="window.app.startGame('breathe')"
+            onclick="window.app.currentFolderMode='eval-special'; window.app.startGame('breathe');"
             style="background: #3498db; color: white; font-size: 1.2em; white-space: normal; height: auto;"
           >
             🧘 Respiración con Dino
@@ -980,6 +985,6 @@
       </div>
     </div>
 
-    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/main.js?v=2"></script>
   </body>
 </html>
