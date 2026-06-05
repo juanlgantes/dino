@@ -10,6 +10,7 @@ export class NumberTraceGame {
         // Tracing state
         this.points = [];
         this.isTracing = false;
+        this.isInvulnerable = false;
         this.traceWidth = 20; // thick brush
         this.boundWidth = 40; // width of allowed trace path
         this.lastValidPoint = null;
@@ -135,6 +136,7 @@ export class NumberTraceGame {
         this.points = [];
         this.traceLines = [];
         this.isTracing = false;
+        this.isInvulnerable = false;
         this.lastValidPoint = null;
         this.showGame();
     }
@@ -303,7 +305,13 @@ export class NumberTraceGame {
 
         if (distToPath > this.boundWidth / 2) {
             // Out of bounds!
-            this.loseLife();
+            if (!this.isInvulnerable) {
+                this.loseLife();
+                this.isInvulnerable = true;
+                setTimeout(() => {
+                    this.isInvulnerable = false;
+                }, 500); // 500ms cooldown to avoid instant life drain
+            }
             return;
         }
 
