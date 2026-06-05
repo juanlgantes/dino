@@ -25,6 +25,7 @@ import { SnakeGame } from "../games/SnakeGame.js";
 import { RoboticsGame } from "../games/RoboticsGame.js";
 import { RoomGame } from "../games/RoomGame.js";
 import { BreatheGame } from "../games/BreatheGame.js";
+import { NumberTraceGame } from "../games/NumberTraceGame.js";
 
 export const ACTIVITIES_DATA = {
   aventura: {
@@ -477,6 +478,15 @@ export const ACTIVITIES_DATA = {
     theme: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
     cost: 10,
   },
+  number_trace: {
+    title: "✍️ Trazar Números",
+    description: "¡Aprende a escribir con trazos suaves!",
+    type: "number_trace",
+    class: NumberTraceGame,
+    icon: "✍️",
+    theme: "linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)",
+    cost: 10,
+  },
   recycling: {
     title: "♻️ Reciclaje",
     description: "¡Cuida el planeta!",
@@ -533,4 +543,5 @@ export const ARCADE_KEYS = [
   "arkanoid",
   "recycling",
   "snake",
+  "number_trace",
 ];
