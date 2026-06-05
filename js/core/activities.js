@@ -25,7 +25,7 @@ import { SnakeGame } from "../games/SnakeGame.js";
 import { RoboticsGame } from "../games/RoboticsGame.js";
 import { RoomGame } from "../games/RoomGame.js";
 import { BreatheGame } from "../games/BreatheGame.js";
-import { NumberTraceGame } from "../games/NumberTraceGame.js";
+import { NumberTraceGame } from "../games/NumberTraceGame.js?v=3";
 
 export const ACTIVITIES_DATA = {
   aventura: {

@@ -1,4 +1,4 @@
-import { ACTIVITIES_DATA, ARCADE_KEYS } from "./activities.js";
+import { ACTIVITIES_DATA, ARCADE_KEYS } from "./activities.js?v=3";
 import { Navigation } from "./Navigation.js";
 import { AudioEngine } from "./AudioEngine.js";
 import { ParentalGate } from "./ParentalGate.js";
